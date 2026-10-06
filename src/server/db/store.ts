@@ -17,9 +17,10 @@ import * as postgresDriver from "./drivers/postgres";
 export function activeStore(): "postgres" | "json" {
   const forced = process.env["HEAL_CONNECT_STORE"];
   if (forced === "json" || forced === "postgres") return forced;
+  // The edge runtime reaches Postgres through the service-role API, so those
+  // two values are what actually enable the Postgres driver.
   const hasApi = Boolean(process.env["SUPABASE_URL"] && process.env["SUPABASE_SERVICE_ROLE_KEY"]);
-  const hasUrl = Boolean(process.env["DATABASE_URL"] || process.env["SUPABASE_DB_URL"]);
-  return hasApi || (hasUrl && hasApi) ? "postgres" : "json";
+  return hasApi ? "postgres" : "json";
 }
 
 function driver(): StoreDriver {
