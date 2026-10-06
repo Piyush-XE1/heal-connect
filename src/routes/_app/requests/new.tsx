@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, HeartHandshake, ShieldCheck } from "lucide-react";
 import { z } from "zod";
 
@@ -29,7 +29,6 @@ export const Route = createFileRoute("/_app/requests/new")({
 
 function NewRequestPage() {
   const { urgency } = Route.useSearch();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   return (
@@ -67,10 +66,7 @@ function NewRequestPage() {
           area: user?.profile.area ?? "",
           ...(urgency ? { urgency: urgency as Urgency } : {}),
         }}
-        onSubmitted={(result) => {
-          void navigate({ to: "/requests/$requestId", params: { requestId: result.id } });
-        }}
-        onCancel={() => void navigate({ to: "/requests/new" })}
+        onCancel={() => window.history.back()}
       />
     </div>
   );

@@ -5,9 +5,11 @@ import {
   Check,
   ClipboardList,
   Droplet,
+  FileText,
   MapPin,
   Pencil,
   Plus,
+  Send,
   Trash2,
   Undo2,
   Users,
@@ -72,6 +74,19 @@ function MyRequestsPage() {
     onError: (error) => toast.error("Could not update the request", { description: errorMessage(error) }),
   });
 
+  const publishMutation = useMutation({
+    mutationFn: async (id: string) => unwrapAction(await updateRequestStatus({ data: { id, status: "open" } })),
+    onSuccess: (_result, id) => {
+      toast.success("Draft published", {
+        description: "Matching donors nearby will be notified. You can track offers here.",
+      });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.myRequests });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      void queryClient.invalidateQueries({ queryKey: ["request", id] });
+    },
+    onError: (error) => toast.error("Could not publish the draft", { description: errorMessage(error) }),
+  });
+
   const renderList = (items: NonNullable<typeof data>["active"]) => (
     <ul className="space-y-4">
       {items.map((request) => (
@@ -112,10 +127,19 @@ function MyRequestsPage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Pill tone={request.pendingResponses > 0 ? "warning" : "neutral"}>
-              {request.pendingResponses} awaiting confirmation
-            </Pill>
-            <Pill tone="success">{request.acceptedResponses} accepted donors</Pill>
+            {request.status === "draft" ? (
+              <Pill tone="warning">
+                <FileText className="size-3.5" aria-hidden="true" />
+                Private draft — not visible to donors yet
+              </Pill>
+            ) : (
+              <>
+                <Pill tone={request.pendingResponses > 0 ? "warning" : "neutral"}>
+                  {request.pendingResponses} awaiting confirmation
+                </Pill>
+                <Pill tone="success">{request.acceptedResponses} accepted donors</Pill>
+              </>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-2 border-t border-border pt-4">
@@ -128,9 +152,25 @@ function MyRequestsPage() {
               <Button asChild size="sm" variant="ghost">
                 <Link to="/requests/$requestId/edit" params={{ requestId: request.id }}>
                   <Pencil className="size-4" aria-hidden="true" />
-                  Edit
+                  {request.status === "draft" ? "Continue editing" : "Edit"}
                 </Link>
               </Button>
+            ) : null}
+            {request.status === "draft" ? (
+              <ConfirmDialog
+                title="Publish this draft?"
+                description="Donors whose group, distance and availability match will be notified. You can still edit or cancel the request afterwards."
+                confirmLabel="Publish request"
+                onConfirm={async () => {
+                  await publishMutation.mutateAsync(request.id);
+                }}
+                trigger={
+                  <Button size="sm">
+                    <Send className="size-4" aria-hidden="true" />
+                    Publish
+                  </Button>
+                }
+              />
             ) : null}
             {request.status === "open" || request.status === "expired" ? (
               <ConfirmDialog
@@ -159,7 +199,7 @@ function MyRequestsPage() {
                 Reopen
               </Button>
             ) : null}
-            {request.status !== "cancelled" && request.status !== "removed" ? (
+            {request.status !== "cancelled" && request.status !== "removed" && request.status !== "draft" ? (
               <ConfirmDialog
                 title="Cancel this request?"
                 description="Donors who offered help will be notified that no further action is needed."
@@ -218,7 +258,7 @@ function MyRequestsPage() {
         />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <StatTile label="Active" value={data.active.length} icon={ClipboardList} />
             <StatTile
               label="Awaiting confirmation"
@@ -233,11 +273,13 @@ function MyRequestsPage() {
               tone="success"
             />
             <StatTile label="Closed requests" value={data.past.length} icon={Undo2} tone="neutral" />
+            <StatTile label="Drafts" value={data.drafts.length} icon={FileText} tone="warning" />
           </div>
 
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList>
               <TabsTrigger value="active">Active ({data.active.length})</TabsTrigger>
+              <TabsTrigger value="drafts">Drafts ({data.drafts.length})</TabsTrigger>
               <TabsTrigger value="past">Past ({data.past.length})</TabsTrigger>
             </TabsList>
             <TabsContent value="active" className="mt-4 space-y-4">
@@ -249,6 +291,22 @@ function MyRequestsPage() {
                 />
               ) : (
                 renderList(data.active)
+              )}
+            </TabsContent>
+            <TabsContent value="drafts" className="mt-4 space-y-4">
+              {data.drafts.length === 0 ? (
+                <EmptyState
+                  icon={FileText}
+                  title="No drafts"
+                  description="Drafts let you save a request before the hospital details are confirmed. Only you can see them until you publish."
+                />
+              ) : (
+                <>
+                  <InfoNote tone="info" title="Drafts are private">
+                    Nothing is visible to donors until you publish. Publishing notifies matching donors immediately.
+                  </InfoNote>
+                  {renderList(data.drafts)}
+                </>
               )}
             </TabsContent>
             <TabsContent value="past" className="mt-4 space-y-4">

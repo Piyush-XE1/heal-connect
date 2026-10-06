@@ -21,6 +21,7 @@ export const URGENCIES = ["normal", "urgent", "emergency"] as const;
 export type Urgency = (typeof URGENCIES)[number];
 
 export const REQUEST_STATUSES = [
+  "draft",
   "open",
   "in_progress",
   "fulfilled",

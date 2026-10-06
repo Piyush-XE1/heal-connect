@@ -63,6 +63,7 @@ export const URGENCY_RANK: Record<Urgency, number> = {
 };
 
 export const REQUEST_STATUS_LABELS: Record<RequestStatus, string> = {
+  draft: "Draft",
   open: "Open",
   in_progress: "In progress",
   fulfilled: "Fulfilled",
@@ -72,6 +73,7 @@ export const REQUEST_STATUS_LABELS: Record<RequestStatus, string> = {
 };
 
 export const REQUEST_STATUS_TONES: Record<RequestStatus, Tone> = {
+  draft: "neutral",
   open: "primary",
   in_progress: "info",
   fulfilled: "success",

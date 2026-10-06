@@ -106,9 +106,7 @@ function EditRequestPage() {
           contactInstructions: request.contact?.instructions ?? "",
           consent: true,
         }}
-        onSubmitted={() => {
-          void navigate({ to: "/requests/$requestId", params: { requestId } });
-        }}
+        isDraft={request.status === "draft"}
         onCancel={() => void navigate({ to: "/requests/$requestId", params: { requestId } })}
       />
     </div>

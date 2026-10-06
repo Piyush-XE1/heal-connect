@@ -244,6 +244,7 @@ await check("own profile includes donor details and completion", async () => {
 await check("own requests are split into active and past", async () => {
   const mine = unwrap((await call(api.requests.fetchMyRequests, { session: recipientSession })).value, "fetchMyRequests");
   assert(Array.isArray(mine.active) && Array.isArray(mine.past), `unexpected shape ${shape(mine)}`);
+  assert(Array.isArray(mine.drafts), `drafts bucket missing: ${shape(mine)}`);
   assert(mine.active.length > 0, "seeded recipient should have active requests");
   return `${mine.active.length} active · ${mine.past.length} past · total=${mine.total}`;
 });
@@ -409,6 +410,87 @@ await check("validation blocks an incomplete request", async () => {
   }
   assert(/unitsRequired|hospitalName|contactName|city/.test(rejected), `unexpected validation output: ${rejected}`);
   return "rejected with field-level detail";
+});
+
+await check("a draft is private until it is published", async () => {
+  const draft = unwrap(
+    (await call(api.requests.createRequestDraft, {
+      session: recipientSession,
+      data: {
+        requestType: "platelets",
+        bloodGroup: "B+",
+        unitsRequired: 1,
+        hospitalName: "Draft Test Clinic",
+        city: "Pune",
+        requiredBy: new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10),
+        urgency: "normal",
+        contactName: "Draft Tester",
+        contactPhone: "9876500000",
+      },
+    })).value,
+    "createRequestDraft",
+  );
+  assert(draft.id && draft.draft === true, `unexpected draft payload ${shape(draft)}`);
+
+  const mine = unwrap(
+    (await call(api.requests.fetchMyRequests, { session: recipientSession })).value,
+    "fetchMyRequests",
+  );
+  assert(mine.drafts.some((item) => item.id === draft.id), "draft missing from the owner's draft bucket");
+  assert(mine.active.every((item) => item.id !== draft.id), "draft leaked into the active bucket");
+
+  const donorView = unwrap(
+    (await call(api.requests.searchRequests, { session: donorSession, data: { q: "Draft Test Clinic" } })).value,
+    "searchRequests",
+  );
+  assert(!donorView.items.some((item) => item.id === draft.id), "draft leaked into donor discovery");
+
+  let hidden = false;
+  try {
+    const detail = await call(api.requests.fetchRequest, { session: donorSession, data: { id: draft.id } });
+    hidden = detail.value?.ok === false;
+  } catch (error) {
+    hidden = true;
+  }
+  assert(hidden, "another member could read a private draft");
+
+  let blocked = false;
+  try {
+    const offer = await call(api.responses.createDonorResponse, {
+      session: donorSession,
+      data: { requestId: draft.id, message: "Can help" },
+    });
+    blocked = offer.value?.ok === false;
+  } catch (error) {
+    blocked = true;
+  }
+  assert(blocked, "a donor could offer help on an unpublished draft");
+
+  const beforeCount = unwrap(
+    (await call(api.notifications.listNotifications, { session: donorSession, data: { filter: "all" } })).value,
+    "listNotifications",
+  ).total;
+
+  unwrap(
+    (await call(api.requests.updateRequestStatus, {
+      session: recipientSession,
+      data: { id: draft.id, status: "open" },
+    })).value,
+    "updateRequestStatus",
+  );
+
+  const after = unwrap(
+    (await call(api.requests.fetchRequest, { session: donorSession, data: { id: draft.id } })).value,
+    "fetchRequest",
+  );
+  assert(after.request.status === "open", `draft did not publish: ${after.request.status}`);
+
+  const donorNotifications = unwrap(
+    (await call(api.notifications.listNotifications, { session: donorSession, data: { filter: "all" } })).value,
+    "listNotifications",
+  );
+  assert(donorNotifications.total >= beforeCount, "notification list shrank unexpectedly");
+  return `${draft.id} published after staying private`;
 });
 
 await check("recipient publishes a request", async () => {

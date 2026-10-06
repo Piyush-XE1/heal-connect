@@ -8,10 +8,12 @@ import {
   Check,
   Droplet,
   Eye,
+  FileText,
   MapPin,
   Pencil,
   PhoneCall,
   RefreshCw,
+  Send,
   ShieldCheck,
   Siren,
   Trash2,
@@ -187,6 +189,31 @@ function RequestDetailPage() {
         </InfoNote>
       ) : null}
 
+      {request.status === "draft" ? (
+        <InfoNote tone="warning" icon={FileText} title="Private draft — not visible to donors">
+          Nothing has been shared yet. Publish the request when the hospital details are confirmed and matching
+          donors will be notified immediately.
+          {isOwner ? (
+            <div className="mt-3">
+              <ConfirmDialog
+                title="Publish this draft?"
+                description="Donors whose blood group, distance and availability match will be notified. You can still edit or cancel the request afterwards."
+                confirmLabel="Publish request"
+                onConfirm={async () => {
+                  await statusMutation.mutateAsync("open");
+                }}
+                trigger={
+                  <Button size="sm" disabled={statusMutation.isPending}>
+                    <Send className="size-4" aria-hidden="true" />
+                    Publish request
+                  </Button>
+                }
+              />
+            </div>
+          ) : null}
+        </InfoNote>
+      ) : null}
+
       {/* Header card */}
       <section
         className={`surface space-y-5 p-6 ${isEmergency ? "border-destructive/40" : ""}`}
@@ -292,7 +319,7 @@ function RequestDetailPage() {
               <Button asChild variant="outline">
                 <Link to="/requests/$requestId/edit" params={{ requestId: request.id }}>
                   <Pencil className="size-4" aria-hidden="true" />
-                  Edit request
+                  {request.status === "draft" ? "Continue editing" : "Edit request"}
                 </Link>
               </Button>
               {request.status === "open" || request.status === "expired" ? (
@@ -304,7 +331,7 @@ function RequestDetailPage() {
                   Mark in progress
                 </Button>
               ) : null}
-              {request.status !== "fulfilled" ? (
+              {request.status !== "fulfilled" && request.status !== "draft" ? (
                 <ConfirmDialog
                   title="Mark this request as fulfilled?"
                   description="Donors who offered help will be notified and their offers will be closed. You can reopen it later if needed."

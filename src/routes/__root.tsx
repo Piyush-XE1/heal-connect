@@ -157,7 +157,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const { user } = Route.useRouteContext() as { user: Awaited<ReturnType<typeof getSessionUser>> };
+  const { user } = Route.useRouteContext() as { user: Awaited<ReturnType<typeof fetchSession>> };
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -73,6 +73,8 @@ export const searchRequests = createServerFn({ method: "GET" })
       const status = effectiveStatus(row);
       if (!statusFilter.has(status)) return false;
       if (status === "removed" && !session?.isAdmin) return false;
+      // Drafts are private: only their author (or a moderator) can see them.
+      if (status === "draft" && row.requesterId !== session?.id && !session?.isAdmin) return false;
       if (data.bloodGroup && row.bloodGroup !== data.bloodGroup) return false;
       if (data.urgency && row.urgency !== data.urgency) return false;
       if (data.requestType && row.requestType !== data.requestType) return false;
@@ -153,7 +155,7 @@ export const fetchMatchedRequests = createServerFn({ method: "GET" })
     const viewer: ViewerContext = { userId: session.id, isAdmin: session.isAdmin, point: donor.point };
 
     const items = database.helpRequests
-      .filter((row) => OPEN_STATUSES.has(effectiveStatus(row)))
+      .filter((row) => OPEN_STATUSES.has(effectiveStatus(row)) && row.requesterId !== session.id)
       .map((row) => {
         const request = { ...row, status: effectiveStatus(row) };
         const match = scoreRequestForDonor(database, request, donor);
@@ -208,6 +210,9 @@ export const fetchRequest = createServerFn({ method: "GET" })
     const status = effectiveStatus(row);
     if (status === "removed" && !session?.isAdmin && session?.id !== row.requesterId) {
       throw notFound("This request was removed by moderators.");
+    }
+    if (status === "draft" && !session?.isAdmin && session?.id !== row.requesterId) {
+      throw notFound("This request is still a private draft.");
     }
 
     const donor = buildDonorContext(database, session?.id ?? null);
@@ -312,6 +317,62 @@ export const createRequest = createServerFn({ method: "POST" })
       });
 
       return { id: requestId, reference: result.reference, notifiedDonors: result.notified };
+    }),
+  );
+
+/**
+ * Drafts let a coordinator start a request and finish it later. Only the author
+ * (and moderators) can see a draft; publishing goes through
+ * `updateRequestStatus({ status: "open" })`, which notifies matching donors.
+ */
+export const createRequestDraft = createServerFn({ method: "POST" })
+  .validator(requestBaseSchema.partial())
+  .handler(async ({ data }) =>
+    action(async () => {
+      const session = await requireActiveUser();
+      const timestamp = nowIso();
+      const requestId = newId("req");
+      const city = data.city ?? session.profile.city ?? "";
+      const cityPoint = city ? cityCoordinates(city) : null;
+      const point = cityPoint ? offsetPoint(cityPoint, requestId, 7) : null;
+
+      const reference = await mutate((db) => {
+        sweepExpiredRequests(db);
+        db.counters.requestReference += 1;
+        const nextReference = `REQ-${db.counters.requestReference}`;
+
+        db.helpRequests.unshift({
+          id: requestId,
+          reference: nextReference,
+          requesterId: session.id,
+          requestType: data.requestType ?? "blood",
+          bloodGroup: data.requestType === "medical_assistance" ? null : (data.bloodGroup ?? null),
+          unitsRequired: data.unitsRequired ?? 1,
+          unitsFulfilled: 0,
+          hospitalName: data.hospitalName ?? "",
+          city,
+          area: data.area ? data.area : null,
+          approxLat: point ? roundCoord(point.lat) : null,
+          approxLng: point ? roundCoord(point.lng) : null,
+          requiredBy: data.requiredBy ?? new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+          urgency: data.urgency ?? "normal",
+          status: "draft",
+          additionalInfo: data.additionalInfo ? data.additionalInfo : null,
+          contactName: data.contactName ?? session.name,
+          contactPhone: data.contactPhone ?? session.profile.phone ?? "",
+          contactInstructions: data.contactInstructions ? data.contactInstructions : null,
+          isDemo: false,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+          resolvedAt: null,
+          moderationNote: null,
+          removedBy: null,
+        });
+
+        return nextReference;
+      });
+
+      return { id: requestId, reference, draft: true as const };
     }),
   );
 
@@ -472,7 +533,22 @@ export const updateRequestStatus = createServerFn({ method: "POST" })
           }
         }
 
-        if (data.status === "open" && previous !== "open") {
+        // Publishing a draft reaches out to matching donors for the first time.
+        if (data.status === "open" && previous === "draft") {
+          createNotification(db, {
+            userId: session.id,
+            type: "request_update",
+            title: `Request ${row.reference} is live`,
+            body:
+              row.urgency === "emergency"
+                ? "Your emergency request is published and highlighted to matching donors near you."
+                : "Your draft is published. We will notify matching donors nearby.",
+            link: `/requests/${row.id}`,
+          });
+          notifyMatchingDonors(db, row);
+        }
+
+        if (data.status === "open" && previous !== "open" && previous !== "draft") {
           for (const responder of responders) {
             createNotification(db, {
               userId: responder.donorId,
@@ -513,8 +589,9 @@ export const fetchMyRequests = createServerFn({ method: "GET" }).handler(async (
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   return {
+    drafts: rows.filter((row) => row.status === "draft"),
     active: rows.filter((row) => row.status === "open" || row.status === "in_progress"),
-    past: rows.filter((row) => row.status !== "open" && row.status !== "in_progress"),
+    past: rows.filter((row) => row.status !== "open" && row.status !== "in_progress" && row.status !== "draft"),
     total: rows.length,
   };
 });
