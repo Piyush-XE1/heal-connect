@@ -10,33 +10,345 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as SafetyRouteImport } from './routes/safety'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AppActivityRouteImport } from './routes/_app/activity'
+import { Route as AppAdminRouteImport } from './routes/_app/admin'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppFindHelpRouteImport } from './routes/_app/find-help'
+import { Route as AppMyRequestsRouteImport } from './routes/_app/my-requests'
+import { Route as AppNotificationsRouteImport } from './routes/_app/notifications'
+import { Route as AppProfileRouteImport } from './routes/_app/profile'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppVerifyRouteImport } from './routes/_app/verify'
+import { Route as AppDonorsIndexRouteImport } from './routes/_app/donors/index'
+import { Route as AppDonorsUserIdRouteImport } from './routes/_app/donors/$userId'
+import { Route as AppRequestsNewRouteImport } from './routes/_app/requests/new'
+import { Route as AppRequestsRequestIdIndexRouteImport } from './routes/_app/requests/$requestId/index'
+import { Route as AppRequestsRequestIdEditRouteImport } from './routes/_app/requests/$requestId/edit'
+import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google/callback'
+import { Route as ApiAuthGoogleStartRouteImport } from './routes/api/auth/google/start'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafetyRoute = SafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFindHelpRoute = AppFindHelpRouteImport.update({
+  id: '/find-help',
+  path: '/find-help',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMyRequestsRoute = AppMyRequestsRouteImport.update({
+  id: '/my-requests',
+  path: '/my-requests',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVerifyRoute = AppVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDonorsIndexRoute = AppDonorsIndexRouteImport.update({
+  id: '/donors/',
+  path: '/donors/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDonorsUserIdRoute = AppDonorsUserIdRouteImport.update({
+  id: '/donors/$userId',
+  path: '/donors/$userId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRequestsNewRoute = AppRequestsNewRouteImport.update({
+  id: '/requests/new',
+  path: '/requests/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRequestsRequestIdIndexRoute =
+  AppRequestsRequestIdIndexRouteImport.update({
+    id: '/requests/$requestId/',
+    path: '/requests/$requestId/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppRequestsRequestIdEditRoute =
+  AppRequestsRequestIdEditRouteImport.update({
+    id: '/requests/$requestId/edit',
+    path: '/requests/$requestId/edit',
+    getParentRoute: () => AppRoute,
+  } as any)
+const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
+  id: '/api/auth/google/callback',
+  path: '/api/auth/google/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthGoogleStartRoute = ApiAuthGoogleStartRouteImport.update({
+  id: '/api/auth/google/start',
+  path: '/api/auth/google/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/emergency': typeof EmergencyRoute
+  '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/safety': typeof SafetyRoute
+  '/terms': typeof TermsRoute
+  '/activity': typeof AppActivityRoute
+  '/admin': typeof AppAdminRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/find-help': typeof AppFindHelpRoute
+  '/my-requests': typeof AppMyRequestsRoute
+  '/notifications': typeof AppNotificationsRoute
+  '/profile': typeof AppProfileRoute
+  '/settings': typeof AppSettingsRoute
+  '/verify': typeof AppVerifyRoute
+  '/donors/$userId': typeof AppDonorsUserIdRoute
+  '/requests/new': typeof AppRequestsNewRoute
+  '/donors/': typeof AppDonorsIndexRoute
+  '/requests/$requestId/edit': typeof AppRequestsRequestIdEditRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/auth/google/start': typeof ApiAuthGoogleStartRoute
+  '/requests/$requestId/': typeof AppRequestsRequestIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/emergency': typeof EmergencyRoute
+  '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/safety': typeof SafetyRoute
+  '/terms': typeof TermsRoute
+  '/activity': typeof AppActivityRoute
+  '/admin': typeof AppAdminRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/find-help': typeof AppFindHelpRoute
+  '/my-requests': typeof AppMyRequestsRoute
+  '/notifications': typeof AppNotificationsRoute
+  '/profile': typeof AppProfileRoute
+  '/settings': typeof AppSettingsRoute
+  '/verify': typeof AppVerifyRoute
+  '/donors/$userId': typeof AppDonorsUserIdRoute
+  '/requests/new': typeof AppRequestsNewRoute
+  '/donors': typeof AppDonorsIndexRoute
+  '/requests/$requestId/edit': typeof AppRequestsRequestIdEditRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/auth/google/start': typeof ApiAuthGoogleStartRoute
+  '/requests/$requestId': typeof AppRequestsRequestIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/emergency': typeof EmergencyRoute
+  '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
+  '/register': typeof RegisterRoute
+  '/safety': typeof SafetyRoute
+  '/terms': typeof TermsRoute
+  '/_app/activity': typeof AppActivityRoute
+  '/_app/admin': typeof AppAdminRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/find-help': typeof AppFindHelpRoute
+  '/_app/my-requests': typeof AppMyRequestsRoute
+  '/_app/notifications': typeof AppNotificationsRoute
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/verify': typeof AppVerifyRoute
+  '/_app/donors/$userId': typeof AppDonorsUserIdRoute
+  '/_app/requests/new': typeof AppRequestsNewRoute
+  '/_app/donors/': typeof AppDonorsIndexRoute
+  '/_app/requests/$requestId/edit': typeof AppRequestsRequestIdEditRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/auth/google/start': typeof ApiAuthGoogleStartRoute
+  '/_app/requests/$requestId/': typeof AppRequestsRequestIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/emergency'
+    | '/faq'
+    | '/login'
+    | '/onboarding'
+    | '/privacy'
+    | '/register'
+    | '/safety'
+    | '/terms'
+    | '/activity'
+    | '/admin'
+    | '/dashboard'
+    | '/find-help'
+    | '/my-requests'
+    | '/notifications'
+    | '/profile'
+    | '/settings'
+    | '/verify'
+    | '/donors/$userId'
+    | '/requests/new'
+    | '/donors/'
+    | '/requests/$requestId/edit'
+    | '/api/auth/google/callback'
+    | '/api/auth/google/start'
+    | '/requests/$requestId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/emergency'
+    | '/faq'
+    | '/login'
+    | '/onboarding'
+    | '/privacy'
+    | '/register'
+    | '/safety'
+    | '/terms'
+    | '/activity'
+    | '/admin'
+    | '/dashboard'
+    | '/find-help'
+    | '/my-requests'
+    | '/notifications'
+    | '/profile'
+    | '/settings'
+    | '/verify'
+    | '/donors/$userId'
+    | '/requests/new'
+    | '/donors'
+    | '/requests/$requestId/edit'
+    | '/api/auth/google/callback'
+    | '/api/auth/google/start'
+    | '/requests/$requestId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/emergency'
+    | '/faq'
+    | '/login'
+    | '/onboarding'
+    | '/privacy'
+    | '/register'
+    | '/safety'
+    | '/terms'
+    | '/_app/activity'
+    | '/_app/admin'
+    | '/_app/dashboard'
+    | '/_app/find-help'
+    | '/_app/my-requests'
+    | '/_app/notifications'
+    | '/_app/profile'
+    | '/_app/settings'
+    | '/_app/verify'
+    | '/_app/donors/$userId'
+    | '/_app/requests/new'
+    | '/_app/donors/'
+    | '/_app/requests/$requestId/edit'
+    | '/api/auth/google/callback'
+    | '/api/auth/google/start'
+    | '/_app/requests/$requestId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  EmergencyRoute: typeof EmergencyRoute
+  FaqRoute: typeof FaqRoute
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RegisterRoute: typeof RegisterRoute
+  SafetyRoute: typeof SafetyRoute
+  TermsRoute: typeof TermsRoute
+  ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
+  ApiAuthGoogleStartRoute: typeof ApiAuthGoogleStartRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +360,233 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safety': {
+      id: '/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof SafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/activity': {
+      id: '/_app/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/find-help': {
+      id: '/_app/find-help'
+      path: '/find-help'
+      fullPath: '/find-help'
+      preLoaderRoute: typeof AppFindHelpRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/my-requests': {
+      id: '/_app/my-requests'
+      path: '/my-requests'
+      fullPath: '/my-requests'
+      preLoaderRoute: typeof AppMyRequestsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/verify': {
+      id: '/_app/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof AppVerifyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/donors/': {
+      id: '/_app/donors/'
+      path: '/donors'
+      fullPath: '/donors/'
+      preLoaderRoute: typeof AppDonorsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/donors/$userId': {
+      id: '/_app/donors/$userId'
+      path: '/donors/$userId'
+      fullPath: '/donors/$userId'
+      preLoaderRoute: typeof AppDonorsUserIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/requests/new': {
+      id: '/_app/requests/new'
+      path: '/requests/new'
+      fullPath: '/requests/new'
+      preLoaderRoute: typeof AppRequestsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/requests/$requestId/': {
+      id: '/_app/requests/$requestId/'
+      path: '/requests/$requestId'
+      fullPath: '/requests/$requestId/'
+      preLoaderRoute: typeof AppRequestsRequestIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/requests/$requestId/edit': {
+      id: '/_app/requests/$requestId/edit'
+      path: '/requests/$requestId/edit'
+      fullPath: '/requests/$requestId/edit'
+      preLoaderRoute: typeof AppRequestsRequestIdEditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/auth/google/callback': {
+      id: '/api/auth/google/callback'
+      path: '/api/auth/google/callback'
+      fullPath: '/api/auth/google/callback'
+      preLoaderRoute: typeof ApiAuthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/google/start': {
+      id: '/api/auth/google/start'
+      path: '/api/auth/google/start'
+      fullPath: '/api/auth/google/start'
+      preLoaderRoute: typeof ApiAuthGoogleStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppActivityRoute: typeof AppActivityRoute
+  AppAdminRoute: typeof AppAdminRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppFindHelpRoute: typeof AppFindHelpRoute
+  AppMyRequestsRoute: typeof AppMyRequestsRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppVerifyRoute: typeof AppVerifyRoute
+  AppDonorsUserIdRoute: typeof AppDonorsUserIdRoute
+  AppRequestsNewRoute: typeof AppRequestsNewRoute
+  AppDonorsIndexRoute: typeof AppDonorsIndexRoute
+  AppRequestsRequestIdEditRoute: typeof AppRequestsRequestIdEditRoute
+  AppRequestsRequestIdIndexRoute: typeof AppRequestsRequestIdIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppActivityRoute: AppActivityRoute,
+  AppAdminRoute: AppAdminRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppFindHelpRoute: AppFindHelpRoute,
+  AppMyRequestsRoute: AppMyRequestsRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppVerifyRoute: AppVerifyRoute,
+  AppDonorsUserIdRoute: AppDonorsUserIdRoute,
+  AppRequestsNewRoute: AppRequestsNewRoute,
+  AppDonorsIndexRoute: AppDonorsIndexRoute,
+  AppRequestsRequestIdEditRoute: AppRequestsRequestIdEditRoute,
+  AppRequestsRequestIdIndexRoute: AppRequestsRequestIdIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  EmergencyRoute: EmergencyRoute,
+  FaqRoute: FaqRoute,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
+  PrivacyRoute: PrivacyRoute,
+  RegisterRoute: RegisterRoute,
+  SafetyRoute: SafetyRoute,
+  TermsRoute: TermsRoute,
+  ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
+  ApiAuthGoogleStartRoute: ApiAuthGoogleStartRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

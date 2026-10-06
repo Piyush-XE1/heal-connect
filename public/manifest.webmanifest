@@ -1,0 +1,62 @@
+{
+  "id": "/?source=pwa",
+  "name": "Heal Connect — Give. Receive. Save lives.",
+  "short_name": "Heal Connect",
+  "description": "One platform connecting people who need legitimate medical donation assistance with donors who can help — blood, platelets and verified requests.",
+  "start_url": "/dashboard?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait-primary",
+  "background_color": "#F7FAF9",
+  "theme_color": "#0E8C86",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["health", "medical", "social"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Heal Connect dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Find requests near me",
+      "short_name": "Find help",
+      "description": "Browse open blood and platelet requests",
+      "url": "/find-help?source=shortcut",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Emergency requests",
+      "short_name": "Emergency",
+      "description": "See the latest emergency requests and what to do first",
+      "url": "/emergency?source=shortcut",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Raise a request",
+      "short_name": "Request help",
+      "description": "Create a blood, platelet or medical assistance request",
+      "url": "/requests/new?source=shortcut",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Notifications",
+      "short_name": "Alerts",
+      "description": "Matching requests, donor offers and updates",
+      "url": "/notifications?source=shortcut",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}
