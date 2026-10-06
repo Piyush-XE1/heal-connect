@@ -1,4 +1,4 @@
-import { EMPTY_DATABASE, type Database } from "./types";
+import { EMPTY_DATABASE, type Database } from "../types";
 
 /**
  * Lightweight persistence adapter.
@@ -13,8 +13,12 @@ import { EMPTY_DATABASE, type Database } from "./types";
  */
 
 const SCHEMA_VERSION = 1;
-const DATA_DIR = process.env["HEAL_CONNECT_DATA_DIR"] ?? ".data";
-const DATA_FILE = `${DATA_DIR}/heal-connect-db.json`;
+function dataDir(): string {
+  return process.env["HEAL_CONNECT_DATA_DIR"] ?? ".data";
+}
+function dataFile(): string {
+  return `${dataDir()}/heal-connect-db.json`;
+}
 
 type FsModule = typeof import("node:fs/promises");
 
@@ -62,7 +66,7 @@ async function readFromDisk(): Promise<Database | null> {
   const fs = await loadFs();
   if (!fs) return null;
   try {
-    const contents = await fs.readFile(DATA_FILE, "utf8");
+    const contents = await fs.readFile(dataFile(), "utf8");
     const parsed = JSON.parse(contents) as Partial<Database>;
     return normalize(parsed);
   } catch {
@@ -74,10 +78,10 @@ async function writeToDisk(database: Database): Promise<void> {
   const fs = await loadFs();
   if (!fs) return;
   try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    const tempFile = `${DATA_FILE}.tmp`;
+    await fs.mkdir(dataDir(), { recursive: true });
+    const tempFile = `${dataFile()}.tmp`;
     await fs.writeFile(tempFile, JSON.stringify(database, null, 2), "utf8");
-    await fs.rename(tempFile, DATA_FILE);
+    await fs.rename(tempFile, dataFile());
   } catch (error) {
     console.error("[heal-connect] failed to persist database", error);
   }
@@ -87,7 +91,7 @@ async function bootstrap(): Promise<Database> {
   const fromDisk = await readFromDisk();
   if (fromDisk) {
     if (!fromDisk.seeded) {
-      const { seedDemoData } = await import("./seed");
+      const { seedDemoData } = await import("../seed");
       await seedDemoData(fromDisk);
       await writeToDisk(fromDisk);
     }
@@ -95,7 +99,7 @@ async function bootstrap(): Promise<Database> {
   }
 
   const fresh = normalize({});
-  const { seedDemoData } = await import("./seed");
+  const { seedDemoData } = await import("../seed");
   await seedDemoData(fresh);
   await writeToDisk(fresh);
   return fresh;
@@ -122,10 +126,13 @@ export async function mutate<T>(fn: (database: Database) => T | Promise<T>): Pro
   let failure: unknown;
 
   writeQueue = writeQueue.then(async () => {
+    const backup = clone(database);
     try {
       result = await fn(database);
       await writeToDisk(database);
     } catch (error) {
+      // Roll back in memory so a failed action never leaves partial state.
+      Object.assign(database, backup);
       failure = error;
     }
   });
@@ -139,21 +146,6 @@ export async function mutate<T>(fn: (database: Database) => T | Promise<T>): Pro
 export async function snapshot(): Promise<Database> {
   const database = await getDb();
   return clone(database);
-}
-
-export function newId(prefix: string): string {
-  const random =
-    globalThis.crypto?.randomUUID?.() ??
-    `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
-  return `${prefix}_${random.replace(/-/g, "").slice(0, 22)}`;
-}
-
-export function nowIso(): string {
-  return new Date().toISOString();
-}
-
-export function isDemoEnvironment(): boolean {
-  return process.env["NODE_ENV"] !== "production";
 }
 
 /** Test helper: resets the in-process cache (used by unit tests). */
