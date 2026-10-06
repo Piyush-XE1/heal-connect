@@ -1,144 +1,42 @@
-import { EMPTY_DATABASE, type Database } from "./types";
+import type { StoreDriver } from "./store-contract";
+import type { Database } from "./types";
+import * as jsonDriver from "./drivers/json";
+import * as postgresDriver from "./drivers/postgres";
 
 /**
- * Lightweight persistence adapter.
+ * Storage facade. Picks the driver from configuration at call time:
  *
- * - In Node (local dev, preview, self-hosted) the database is written to a JSON
- *   file so data survives restarts.
- * - In environments without a filesystem (edge workers) it degrades to an
- *   in-memory database, so the app keeps working.
+ * - Postgres (Lovable Cloud) when SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are
+ *   set (DATABASE_URL / SUPABASE_DB_URL also opt in).
+ * - JSON file store otherwise — the zero-config default for local development.
+ * - HEAL_CONNECT_STORE=json|postgres forces a driver.
  *
- * All access goes through `getDb()` / `mutate()`, which means replacing this file
- * with a Postgres or Supabase client is a contained change.
+ * `src/server/api/*` only imports from this file, so nothing there changes.
  */
 
-const SCHEMA_VERSION = 1;
-const DATA_DIR = process.env["HEAL_CONNECT_DATA_DIR"] ?? ".data";
-const DATA_FILE = `${DATA_DIR}/heal-connect-db.json`;
-
-type FsModule = typeof import("node:fs/promises");
-
-let dbCache: Database | null = null;
-let loadPromise: Promise<Database> | null = null;
-let writeQueue: Promise<void> = Promise.resolve();
-let fsModule: FsModule | null | undefined;
-
-async function loadFs(): Promise<FsModule | null> {
-  if (fsModule !== undefined) return fsModule;
-  const isNode =
-    typeof process !== "undefined" &&
-    typeof process.versions !== "undefined" &&
-    Boolean(process.versions.node);
-  if (!isNode) {
-    fsModule = null;
-    return fsModule;
-  }
-  try {
-    // Built at runtime so bundlers never try to resolve the Node builtin
-    // statically. Must evaluate to "node:fs/promises".
-    const specifier = ["node", "fs/promises"].join(":");
-    fsModule = (await import(/* @vite-ignore */ specifier)) as FsModule;
-  } catch {
-    fsModule = null;
-  }
-  return fsModule;
+export function activeStore(): "postgres" | "json" {
+  const forced = process.env["HEAL_CONNECT_STORE"];
+  if (forced === "json" || forced === "postgres") return forced;
+  // The edge runtime reaches Postgres through the service-role API, so those
+  // two values are what actually enable the Postgres driver.
+  const hasApi = Boolean(process.env["SUPABASE_URL"] && process.env["SUPABASE_SERVICE_ROLE_KEY"]);
+  return hasApi ? "postgres" : "json";
 }
 
-function clone<T>(value: T): T {
-  return structuredClone(value);
+function driver(): StoreDriver {
+  return activeStore() === "postgres" ? postgresDriver : jsonDriver;
 }
 
-function normalize(raw: Partial<Database>): Database {
-  const merged: Database = {
-    ...EMPTY_DATABASE,
-    ...raw,
-    counters: { ...EMPTY_DATABASE.counters, ...(raw.counters ?? {}) },
-  };
-  merged.version = SCHEMA_VERSION;
-  return merged;
+export function getDb(): Promise<Database> {
+  return driver().getDb();
 }
 
-async function readFromDisk(): Promise<Database | null> {
-  const fs = await loadFs();
-  if (!fs) return null;
-  try {
-    const contents = await fs.readFile(DATA_FILE, "utf8");
-    const parsed = JSON.parse(contents) as Partial<Database>;
-    return normalize(parsed);
-  } catch {
-    return null;
-  }
+export function mutate<T>(fn: (database: Database) => T | Promise<T>): Promise<T> {
+  return driver().mutate(fn);
 }
 
-async function writeToDisk(database: Database): Promise<void> {
-  const fs = await loadFs();
-  if (!fs) return;
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    const tempFile = `${DATA_FILE}.tmp`;
-    await fs.writeFile(tempFile, JSON.stringify(database, null, 2), "utf8");
-    await fs.rename(tempFile, DATA_FILE);
-  } catch (error) {
-    console.error("[heal-connect] failed to persist database", error);
-  }
-}
-
-async function bootstrap(): Promise<Database> {
-  const fromDisk = await readFromDisk();
-  if (fromDisk) {
-    if (!fromDisk.seeded) {
-      const { seedDemoData } = await import("./seed");
-      await seedDemoData(fromDisk);
-      await writeToDisk(fromDisk);
-    }
-    return fromDisk;
-  }
-
-  const fresh = normalize({});
-  const { seedDemoData } = await import("./seed");
-  await seedDemoData(fresh);
-  await writeToDisk(fresh);
-  return fresh;
-}
-
-export async function getDb(): Promise<Database> {
-  if (dbCache) return dbCache;
-  if (!loadPromise) {
-    loadPromise = bootstrap().then((database) => {
-      dbCache = database;
-      return database;
-    });
-  }
-  return loadPromise;
-}
-
-/**
- * Serialises every mutation behind a promise chain so concurrent requests can
- * never interleave partial writes.
- */
-export async function mutate<T>(fn: (database: Database) => T | Promise<T>): Promise<T> {
-  const database = await getDb();
-  let result!: T;
-  let failure: unknown;
-
-  writeQueue = writeQueue.then(async () => {
-    try {
-      result = await fn(database);
-      await writeToDisk(database);
-    } catch (error) {
-      failure = error;
-    }
-  });
-
-  await writeQueue;
-  if (failure) throw failure;
-  return result;
-}
-
-/** Read-only snapshot (cloned) — safe for serialising into responses. */
-export async function snapshot(): Promise<Database> {
-  const database = await getDb();
-  return clone(database);
+export function snapshot(): Promise<Database> {
+  return driver().snapshot();
 }
 
 export function newId(prefix: string): string {
@@ -156,9 +54,8 @@ export function isDemoEnvironment(): boolean {
   return process.env["NODE_ENV"] !== "production";
 }
 
-/** Test helper: resets the in-process cache (used by unit tests). */
+/** Test helper: resets the in-process cache of both drivers. */
 export function __resetStoreForTests(): void {
-  dbCache = null;
-  loadPromise = null;
-  writeQueue = Promise.resolve();
+  jsonDriver.__resetStoreForTests();
+  postgresDriver.__resetStoreForTests();
 }

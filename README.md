@@ -110,3 +110,22 @@ and set `HEAL_CONNECT_DEMO_LOGIN=0` in production so demo sign-in is disabled.
 
 This project was built with [Lovable](https://lovable.dev) and continues to sync with the
 [Lovable editor](https://lovable.dev/projects/c3b03c47-3746-460e-8549-7f95e48c1177).
+
+## Storage: JSON file store vs Lovable Cloud (Postgres)
+
+All data access goes through `src/server/db/store.ts`, a small facade that picks a driver at call time:
+
+| Driver | When it is used | Where data lives |
+| --- | --- | --- |
+| Postgres (`src/server/db/drivers/postgres.ts`) | `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set (always true on the deployed app) | Lovable Cloud database |
+| JSON (`src/server/db/drivers/json.ts`) | Neither is set — zero-config local default | `.data/heal-connect-db.json` |
+
+Force one with `HEAL_CONNECT_STORE=json` or `HEAL_CONNECT_STORE=postgres`.
+
+- Schema: `supabase/migrations/20261006210000_heal_connect_schema.sql` (copy in `db/schema.sql`). All timestamps and dates are ISO-8601 UTC `text`.
+- Every table has RLS enabled with no policies; only the server (service-role key) can read or write.
+- Each `mutate()` is diffed and sent as one change set to the `heal_connect_apply` SQL function, which runs in a single transaction. If the action throws, nothing is written and the in-memory copy is discarded.
+- The edge runtime has no raw TCP, so the driver uses the service-role Data API rather than `pg`.
+- On first boot against an empty database the demo data in `src/server/db/seed.ts` is seeded unless `HEAL_CONNECT_SEED_DEMO=false`.
+
+See `.env.example` for every variable. Google sign-in needs `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`; register `<origin>/api/auth/google/callback` as an authorized redirect URI for every origin you use.
