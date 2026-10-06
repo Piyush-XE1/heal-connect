@@ -8,6 +8,7 @@ import {
   readOAuthState,
   sessionSecret,
 } from "@/server/auth/google";
+import { redirectResponse } from "@/server/auth/google";
 import { createSession } from "@/server/auth/session";
 import { getDb, mutate, newId, nowIso } from "@/server/db/store";
 import { verifyPayload } from "@/server/auth/crypto";
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/api/auth/google/callback")({
         const error = url.searchParams.get("error");
 
         const fail = (reason: string) =>
-          Response.redirect(`${origin}/login?error=${encodeURIComponent(reason)}`, 302);
+          redirectResponse(`${origin}/login?error=${encodeURIComponent(reason)}`, 302);
 
         if (error) return fail(error);
         if (!code || !state) return fail("google_missing_code");
@@ -124,7 +125,7 @@ export const Route = createFileRoute("/api/auth/google/callback")({
         const target = needsOnboarding
           ? `/onboarding?redirect=${encodeURIComponent(parsed.redirectTo)}`
           : parsed.redirectTo;
-        return Response.redirect(`${origin}${target}`, 302);
+        return redirectResponse(`${origin}${target}`, 302);
       },
     },
   },
