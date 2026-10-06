@@ -7,6 +7,7 @@ import {
   OAUTH_STATE_COOKIE,
   sessionSecret,
 } from "@/server/auth/google";
+import { redirectResponse } from "@/server/auth/google";
 import { randomToken, signPayload } from "@/server/auth/crypto";
 
 /** Sanitises the post-login redirect so it can never leave the site. */
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/api/auth/google/start")({
         const redirectTo = safeRedirect(url.searchParams.get("redirect"));
 
         if (!googleOAuthConfig().configured) {
-          return Response.redirect(
+          return redirectResponse(
             new URL(
               "/login?error=google_not_configured",
               `${url.protocol}//${url.host}`,
@@ -47,7 +48,7 @@ export const Route = createFileRoute("/api/auth/google/start")({
         const withState = new URL(authorizationUrl);
         withState.searchParams.set("state", state);
 
-        return Response.redirect(withState.toString(), 302);
+        return redirectResponse(withState.toString(), 302);
       },
     },
   },

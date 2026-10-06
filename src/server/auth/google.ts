@@ -146,3 +146,11 @@ export async function exchangeCodeForProfile(code: string): Promise<GoogleProfil
     emailVerified: Boolean(profile.email_verified),
   };
 }
+
+/**
+ * Mutable-header redirect. `Response.redirect()` returns immutable headers,
+ * which breaks when the session/state cookies are merged into the response.
+ */
+export function redirectResponse(location: string, status = 302): Response {
+  return new Response(null, { status, headers: { Location: location } });
+}
