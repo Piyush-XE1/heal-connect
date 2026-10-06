@@ -40,28 +40,83 @@ let cache: { db: Database; at: number } | null = null;
 let writeQueue: Promise<void> = Promise.resolve();
 let seedPromise: Promise<void> | null = null;
 /**
- * Sessions whose user was removed and is expected back with the same id (the
- * demo reset deletes then re-seeds deterministic demo accounts). Postgres
- * cascades would drop them, so they are re-attached once the user exists again.
+ * Rows whose parent was removed in one mutation and is expected back with the
+ * same id (the demo reset deletes and then re-seeds deterministic demo
+ * accounts, keeping their sessions and real records). Postgres cascades would
+ * drop such rows, so they are held here and re-attached once every parent
+ * exists again — matching the JSON store's behaviour.
  */
-let pendingSessions: Database["sessions"] = [];
+const REFS: { key: TableKey; cols: { col: string; parent: TableKey }[] }[] = [
+  { key: "profiles", cols: [{ col: "userId", parent: "users" }] },
+  { key: "donorProfiles", cols: [{ col: "userId", parent: "users" }] },
+  { key: "helpRequests", cols: [{ col: "requesterId", parent: "users" }] },
+  {
+    key: "donorResponses",
+    cols: [
+      { col: "requestId", parent: "helpRequests" },
+      { col: "donorId", parent: "users" },
+    ],
+  },
+  { key: "notifications", cols: [{ col: "userId", parent: "users" }] },
+  { key: "reports", cols: [{ col: "reporterId", parent: "users" }] },
+  { key: "verifications", cols: [{ col: "userId", parent: "users" }] },
+  {
+    key: "blocks",
+    cols: [
+      { col: "userId", parent: "users" },
+      { col: "blockedUserId", parent: "users" },
+    ],
+  },
+  { key: "sessions", cols: [{ col: "userId", parent: "users" }] },
+];
 
-function reattachSessions(database: Database): void {
-  const userIds = new Set(database.users.map((row) => row.id));
-  const present = new Set(database.sessions.map((row) => row.id));
-  const now = new Date().toISOString();
-  pendingSessions = pendingSessions.filter((row) => row.expiresAt > now);
-  const ready = pendingSessions.filter((row) => userIds.has(row.userId) && !present.has(row.id));
-  database.sessions.push(...ready);
-  pendingSessions = pendingSessions.filter((row) => !userIds.has(row.userId));
+let pending: Partial<Record<TableKey, Record<string, unknown>[]>> = {};
+
+function idsOf(database: Database, key: TableKey): Set<string> {
+  const pk = TABLES.find((t) => t.key === key)!.pk;
+  return new Set((database[key] as Record<string, unknown>[]).map((row) => String(row[pk])));
 }
 
-function holdOrphanSessions(database: Database): void {
-  const userIds = new Set(database.users.map((row) => row.id));
-  const orphans = database.sessions.filter((row) => !userIds.has(row.userId));
-  if (!orphans.length) return;
-  pendingSessions.push(...orphans);
-  database.sessions = database.sessions.filter((row) => userIds.has(row.userId));
+function reattachOrphans(database: Database): void {
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const ref of REFS) {
+      const held = pending[ref.key];
+      if (!held?.length) continue;
+      const pk = TABLES.find((t) => t.key === ref.key)!.pk;
+      const present = idsOf(database, ref.key);
+      const keep: Record<string, unknown>[] = [];
+      for (const row of held) {
+        const ok = ref.cols.every((c) => idsOf(database, c.parent).has(String(row[c.col])));
+        if (ok) {
+          if (!present.has(String(row[pk]))) {
+            (database[ref.key] as unknown[]).push(row);
+            changed = true;
+          }
+        } else keep.push(row);
+      }
+      pending[ref.key] = keep;
+    }
+  }
+}
+
+function holdOrphans(database: Database): void {
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const ref of REFS) {
+      const rows = database[ref.key] as Record<string, unknown>[];
+      const parents = ref.cols.map((c) => ({ c, ids: idsOf(database, c.parent) }));
+      const orphan = (row: Record<string, unknown>) =>
+        parents.some(({ c, ids }) => !ids.has(String(row[c.col])));
+      const orphans = rows.filter(orphan);
+      if (!orphans.length) continue;
+      pending[ref.key] = [...(pending[ref.key] ?? []), ...orphans];
+      (database[ref.key] as unknown[]) = rows.filter((row) => !orphan(row));
+      changed = true;
+    }
+  }
 }
 
 const toSnake = (key: string) => key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
@@ -191,8 +246,8 @@ export async function mutate<T>(fn: (database: Database) => T | Promise<T>): Pro
       const committed = await fresh();
       const before = structuredClone(committed);
       result = await fn(committed);
-      reattachSessions(committed);
-      holdOrphanSessions(committed);
+      reattachOrphans(committed);
+      holdOrphans(committed);
       try {
         await apply(diff(before, committed));
         cache = { db: committed, at: Date.now() };
@@ -220,5 +275,5 @@ export function __resetStoreForTests(): void {
   cache = null;
   writeQueue = Promise.resolve();
   seedPromise = null;
-  pendingSessions = [];
+  pending = {};
 }
