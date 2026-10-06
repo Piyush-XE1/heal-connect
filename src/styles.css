@@ -159,8 +159,8 @@
  .brand { font-size:26px; gap:7px; } .brand-mark { width:29px; height:29px; }
  .main-nav { display:none; }
  .livora-nav-button { font-size:11px; padding-inline:13px; height:38px; }
- .hero { min-height:724px; display:block; }
- .hero-inner { padding-block:40px 320px; }
+ .hero { min-height:690px; display:block; }
+ .hero-inner { padding-block:40px 270px; }
  .hero-photo { object-position:74% bottom; height:340px; top:auto; }
  .hero::after { background:var(--hero-mobile-overlay); }
  .hero h1 { font-size:40px; line-height:1.16; margin-top:20px; }
