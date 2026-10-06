@@ -60,7 +60,8 @@ export function RequestCard({
     <article
       className={cn(
         "surface surface-hover flex h-full flex-col gap-4 p-5",
-        isEmergency && "border-destructive/40 shadow-[0_0_0_1px_color-mix(in_oklab,var(--destructive)_18%,transparent)]",
+        isEmergency &&
+          "border-destructive/40 shadow-[0_0_0_1px_color-mix(in_oklab,var(--destructive)_18%,transparent)]",
         className,
       )}
     >
@@ -74,7 +75,9 @@ export function RequestCard({
       </header>
 
       <div className="space-y-2">
-        <h3 className="font-display text-lg leading-snug font-bold text-balance">{matchHeadline(item)}</h3>
+        <h3 className="font-display text-lg leading-snug font-bold text-balance">
+          {matchHeadline(item)}
+        </h3>
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Building2 className="size-4 shrink-0 text-primary" aria-hidden="true" />
           <span className="truncate">{item.hospitalName}</span>
@@ -94,14 +97,17 @@ export function RequestCard({
             {dueLabel(item.requiredBy)}
           </span>
           {item.distanceKm != null ? (
-            <span className="inline-flex items-center gap-1.5 text-xs">{formatDistance(item.distanceKm)}</span>
+            <span className="inline-flex items-center gap-1.5 text-xs">
+              {formatDistance(item.distanceKm)}
+            </span>
           ) : null}
         </div>
       </div>
 
       {!compact ? (
         <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-          {item.additionalInfo ?? "No additional notes were provided. Coordinate through the hospital blood bank."}
+          {item.additionalInfo ??
+            "No additional notes were provided. Coordinate through the hospital blood bank."}
         </p>
       ) : null}
 
@@ -118,19 +124,23 @@ export function RequestCard({
         {item.isDemo ? <DemoBadge /> : null}
       </div>
 
-      {showMatch && item.match && (item.match.cautions.length > 0 || item.match.breakdown.length > 0) ? (
+      {showMatch &&
+      item.match &&
+      (item.match.cautions.length > 0 || item.match.breakdown.length > 0) ? (
         <MatchDisclosure match={item.match} />
       ) : null}
 
       <footer className="mt-auto flex flex-wrap items-center gap-2 border-t border-border pt-4">
         {canRespond ? (
           <Button
-            className={cn("flex-1 sm:flex-none", isEmergency && "gradient-life text-white hover:opacity-95")}
+            className={cn(
+              "flex-1 sm:flex-none",
+              isEmergency && "gradient-life text-white hover:opacity-95",
+            )}
             onClick={() => onRespond?.(item)}
             disabled={!onRespond}
           >
-            <Heart className="size-4" aria-hidden="true" />
-            I can help
+            <Heart className="size-4" aria-hidden="true" />I can help
           </Button>
         ) : null}
 
@@ -147,9 +157,7 @@ export function RequestCard({
         ) : null}
 
         <Button asChild variant="ghost" className="rounded-full">
-          <Link {...detailHref}>
-            View details
-          </Link>
+          <Link {...detailHref}>View details</Link>
         </Button>
 
         {!item.isOwn ? (
@@ -180,7 +188,9 @@ export function MatchDisclosure({ match }: { match: MatchResult }) {
         <span className="inline-flex items-center gap-2">
           <MessageCircle className="size-4 text-primary" aria-hidden="true" />
           Why this is shown to you
-          <span className="text-xs font-normal text-muted-foreground">({match.score}/100 match score)</span>
+          <span className="text-xs font-normal text-muted-foreground">
+            ({match.score}/100 match score)
+          </span>
         </span>
         <ChevronDown className="size-4 transition group-open:rotate-180" aria-hidden="true" />
       </summary>
@@ -216,8 +226,9 @@ export function MatchDisclosure({ match }: { match: MatchResult }) {
         </ul>
       ) : null}
       <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-muted-foreground">
-        Match score is a relevance ranking only — it is not a medical decision. Compatibility, screening and
-        eligibility are confirmed by qualified medical professionals and the blood bank.
+        Match score is a relevance ranking only — it is not a medical decision. Compatibility,
+        screening and eligibility are confirmed by qualified medical professionals and the blood
+        bank.
       </p>
     </details>
   );

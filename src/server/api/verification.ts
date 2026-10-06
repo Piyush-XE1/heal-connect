@@ -31,7 +31,10 @@ export const fetchMyVerification = createServerFn({ method: "GET" }).handler(
     const profile = database.profiles.find((row) => row.userId === session.id);
     const requirements = [
       { label: "Full name on your account", met: Boolean(session.name && session.name.length > 1) },
-      { label: "City and area added to your profile", met: Boolean(profile?.city && profile?.area) },
+      {
+        label: "City and area added to your profile",
+        met: Boolean(profile?.city && profile?.area),
+      },
       { label: "A contact number saved privately", met: Boolean(profile?.phone) },
       { label: "Profile marked complete", met: session.onboardingComplete },
       {

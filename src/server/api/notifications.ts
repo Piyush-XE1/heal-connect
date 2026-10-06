@@ -27,9 +27,7 @@ export const listNotifications = createServerFn({ method: "GET" })
       .filter((row) => (data?.unreadOnly ? !row.readAt : true))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
-    const items: NotificationView[] = rows
-      .slice(0, data?.limit ?? 50)
-      .map(toNotificationView);
+    const items: NotificationView[] = rows.slice(0, data?.limit ?? 50).map(toNotificationView);
 
     return {
       items,
@@ -67,7 +65,9 @@ export const markNotifications = createServerFn({ method: "POST" })
           return markAllNotificationsRead(db, session.id);
         }
         if (!data.id) throw notFound("Nothing to update.");
-        const row = db.notifications.find((item) => item.id === data.id && item.userId === session.id);
+        const row = db.notifications.find(
+          (item) => item.id === data.id && item.userId === session.id,
+        );
         if (!row) throw notFound("Notification not found.");
         if (!row.readAt) {
           row.readAt = timestamp;

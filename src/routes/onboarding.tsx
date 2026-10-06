@@ -1,6 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, Check, Droplet, HeartHandshake, Loader2, MapPin, Phone, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Droplet,
+  HeartHandshake,
+  Loader2,
+  MapPin,
+  Phone,
+  Users,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -10,7 +20,13 @@ import { InfoNote, Pill, SuccessNote } from "@/components/common/primitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/components/providers/auth-provider";
 import { errorMessage, fieldErrors, unwrapAction } from "@/lib/actions";
@@ -19,17 +35,18 @@ import { BLOOD_GROUPS, type BloodGroup, type UserRole } from "@/lib/domain";
 import { areasForCity, cityOptions } from "@/lib/cities";
 import { queryKeys } from "@/lib/query-keys";
 import { completeOnboarding, fetchAuthConfig } from "@/server/api/auth";
+import { pageHead } from "@/lib/seo";
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 
 export const Route = createFileRoute("/onboarding")({
   validateSearch: (search) => searchSchema.parse(search),
-  head: () => ({
-    meta: [
-      { title: "Choose your role — Heal Connect" },
-      { name: "description", content: "Tell Heal Connect how you want to take part: donor, recipient, or both." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Choose your role — Heal Connect",
+      description: "Tell Heal Connect how you want to take part: donor, recipient, or both.",
+      noIndex: true,
+    }),
   component: OnboardingPage,
 });
 
@@ -52,7 +69,9 @@ function OnboardingPage() {
   const [city, setCity] = useState(user?.profile.city ?? "");
   const [area, setArea] = useState(user?.profile.area ?? "");
   const [phone, setPhone] = useState(user?.profile.phone ?? "");
-  const [bloodGroup, setBloodGroup] = useState<BloodGroup | "">(user?.donorProfile?.bloodGroup ?? "");
+  const [bloodGroup, setBloodGroup] = useState<BloodGroup | "">(
+    user?.donorProfile?.bloodGroup ?? "",
+  );
   const [availability, setAvailability] = useState<"available" | "on_hold" | "unavailable">(
     user?.donorProfile?.availability ?? "available",
   );
@@ -135,7 +154,9 @@ function OnboardingPage() {
             <li key={label} className="flex flex-1 items-center gap-2">
               <span
                 className={`grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold ${
-                  index <= step ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  index <= step
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
                 {index < step ? <Check className="size-3.5" aria-hidden="true" /> : index + 1}
@@ -147,14 +168,19 @@ function OnboardingPage() {
               >
                 {label}
               </span>
-              {index < lastStep ? <span className="h-px flex-1 bg-border" aria-hidden="true" /> : null}
+              {index < lastStep ? (
+                <span className="h-px flex-1 bg-border" aria-hidden="true" />
+              ) : null}
             </li>
           ))}
         </ol>
 
         <div className="surface mt-6 space-y-6 p-6 sm:p-8">
           {formError ? (
-            <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+            <div
+              role="alert"
+              className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive"
+            >
               {formError}
             </div>
           ) : null}
@@ -193,9 +219,13 @@ function OnboardingPage() {
                       <span>
                         <span className="flex items-center gap-2 font-display text-base font-bold">
                           {ROLE_LABELS[option]}
-                          {active ? <Check className="size-4 text-primary" aria-hidden="true" /> : null}
+                          {active ? (
+                            <Check className="size-4 text-primary" aria-hidden="true" />
+                          ) : null}
                         </span>
-                        <span className="mt-1 block text-sm text-muted-foreground">{ROLE_DESCRIPTIONS[option]}</span>
+                        <span className="mt-1 block text-sm text-muted-foreground">
+                          {ROLE_DESCRIPTIONS[option]}
+                        </span>
                       </span>
                     </button>
                   );
@@ -233,7 +263,9 @@ function OnboardingPage() {
                     ))}
                   </datalist>
                   {fieldErrorState["city"] ? (
-                    <p className="text-xs font-medium text-destructive">{fieldErrorState["city"]}</p>
+                    <p className="text-xs font-medium text-destructive">
+                      {fieldErrorState["city"]}
+                    </p>
                   ) : null}
                 </div>
                 <div className="space-y-2">
@@ -290,8 +322,8 @@ function OnboardingPage() {
                         Share my number when I am matched
                       </span>
                       <span className="mt-1 block text-xs text-muted-foreground">
-                        If you turn this off, coordinators can still reach you through the platform, but your number
-                        stays hidden. Recommended for most members.
+                        If you turn this off, coordinators can still reach you through the platform,
+                        but your number stays hidden. Recommended for most members.
                       </span>
                     </span>
                   </label>
@@ -306,14 +338,20 @@ function OnboardingPage() {
                 Donor details
               </h1>
               <p className="text-sm text-muted-foreground">
-                These details decide which requests we show you. They are not a medical screening — the blood bank
-                always confirms eligibility.
+                These details decide which requests we show you. They are not a medical screening —
+                the blood bank always confirms eligibility.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="bloodGroup">Blood group *</Label>
-                  <Select value={bloodGroup} onValueChange={(value) => setBloodGroup(value as BloodGroup)}>
-                    <SelectTrigger id="bloodGroup" aria-invalid={Boolean(fieldErrorState["bloodGroup"])}>
+                  <Select
+                    value={bloodGroup}
+                    onValueChange={(value) => setBloodGroup(value as BloodGroup)}
+                  >
+                    <SelectTrigger
+                      id="bloodGroup"
+                      aria-invalid={Boolean(fieldErrorState["bloodGroup"])}
+                    >
                       <SelectValue placeholder="Select group" />
                     </SelectTrigger>
                     <SelectContent>
@@ -335,7 +373,9 @@ function OnboardingPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {(Object.keys(AVAILABILITY_LABELS) as (keyof typeof AVAILABILITY_LABELS)[]).map((option) => (
+                      {(
+                        Object.keys(AVAILABILITY_LABELS) as (keyof typeof AVAILABILITY_LABELS)[]
+                      ).map((option) => (
                         <SelectItem key={option} value={option}>
                           {AVAILABILITY_LABELS[option]}
                         </SelectItem>
@@ -356,8 +396,8 @@ function OnboardingPage() {
                 </div>
               </div>
               <SuccessNote>
-                You can refine donation preferences, last donation date and travel distance later in your donor
-                profile.
+                You can refine donation preferences, last donation date and travel distance later in
+                your donor profile.
               </SuccessNote>
             </section>
           ) : null}
@@ -404,8 +444,8 @@ function OnboardingPage() {
           </div>
 
           <InfoNote tone="info" icon={MapPin} title="Not sure about your role?">
-            You can start as a recipient and add donor details later, or pick “Donor and Recipient” to see both
-            sides of the platform.
+            You can start as a recipient and add donor details later, or pick “Donor and Recipient”
+            to see both sides of the platform.
           </InfoNote>
         </div>
       </div>

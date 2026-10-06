@@ -4,9 +4,22 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { BLOOD_GROUPS, REQUEST_TYPES, URGENCIES, type BloodGroup, type RequestType, type Urgency } from "@/lib/domain";
+import {
+  BLOOD_GROUPS,
+  REQUEST_TYPES,
+  URGENCIES,
+  type BloodGroup,
+  type RequestType,
+  type Urgency,
+} from "@/lib/domain";
 import { REQUEST_TYPE_SHORT_LABELS, URGENCY_LABELS } from "@/lib/labels";
 import { cityOptions } from "@/lib/cities";
 import { cn } from "@/lib/utils";
@@ -71,7 +84,10 @@ function FilterFields({
       <div className="space-y-2 sm:col-span-2">
         <Label htmlFor="filter-q">Search</Label>
         <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
+          />
           <Input
             id="filter-q"
             value={filters.q}
@@ -86,7 +102,9 @@ function FilterFields({
         <Label htmlFor="filter-blood">Blood group</Label>
         <Select
           value={filters.bloodGroup || "any"}
-          onValueChange={(value) => onChange({ bloodGroup: value === "any" ? "" : (value as BloodGroup) })}
+          onValueChange={(value) =>
+            onChange({ bloodGroup: value === "any" ? "" : (value as BloodGroup) })
+          }
         >
           <SelectTrigger id="filter-blood">
             <SelectValue placeholder="Any group" />
@@ -106,7 +124,9 @@ function FilterFields({
         <Label htmlFor="filter-urgency">Urgency</Label>
         <Select
           value={filters.urgency || "any"}
-          onValueChange={(value) => onChange({ urgency: value === "any" ? "" : (value as Urgency) })}
+          onValueChange={(value) =>
+            onChange({ urgency: value === "any" ? "" : (value as Urgency) })
+          }
         >
           <SelectTrigger id="filter-urgency">
             <SelectValue placeholder="Any urgency" />
@@ -126,7 +146,9 @@ function FilterFields({
         <Label htmlFor="filter-type">Request type</Label>
         <Select
           value={filters.requestType || "any"}
-          onValueChange={(value) => onChange({ requestType: value === "any" ? "" : (value as RequestType) })}
+          onValueChange={(value) =>
+            onChange({ requestType: value === "any" ? "" : (value as RequestType) })
+          }
         >
           <SelectTrigger id="filter-type">
             <SelectValue placeholder="Any type" />
@@ -235,11 +257,15 @@ function FilterFields({
             disabled={locating}
           >
             <MapPin className="size-4" aria-hidden="true" />
-            {hasLocation ? "Refresh my location" : locating ? "Getting your location…" : "Use my location for distance"}
+            {hasLocation
+              ? "Refresh my location"
+              : locating
+                ? "Getting your location…"
+                : "Use my location for distance"}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Location is optional and only used to estimate distance. We round it to about a kilometre and never publish
-            it. Your exact address is never stored on requests.
+            Location is optional and only used to estimate distance. We round it to about a
+            kilometre and never publish it. Your exact address is never stored on requests.
           </p>
         </div>
       ) : null}

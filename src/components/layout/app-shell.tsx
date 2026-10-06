@@ -38,7 +38,13 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/components/providers/auth-provider";
 import { usePwa } from "@/components/providers/pwa-provider";
-import { BRAND, EMERGENCY_DISCLAIMER, MEDICAL_DISCLAIMER, ORGAN_DONATION_NOTICE, PAYMENT_PROHIBITION } from "@/lib/brand";
+import {
+  BRAND,
+  EMERGENCY_DISCLAIMER,
+  MEDICAL_DISCLAIMER,
+  ORGAN_DONATION_NOTICE,
+  PAYMENT_PROHIBITION,
+} from "@/lib/brand";
 import { initials, relativeTime } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
@@ -49,7 +55,8 @@ function useUnreadCount() {
   const { user } = useAuth();
   const { data } = useQuery({
     queryKey: queryKeys.notifications("unread"),
-    queryFn: async () => unwrapAction(await listNotifications({ data: { unreadOnly: true, limit: 20 } })),
+    queryFn: async () =>
+      unwrapAction(await listNotifications({ data: { unreadOnly: true, limit: 20 } })),
     enabled: Boolean(user),
     staleTime: 30_000,
     refetchInterval: 60_000,
@@ -123,10 +130,14 @@ function NotificationBell() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm font-semibold">{item.title}</p>
-                  {!item.read ? <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" /> : null}
+                  {!item.read ? (
+                    <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />
+                  ) : null}
                 </div>
                 <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{item.body}</p>
-                <p className="mt-1 text-[11px] text-muted-foreground">{relativeTime(item.createdAt)}</p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {relativeTime(item.createdAt)}
+                </p>
               </Link>
             ))
           ) : (
@@ -186,7 +197,8 @@ function UserMenu() {
     );
   }
 
-  const roleLabel = user.role === "donor" ? "Donor" : user.role === "recipient" ? "Recipient" : "Donor & Recipient";
+  const roleLabel =
+    user.role === "donor" ? "Donor" : user.role === "recipient" ? "Recipient" : "Donor & Recipient";
 
   return (
     <DropdownMenu>
@@ -203,7 +215,9 @@ function UserMenu() {
               {initials(user.name)}
             </span>
           )}
-          <span className="hidden max-w-28 truncate text-sm font-semibold sm:block">{user.name.split(" ")[0]}</span>
+          <span className="hidden max-w-28 truncate text-sm font-semibold sm:block">
+            {user.name.split(" ")[0]}
+          </span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
@@ -250,7 +264,10 @@ function UserMenu() {
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => void signOut()} className="text-destructive focus:text-destructive">
+        <DropdownMenuItem
+          onSelect={() => void signOut()}
+          className="text-destructive focus:text-destructive"
+        >
           <LogOut className="size-4" aria-hidden="true" /> Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -274,14 +291,18 @@ function DesktopNav() {
     <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
       {DESKTOP_LINKS.map((link) => {
         const target = link.to === "/dashboard" && !user ? "/login" : link.to;
-        const active = link.to === "/" ? location.pathname === "/" : location.pathname.startsWith(link.to);
+        const active =
+          link.to === "/" ? location.pathname === "/" : location.pathname.startsWith(link.to);
         return (
           <Link
             key={link.to}
             to={target}
+            aria-current={active ? "page" : undefined}
             className={cn(
               "rounded-full px-3.5 py-2 text-sm font-semibold transition",
-              active ? "bg-primary-soft text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              active
+                ? "bg-primary-soft text-primary"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
             {link.label}
@@ -291,6 +312,7 @@ function DesktopNav() {
       {user?.isAdmin ? (
         <Link
           to="/admin"
+          aria-current={location.pathname.startsWith("/admin") ? "page" : undefined}
           className={cn(
             "rounded-full px-3.5 py-2 text-sm font-semibold transition",
             location.pathname.startsWith("/admin")
@@ -329,7 +351,7 @@ function MobileBottomNav() {
               <Link
                 key={item.to}
                 to="/login"
-                className="flex flex-1 flex-col items-center gap-1 rounded-xl px-1 py-1.5 text-[11px] font-semibold text-muted-foreground"
+                className="flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-semibold text-muted-foreground"
               >
                 <item.icon className="size-5" aria-hidden="true" />
                 {item.label}
@@ -344,11 +366,14 @@ function MobileBottomNav() {
               to={item.to}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex flex-1 flex-col items-center gap-1 rounded-xl px-1 py-1.5 text-[11px] font-semibold transition",
+                "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-semibold transition",
                 active ? "text-primary" : "text-muted-foreground",
               )}
             >
-              <item.icon className={cn("size-5", active && "scale-110 transition-transform")} aria-hidden="true" />
+              <item.icon
+                className={cn("size-5", active && "scale-110 transition-transform")}
+                aria-hidden="true"
+              />
               {item.label}
             </Link>
           );
@@ -379,7 +404,8 @@ function OfflineBanner() {
 }
 
 export function InstallBanner() {
-  const { canInstall, installDismissed, dismissInstall, promptInstall, isIos, isStandalone } = usePwa();
+  const { canInstall, installDismissed, dismissInstall, promptInstall, isIos, isStandalone } =
+    usePwa();
   const [hidden, setHidden] = useState(false);
 
   if (hidden || isStandalone) return null;
@@ -469,7 +495,9 @@ export function SiteFooter() {
       <div className="page-shell grid gap-10 py-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-3">
           <Logo showTagline />
-          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">{BRAND.positioning}</p>
+          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+            {BRAND.positioning}
+          </p>
           <div className="flex flex-wrap gap-2 pt-1">
             <Pill tone="primary">
               <ShieldCheck className="size-3.5" aria-hidden="true" /> Privacy-first
@@ -554,8 +582,8 @@ export function SiteFooter() {
         <p>{ORGAN_DONATION_NOTICE}</p>
         <p>{PAYMENT_PROHIBITION}</p>
         <p className="pt-2">
-          © {new Date().getFullYear()} {BRAND.name}. Demo product build — legal pages are placeholders awaiting legal
-          review.
+          © {new Date().getFullYear()} {BRAND.name}. Demo product build — legal pages are
+          placeholders awaiting legal review.
         </p>
       </div>
     </footer>
@@ -581,7 +609,11 @@ export function AppShell({
       <SuspendedBanner />
       <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
         <div className="page-shell flex h-16 items-center justify-between gap-3">
-          <Link to={user ? "/dashboard" : "/"} className="flex items-center" aria-label={`${BRAND.name} home`}>
+          <Link
+            to={user ? "/dashboard" : "/"}
+            className="flex items-center"
+            aria-label={`${BRAND.name} home`}
+          >
             <Logo compact className="hidden sm:inline-flex" />
             <LogoMark className="sm:hidden" />
           </Link>

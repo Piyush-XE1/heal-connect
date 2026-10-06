@@ -71,7 +71,11 @@ export function ConfirmDialog({
           <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction
             disabled={pending}
-            className={destructive ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : undefined}
+            className={
+              destructive
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                : undefined
+            }
             onClick={async (event) => {
               event.preventDefault();
               setPending(true);
@@ -122,7 +126,8 @@ export function ReportDialog({
       ),
     onSuccess: () => {
       toast.success("Report sent", {
-        description: "Our trust & safety team will review this. Thank you for keeping the platform safe.",
+        description:
+          "Our trust & safety team will review this. Thank you for keeping the platform safe.",
       });
       setOpen(false);
       setDetails("");
@@ -140,7 +145,8 @@ export function ReportDialog({
         <DialogHeader>
           <DialogTitle>Report {targetType === "user" ? "a member" : "a request"}</DialogTitle>
           <DialogDescription>
-            Reports go to platform moderators only. Nothing is shared with the person you are reporting.
+            Reports go to platform moderators only. Nothing is shared with the person you are
+            reporting.
           </DialogDescription>
         </DialogHeader>
 
@@ -184,7 +190,9 @@ export function ReportDialog({
             onClick={() => mutation.mutate()}
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
+            {mutation.isPending ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            ) : null}
             {label} {targetType === "user" ? "member" : "request"}
           </Button>
         </DialogFooter>

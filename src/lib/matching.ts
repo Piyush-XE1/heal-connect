@@ -174,7 +174,9 @@ export function scoreMatch(
   }
 
   if (donor.availability === "unavailable") {
-    cautions.push("You are currently marked as not available. Update availability if that changed.");
+    cautions.push(
+      "You are currently marked as not available. Update availability if that changed.",
+    );
   }
 
   if (
@@ -204,7 +206,11 @@ export function scoreMatch(
   const breakdown: MatchBreakdownEntry[] = [
     { label: "Blood group", ...group, max: MATCHING_WEIGHTS.bloodGroup },
     { label: "Distance", ...distanceScore(resolvedDistance), max: MATCHING_WEIGHTS.distance },
-    { label: "Availability", ...availabilityScore(donor.availability), max: MATCHING_WEIGHTS.availability },
+    {
+      label: "Availability",
+      ...availabilityScore(donor.availability),
+      max: MATCHING_WEIGHTS.availability,
+    },
     { label: "Urgency", ...urgencyScore(request.urgency), max: MATCHING_WEIGHTS.urgency },
   ];
 

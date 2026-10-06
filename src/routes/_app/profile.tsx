@@ -31,11 +31,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/components/providers/auth-provider";
 import { AVAILABILITY_LABELS, ROLE_LABELS } from "@/lib/labels";
-import { AVAILABILITY_STATES, BLOOD_GROUPS, DONATION_PREFERENCES, type Availability, type BloodGroup } from "@/lib/domain";
+import {
+  AVAILABILITY_STATES,
+  BLOOD_GROUPS,
+  DONATION_PREFERENCES,
+  type Availability,
+  type BloodGroup,
+} from "@/lib/domain";
 import { PRIVACY_PROMISE } from "@/lib/brand";
 import { areasForCity, cityOptions, findCity } from "@/lib/cities";
 import { formatDate, formatFileSize, initials, todayIsoDate } from "@/lib/format";
@@ -43,18 +55,16 @@ import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, fieldErrors, unwrapAction } from "@/lib/actions";
 import { fetchMyProfile, updateDonorProfile, updateProfile } from "@/server/api/profile";
 import type { DonationPreference } from "@/lib/domain";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/profile")({
-  head: () => ({
-    meta: [
-      { title: "Donor profile — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Manage your donor profile: blood group, availability, donation preferences, travel distance and privacy settings.",
-      },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Donor profile — Heal Connect",
+      description:
+        "Manage your donor profile: blood group, availability, donation preferences, travel distance and privacy settings.",
+      noIndex: true,
+    }),
   component: ProfilePage,
 });
 
@@ -255,13 +265,21 @@ function ProfilePage() {
         <StatTile
           label="Blood group"
           value={session?.donorProfile?.bloodGroup ?? "Not set"}
-          hint={session?.donorProfile ? AVAILABILITY_LABELS[session.donorProfile.availability] : "Add donor details below"}
+          hint={
+            session?.donorProfile
+              ? AVAILABILITY_LABELS[session.donorProfile.availability]
+              : "Add donor details below"
+          }
           icon={Droplet}
           tone="blood"
         />
         <StatTile
           label="Last donation"
-          value={session?.donorProfile?.lastDonationDate ? formatDate(session.donorProfile.lastDonationDate) : "—"}
+          value={
+            session?.donorProfile?.lastDonationDate
+              ? formatDate(session.donorProfile.lastDonationDate)
+              : "—"
+          }
           hint="Used for interval reminders only"
           icon={CalendarClock}
           tone="info"
@@ -281,7 +299,11 @@ function ProfilePage() {
 
         <div className="flex flex-wrap items-center gap-4">
           {avatarUrl ? (
-            <img src={avatarUrl} alt="Your profile photo" className="size-20 rounded-3xl object-cover" />
+            <img
+              src={avatarUrl}
+              alt="Your profile photo"
+              className="size-20 rounded-3xl object-cover"
+            />
           ) : (
             <span className="grid size-20 place-items-center rounded-3xl bg-primary-soft font-display text-xl font-extrabold text-primary">
               {initials(name || "You")}
@@ -299,7 +321,12 @@ function ProfilePage() {
               }}
             />
             <div className="flex flex-wrap gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 <Camera className="size-4" aria-hidden="true" />
                 {avatarUrl ? "Change photo" : "Add photo"}
               </Button>
@@ -313,7 +340,9 @@ function ProfilePage() {
             <p className="text-xs text-muted-foreground">
               Stored with your account only. Images under 250 KB work best.
             </p>
-            {photoError ? <p className="text-xs font-medium text-destructive">{photoError}</p> : null}
+            {photoError ? (
+              <p className="text-xs font-medium text-destructive">{photoError}</p>
+            ) : null}
           </div>
         </div>
 
@@ -409,7 +438,11 @@ function ProfilePage() {
                 </SelectContent>
               </Select>
             ) : (
-              <Input id="profile-area" value={area} onChange={(event) => setArea(event.target.value)} />
+              <Input
+                id="profile-area"
+                value={area}
+                onChange={(event) => setArea(event.target.value)}
+              />
             )}
           </div>
           <div className="space-y-2 sm:col-span-2">
@@ -436,16 +469,18 @@ function ProfilePage() {
           <span>
             <span className="font-semibold">Share my contact number when I am matched</span>
             <span className="mt-1 block text-xs text-muted-foreground">
-              When off, coordinators can still reach you through the platform but your number stays hidden.
+              When off, coordinators can still reach you through the platform but your number stays
+              hidden.
             </span>
           </span>
         </label>
 
         {session?.profile.approxLat != null ? (
           <InfoNote tone="primary" icon={MapPin} title="Your stored location is coarse">
-            We keep approximately {session.profile.approxLat.toFixed(2)}, {session.profile.approxLng?.toFixed(2)} —
-            rounded to about a kilometre{findCity(city) ? ` around ${findCity(city)!.city}` : ""}. It is used for
-            distance ranking only and is never shown to anyone else.
+            We keep approximately {session.profile.approxLat.toFixed(2)},{" "}
+            {session.profile.approxLng?.toFixed(2)} — rounded to about a kilometre
+            {findCity(city) ? ` around ${findCity(city)!.city}` : ""}. It is used for distance
+            ranking only and is never shown to anyone else.
           </InfoNote>
         ) : null}
 
@@ -539,10 +574,13 @@ function ProfilePage() {
               aria-invalid={Boolean(donorErrors["lastDonationDate"])}
             />
             {donorErrors["lastDonationDate"] ? (
-              <p className="text-xs font-medium text-destructive">{donorErrors["lastDonationDate"]}</p>
+              <p className="text-xs font-medium text-destructive">
+                {donorErrors["lastDonationDate"]}
+              </p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                We only use this to remind you about donation intervals. The blood bank's rules always apply.
+                We only use this to remind you about donation intervals. The blood bank's rules
+                always apply.
               </p>
             )}
           </div>
@@ -596,7 +634,8 @@ function ProfilePage() {
               <p className="text-xs font-medium text-destructive">{donorErrors["preferences"]}</p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                Preferences influence matching only — the blood bank decides what you are eligible to donate.
+                Preferences influence matching only — the blood bank decides what you are eligible
+                to donate.
               </p>
             )}
           </fieldset>
@@ -625,8 +664,8 @@ function ProfilePage() {
             <span>
               <span className="font-semibold">Show me in the donor directory</span>
               <span className="mt-1 block text-xs text-muted-foreground">
-                Your name, area, blood group and availability are listed — never your phone number or address. Turning
-                this off stops new matched notifications too.
+                Your name, area, blood group and availability are listed — never your phone number
+                or address. Turning this off stops new matched notifications too.
               </span>
             </span>
           </label>

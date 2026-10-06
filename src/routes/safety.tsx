@@ -24,17 +24,16 @@ import {
   PRIVACY_PROMISE,
   SAFETY_RULES,
 } from "@/lib/brand";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/safety")({
   head: () => ({
-    meta: [
-      { title: "Safety & privacy guidelines — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "How Heal Connect protects donors and recipients: privacy by default, no payments, reporting and blocking, and clear medical boundaries.",
-      },
-    ],
+    ...pageHead({
+      title: "Safety & privacy guidelines — Heal Connect",
+      description:
+        "How Heal Connect protects donors and recipients: privacy by default, no payments, reporting and blocking, and clear medical boundaries.",
+      path: "/safety",
+    }),
   }),
   component: SafetyPage,
 });
@@ -145,7 +144,10 @@ function SafetyPage() {
           <ul className="space-y-2">
             {DONTS.map((item) => (
               <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
-                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
+                <AlertTriangle
+                  className="mt-0.5 size-4 shrink-0 text-destructive"
+                  aria-hidden="true"
+                />
                 {item}
               </li>
             ))}
@@ -154,10 +156,15 @@ function SafetyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-display text-xl font-extrabold">Safety rules shown inside the product</h2>
+        <h2 className="font-display text-xl font-extrabold">
+          Safety rules shown inside the product
+        </h2>
         <ul className="grid gap-2 sm:grid-cols-2">
           {SAFETY_RULES.map((rule) => (
-            <li key={rule} className="surface flex items-start gap-3 p-4 text-sm text-muted-foreground">
+            <li
+              key={rule}
+              className="surface flex items-start gap-3 p-4 text-sm text-muted-foreground"
+            >
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
               {rule}
             </li>

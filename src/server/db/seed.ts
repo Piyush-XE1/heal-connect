@@ -934,7 +934,10 @@ export async function seedDemoData(database: Database): Promise<void> {
               : null,
         reviewedBy: spec.verification === "pending" ? null : "usr_demo_admin",
         submittedAt: daysAgoIso(Math.max(1, spec.createdDaysAgo - 2), 9),
-        reviewedAt: spec.verification === "pending" ? null : daysAgoIso(Math.max(1, spec.createdDaysAgo - 3), 15),
+        reviewedAt:
+          spec.verification === "pending"
+            ? null
+            : daysAgoIso(Math.max(1, spec.createdDaysAgo - 3), 15),
         isDemo: true,
       });
     }

@@ -5,17 +5,16 @@ import { InfoNote, Pill } from "@/components/common/primitives";
 import { PublicPage } from "@/components/layout/public-page";
 import { Button } from "@/components/ui/button";
 import { BRAND, LEGAL_REVIEW_NOTICE, PAYMENT_PROHIBITION } from "@/lib/brand";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
-    meta: [
-      { title: "Terms & Conditions — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Terms and conditions for using Heal Connect. Draft content prepared for legal review before launch.",
-      },
-    ],
+    ...pageHead({
+      title: "Terms & Conditions — Heal Connect",
+      description:
+        "Terms and conditions for using Heal Connect. Draft content prepared for legal review before launch.",
+      path: "/terms",
+    }),
   }),
   component: TermsPage,
 });
@@ -129,7 +128,8 @@ function TermsPage() {
             Draft — pending legal review
           </Pill>
           <Pill tone="neutral">
-            Last updated {new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
+            Last updated{" "}
+            {new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
           </Pill>
         </>
       }
@@ -140,7 +140,9 @@ function TermsPage() {
       </InfoNote>
 
       <nav aria-label="Sections" className="surface p-5">
-        <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">On this page</p>
+        <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
+          On this page
+        </p>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {SECTIONS.map((section) => (
             <li key={section.id}>
@@ -160,13 +162,17 @@ function TermsPage() {
               {section.title}
             </h2>
             {section.body.map((paragraph) => (
-              <p key={paragraph.slice(0, 40)} className="text-sm leading-relaxed text-muted-foreground">
+              <p
+                key={paragraph.slice(0, 40)}
+                className="text-sm leading-relaxed text-muted-foreground"
+              >
                 {paragraph}
               </p>
             ))}
             {section.placeholder ? (
               <p className="rounded-xl border border-dashed border-border p-3 text-xs text-muted-foreground">
-                Reviewer note: confirm wording with legal counsel for your jurisdiction before launch.
+                Reviewer note: confirm wording with legal counsel for your jurisdiction before
+                launch.
               </p>
             ) : null}
           </section>

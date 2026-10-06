@@ -5,17 +5,16 @@ import { InfoNote, Pill } from "@/components/common/primitives";
 import { PublicPage } from "@/components/layout/public-page";
 import { Button } from "@/components/ui/button";
 import { BRAND, LEGAL_REVIEW_NOTICE, PRIVACY_PROMISE } from "@/lib/brand";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
-    meta: [
-      { title: "Privacy Policy — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "How Heal Connect collects, uses, protects and retains personal data. Draft content prepared for legal review.",
-      },
-    ],
+    ...pageHead({
+      title: "Privacy Policy — Heal Connect",
+      description:
+        "How Heal Connect collects, uses, protects and retains personal data. Draft content prepared for legal review.",
+      path: "/privacy",
+    }),
   }),
   component: PrivacyPage,
 });
@@ -44,11 +43,27 @@ const COLLECTED = [
 ];
 
 const VISIBILITY = [
-  { label: "Your name, area, city, blood group, availability, verified status", visible: "Visible to signed-in members" },
-  { label: "Your phone number", visible: "Only you, moderators, and a donor or requester whose match is confirmed (and only if you allow sharing)" },
-  { label: "Request contact details", visible: "Only the requester, moderators, and a donor whose offer the requester accepted" },
-  { label: "Your exact address or street location", visible: "Never collected on requests, never displayed" },
-  { label: "Your stored coordinates", visible: "Never displayed. Rounded to ~1 km and used only for distance ranking" },
+  {
+    label: "Your name, area, city, blood group, availability, verified status",
+    visible: "Visible to signed-in members",
+  },
+  {
+    label: "Your phone number",
+    visible:
+      "Only you, moderators, and a donor or requester whose match is confirmed (and only if you allow sharing)",
+  },
+  {
+    label: "Request contact details",
+    visible: "Only the requester, moderators, and a donor whose offer the requester accepted",
+  },
+  {
+    label: "Your exact address or street location",
+    visible: "Never collected on requests, never displayed",
+  },
+  {
+    label: "Your stored coordinates",
+    visible: "Never displayed. Rounded to ~1 km and used only for distance ranking",
+  },
   { label: "Your reports and blocks", visible: "Only you and platform moderators" },
 ];
 
@@ -128,7 +143,8 @@ function PrivacyPage() {
             Draft — pending legal review
           </Pill>
           <Pill tone="neutral">
-            Last updated {new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
+            Last updated{" "}
+            {new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
           </Pill>
         </>
       }
@@ -152,8 +168,9 @@ function PrivacyPage() {
           ))}
         </div>
         <InfoNote tone="primary" icon={Lock} title="What we never collect">
-          ID documents, medical reports, prescriptions, bank details, card details or payment information. If anyone asks
-          you for these on Heal Connect, report it immediately — legitimate coordination never needs them.
+          ID documents, medical reports, prescriptions, bank details, card details or payment
+          information. If anyone asks you for these on Heal Connect, report it immediately —
+          legitimate coordination never needs them.
         </InfoNote>
       </section>
 
@@ -194,7 +211,10 @@ function PrivacyPage() {
               {section.title}
             </h2>
             {section.body.map((paragraph) => (
-              <p key={paragraph.slice(0, 40)} className="text-sm leading-relaxed text-muted-foreground">
+              <p
+                key={paragraph.slice(0, 40)}
+                className="text-sm leading-relaxed text-muted-foreground"
+              >
                 {paragraph}
               </p>
             ))}
@@ -207,8 +227,8 @@ function PrivacyPage() {
         <a className="font-semibold underline" href={`mailto:${BRAND.supportEmail}`}>
           {BRAND.supportEmail}
         </a>{" "}
-        from your registered address. We remove your account, profile and contact details, and any open requests you
-        raised. Completed donation counts are kept anonymously for reporting.
+        from your registered address. We remove your account, profile and contact details, and any
+        open requests you raised. Completed donation counts are kept anonymously for reporting.
       </InfoNote>
     </PublicPage>
   );

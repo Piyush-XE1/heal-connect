@@ -143,7 +143,8 @@ export async function snapshot(): Promise<Database> {
 
 export function newId(prefix: string): string {
   const random =
-    globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+    globalThis.crypto?.randomUUID?.() ??
+    `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
   return `${prefix}_${random.replace(/-/g, "").slice(0, 22)}`;
 }
 

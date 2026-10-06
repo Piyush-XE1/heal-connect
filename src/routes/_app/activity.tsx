@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Activity, Bell, CheckCircle2, Droplet, Heart, History, MapPin, Trash2 } from "lucide-react";
+import {
+  Activity,
+  Bell,
+  CheckCircle2,
+  Droplet,
+  Heart,
+  History,
+  MapPin,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { ConfirmDialog } from "@/components/common/dialogs";
@@ -23,14 +32,15 @@ import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, unwrapAction } from "@/lib/actions";
 import { fetchMyActivity, withdrawResponse } from "@/server/api/responses";
 import type { DonorResponseView } from "@/lib/domain";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/activity")({
-  head: () => ({
-    meta: [
-      { title: "My activity — Heal Connect" },
-      { name: "description", content: "Offers you sent, their status, and your notification history." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "My activity — Heal Connect",
+      description: "Offers you sent, their status, and your notification history.",
+      noIndex: true,
+    }),
   component: ActivityPage,
 });
 
@@ -49,7 +59,8 @@ function ActivityPage() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.myActivity });
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error) => toast.error("Could not withdraw the offer", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not withdraw the offer", { description: errorMessage(error) }),
   });
 
   const renderOffer = (offer: DonorResponseView, showWithdraw: boolean) => (
@@ -60,7 +71,9 @@ function ActivityPage() {
           <ResponseStatusBadge status={offer.status} />
           <BloodGroupChip group={offer.requestBloodGroup} size="sm" />
         </div>
-        <span className="text-xs text-muted-foreground">Offered {relativeTime(offer.createdAt)}</span>
+        <span className="text-xs text-muted-foreground">
+          Offered {relativeTime(offer.createdAt)}
+        </span>
       </div>
 
       <div>
@@ -81,7 +94,9 @@ function ActivityPage() {
       </div>
 
       {offer.message ? (
-        <p className="rounded-xl bg-muted/50 p-3 text-sm text-muted-foreground">“{offer.message}”</p>
+        <p className="rounded-xl bg-muted/50 p-3 text-sm text-muted-foreground">
+          “{offer.message}”
+        </p>
       ) : null}
 
       {offer.status === "accepted" && offer.contact?.phone ? (
@@ -154,8 +169,18 @@ function ActivityPage() {
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatTile label="Active offers" value={data.stats.active} icon={Heart} tone="blood" />
-            <StatTile label="Awaiting confirmation" value={data.stats.pending} icon={Activity} tone="warning" />
-            <StatTile label="Accepted" value={data.stats.accepted} icon={CheckCircle2} tone="info" />
+            <StatTile
+              label="Awaiting confirmation"
+              value={data.stats.pending}
+              icon={Activity}
+              tone="warning"
+            />
+            <StatTile
+              label="Accepted"
+              value={data.stats.accepted}
+              icon={CheckCircle2}
+              tone="info"
+            />
             <StatTile
               label="Completed"
               value={data.stats.completed}
@@ -169,7 +194,9 @@ function ActivityPage() {
             <TabsList>
               <TabsTrigger value="offers">Active offers ({data.offers.length})</TabsTrigger>
               <TabsTrigger value="history">History ({data.history.length})</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications ({data.notifications.length})</TabsTrigger>
+              <TabsTrigger value="notifications">
+                Notifications ({data.notifications.length})
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="offers" className="mt-4">
@@ -185,7 +212,9 @@ function ActivityPage() {
                   }
                 />
               ) : (
-                <ul className="space-y-4">{data.offers.map((offer) => renderOffer(offer, true))}</ul>
+                <ul className="space-y-4">
+                  {data.offers.map((offer) => renderOffer(offer, true))}
+                </ul>
               )}
             </TabsContent>
 
@@ -197,7 +226,9 @@ function ActivityPage() {
                   description="Completed, declined and withdrawn offers are archived here."
                 />
               ) : (
-                <ul className="space-y-4">{data.history.map((offer) => renderOffer(offer, false))}</ul>
+                <ul className="space-y-4">
+                  {data.history.map((offer) => renderOffer(offer, false))}
+                </ul>
               )}
             </TabsContent>
 
@@ -214,7 +245,9 @@ function ActivityPage() {
                     <li key={notification.id} className="surface flex gap-4 p-4">
                       <span
                         className={`mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl ${
-                          notification.read ? "bg-muted text-muted-foreground" : "bg-primary-soft text-primary"
+                          notification.read
+                            ? "bg-muted text-muted-foreground"
+                            : "bg-primary-soft text-primary"
                         }`}
                       >
                         <Bell className="size-4" aria-hidden="true" />
@@ -230,7 +263,10 @@ function ActivityPage() {
                           {notification.link ? (
                             <>
                               {" · "}
-                              <Link to={notification.link} className="font-semibold text-primary hover:underline">
+                              <Link
+                                to={notification.link}
+                                className="font-semibold text-primary hover:underline"
+                              >
                                 Open
                               </Link>
                             </>
@@ -246,14 +282,14 @@ function ActivityPage() {
 
           {data.stats.completed > 0 ? (
             <InfoNote tone="success" title={`${formatUnits(data.stats.completed)} contributed`}>
-              Thank you. Donation counts are based on what coordinators recorded here — your official donation record
-              always lives with the blood bank or hospital.
+              Thank you. Donation counts are based on what coordinators recorded here — your
+              official donation record always lives with the blood bank or hospital.
             </InfoNote>
           ) : null}
 
           <InfoNote tone="info" title="What withdrawing means">
-            Withdrawing an offer removes you from the match and notifies the coordinator. If you are unwell or cannot
-            travel, withdrawing early is always better than not showing up.
+            Withdrawing an offer removes you from the match and notifies the coordinator. If you are
+            unwell or cannot travel, withdrawing early is always better than not showing up.
           </InfoNote>
         </>
       )}

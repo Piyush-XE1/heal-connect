@@ -12,7 +12,9 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "smoke": "node scripts/api-smoke.mjs"
+    "smoke": "node scripts/api-smoke.mjs",
+    "check:links": "node scripts/check-links.mjs",
+    "check": "npm run check:links && npm run smoke"
   },
   "overrides": {
     "rolldown": "1.2.1"

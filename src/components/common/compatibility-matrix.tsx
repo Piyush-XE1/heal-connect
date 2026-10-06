@@ -15,13 +15,16 @@ export function CompatibilityMatrix({ highlight }: { highlight?: BloodGroup | nu
       <div className="overflow-x-auto scroll-thin">
         <table className="w-full min-w-[34rem] border-separate border-spacing-0 text-sm">
           <caption className="sr-only">
-            General red-blood-cell compatibility: rows are donor blood groups, columns are recipient blood
-            groups. A tick means the donor group can often donate to that recipient group. The blood bank
-            always confirms the final match.
+            General red-blood-cell compatibility: rows are donor blood groups, columns are recipient
+            blood groups. A tick means the donor group can often donate to that recipient group. The
+            blood bank always confirms the final match.
           </caption>
           <thead>
             <tr>
-              <th scope="col" className="sticky left-0 bg-card p-2 text-left text-xs font-bold tracking-wide text-muted-foreground uppercase">
+              <th
+                scope="col"
+                className="sticky left-0 bg-card p-2 text-left text-xs font-bold tracking-wide text-muted-foreground uppercase"
+              >
                 Donor ↓ / Recipient →
               </th>
               {BLOOD_GROUPS.map((group) => (

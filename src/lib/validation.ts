@@ -96,40 +96,36 @@ export const onboardingSchema = z.object({
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 
 export const requestBaseSchema = z.object({
-    requestType: z.enum(REQUEST_TYPES, {
-      errorMap: () => ({ message: "Choose what kind of help is needed" }),
-    }),
-    bloodGroup: z.enum(BLOOD_GROUPS).optional().nullable(),
-    unitsRequired: z.coerce
-      .number({ invalid_type_error: "Enter the number of units" })
-      .int("Units must be a whole number")
-      .min(1, "At least 1 unit is required")
-      .max(20, "For more than 20 units, coordinate directly with the hospital blood bank"),
-    hospitalName: z
-      .string()
-      .trim()
-      .min(3, "Enter the hospital or blood bank name")
-      .max(120, "Hospital name is too long"),
-    city: citySchema,
-    area: areaSchema,
-    requiredBy: z
-      .string()
-      .trim()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the date help is needed")
-      .refine((value) => value >= todayIso(), "Choose today or a future date"),
-    urgency: z.enum(URGENCIES, { errorMap: () => ({ message: "Select the urgency" }) }),
-    additionalInfo: z
-      .string()
-      .trim()
-      .max(1000, "Keep the note under 1000 characters")
-      .optional(),
-    contactName: nameSchema,
-    contactPhone: phoneSchema,
-    contactInstructions: z
-      .string()
-      .trim()
-      .max(300, "Keep coordination notes under 300 characters")
-      .optional(),
+  requestType: z.enum(REQUEST_TYPES, {
+    errorMap: () => ({ message: "Choose what kind of help is needed" }),
+  }),
+  bloodGroup: z.enum(BLOOD_GROUPS).optional().nullable(),
+  unitsRequired: z.coerce
+    .number({ invalid_type_error: "Enter the number of units" })
+    .int("Units must be a whole number")
+    .min(1, "At least 1 unit is required")
+    .max(20, "For more than 20 units, coordinate directly with the hospital blood bank"),
+  hospitalName: z
+    .string()
+    .trim()
+    .min(3, "Enter the hospital or blood bank name")
+    .max(120, "Hospital name is too long"),
+  city: citySchema,
+  area: areaSchema,
+  requiredBy: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the date help is needed")
+    .refine((value) => value >= todayIso(), "Choose today or a future date"),
+  urgency: z.enum(URGENCIES, { errorMap: () => ({ message: "Select the urgency" }) }),
+  additionalInfo: z.string().trim().max(1000, "Keep the note under 1000 characters").optional(),
+  contactName: nameSchema,
+  contactPhone: phoneSchema,
+  contactInstructions: z
+    .string()
+    .trim()
+    .max(300, "Keep coordination notes under 300 characters")
+    .optional(),
   consent: z.literal(true, {
     errorMap: () => ({ message: "Please confirm the accuracy and consent statements" }),
   }),
@@ -148,7 +144,8 @@ export const requestSchema = requestBaseSchema.superRefine((value, ctx) => {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["additionalInfo"],
-      message: "For emergency requests, add a short note (ward, department or coordinating person).",
+      message:
+        "For emergency requests, add a short note (ward, department or coordinating person).",
     });
   }
 });

@@ -53,18 +53,16 @@ import { errorMessage, unwrapAction } from "@/lib/actions";
 import { updateRole } from "@/server/api/auth";
 import { unblockUser } from "@/server/api/safety";
 import { fetchBlockedUsers, fetchMyReports } from "@/server/api/safety";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/settings")({
-  head: () => ({
-    meta: [
-      { title: "Settings — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Manage your role, privacy, notifications, blocked accounts and the reports you have raised.",
-      },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Settings — Heal Connect",
+      description:
+        "Manage your role, privacy, notifications, blocked accounts and the reports you have raised.",
+      noIndex: true,
+    }),
   component: SettingsPage,
 });
 
@@ -148,11 +146,15 @@ function SettingsPage() {
         </h2>
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Name</dt>
+            <dt className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Name
+            </dt>
             <dd className="mt-1 text-sm font-semibold">{user.name}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Email</dt>
+            <dt className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Email
+            </dt>
             <dd className="mt-1 text-sm">{user.email}</dd>
           </div>
           <div>
@@ -162,7 +164,9 @@ function SettingsPage() {
             <dd className="mt-1 text-sm">{maskPhone(user.profile.phone)}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Member since</dt>
+            <dt className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Member since
+            </dt>
             <dd className="mt-1 text-sm">{formatDate(user.createdAt)}</dd>
           </div>
         </dl>
@@ -188,8 +192,8 @@ function SettingsPage() {
           {savedRole ? <SuccessNote>Role updated</SuccessNote> : null}
         </div>
         <p className="text-sm text-muted-foreground">
-          Changing your role changes which tools you see first. You can switch back whenever you like — it never deletes
-          your history.
+          Changing your role changes which tools you see first. You can switch back whenever you
+          like — it never deletes your history.
         </p>
         <div className="grid gap-3">
           {USER_ROLES.map((role) => {
@@ -202,7 +206,9 @@ function SettingsPage() {
                 aria-pressed={active}
                 onClick={() => setRoleDraft(role)}
                 className={`flex items-start gap-4 rounded-2xl border p-4 text-left transition ${
-                  active ? "border-primary bg-primary-soft" : "border-border bg-card hover:bg-accent/60"
+                  active
+                    ? "border-primary bg-primary-soft"
+                    : "border-border bg-card hover:bg-accent/60"
                 }`}
               >
                 <span
@@ -217,7 +223,9 @@ function SettingsPage() {
                     {ROLE_LABELS[role]}
                     {active ? <Check className="size-4 text-primary" aria-hidden="true" /> : null}
                   </span>
-                  <span className="mt-1 block text-xs text-muted-foreground">{ROLE_DESCRIPTIONS[role]}</span>
+                  <span className="mt-1 block text-xs text-muted-foreground">
+                    {ROLE_DESCRIPTIONS[role]}
+                  </span>
                 </span>
               </button>
             );
@@ -255,7 +263,8 @@ function SettingsPage() {
               checked={user.profile.sharePhoneWithMatches}
               onCheckedChange={(next) => {
                 toast.info(next ? "Enable in your profile" : "Update in your profile", {
-                  description: "Phone sharing is stored with your profile — open Donor profile to change it.",
+                  description:
+                    "Phone sharing is stored with your profile — open Donor profile to change it.",
                 });
               }}
               aria-label="Share phone when matched"
@@ -285,8 +294,8 @@ function SettingsPage() {
           </div>
         </div>
         <InfoNote tone="primary" icon={MapPin} title="Location">
-          {PRIVACY_PROMISE} Requests never carry a street address, and your stored coordinates are rounded to about a
-          kilometre.
+          {PRIVACY_PROMISE} Requests never carry a street address, and your stored coordinates are
+          rounded to about a kilometre.
         </InfoNote>
       </section>
 
@@ -297,12 +306,24 @@ function SettingsPage() {
         </h2>
         <div className="grid gap-3">
           {[
-            { label: "Matching requests near me", detail: "When a compatible request is posted in your area." },
-            { label: "Donor responses and updates", detail: "Offers, acceptances and withdrawals." },
+            {
+              label: "Matching requests near me",
+              detail: "When a compatible request is posted in your area.",
+            },
+            {
+              label: "Donor responses and updates",
+              detail: "Offers, acceptances and withdrawals.",
+            },
             { label: "Request status changes", detail: "Cancellations, fulfilments and edits." },
-            { label: "Verification decisions", detail: "When your verification is approved or needs attention." },
+            {
+              label: "Verification decisions",
+              detail: "When your verification is approved or needs attention.",
+            },
           ].map((row) => (
-            <div key={row.label} className="flex items-start justify-between gap-4 rounded-2xl border border-border p-4">
+            <div
+              key={row.label}
+              className="flex items-start justify-between gap-4 rounded-2xl border border-border p-4"
+            >
               <div>
                 <p className="text-sm font-semibold">{row.label}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{row.detail}</p>
@@ -321,8 +342,8 @@ function SettingsPage() {
           ))}
         </div>
         <InfoNote tone="info" icon={BellRing} title="Push notifications coming next">
-          Today you get in-app notifications, and the badge in the header updates automatically. Web push is scaffolded
-          behind the same service so this setting can control it once enabled.
+          Today you get in-app notifications, and the badge in the header updates automatically. Web
+          push is scaffolded behind the same service so this setting can control it once enabled.
         </InfoNote>
       </section>
 
@@ -350,7 +371,8 @@ function SettingsPage() {
                 const outcome = await promptInstall();
                 if (outcome === "unavailable") {
                   toast.info("Use your browser menu", {
-                    description: "Choose “Install app” or “Add to Home Screen” from the browser menu.",
+                    description:
+                      "Choose “Install app” or “Add to Home Screen” from the browser menu.",
                   });
                 }
               }}
@@ -397,7 +419,9 @@ function SettingsPage() {
                 >
                   <div>
                     <p className="text-sm font-semibold">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">Blocked {relativeTime(item.blockedAt)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Blocked {relativeTime(item.blockedAt)}
+                    </p>
                   </div>
                   <div className="flex gap-2">
                     <BlockUserButton userId={item.id} name={item.name} blocked />
@@ -416,7 +440,8 @@ function SettingsPage() {
             </ul>
           ) : (
             <p className="mt-2 text-xs text-muted-foreground">
-              You have not blocked anyone. Blocking hides each other's requests and offers instantly.
+              You have not blocked anyone. Blocking hides each other's requests and offers
+              instantly.
             </p>
           )}
         </div>
@@ -448,7 +473,9 @@ function SettingsPage() {
                     {REPORT_REASON_LABELS[report.reason]} · {relativeTime(report.createdAt)}
                   </p>
                   {report.resolutionNote ? (
-                    <p className="mt-1 text-xs text-muted-foreground">Reviewer note: {report.resolutionNote}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Reviewer note: {report.resolutionNote}
+                    </p>
                   ) : null}
                 </li>
               ))}
@@ -467,8 +494,8 @@ function SettingsPage() {
           Your data
         </h2>
         <p className="text-sm text-muted-foreground">
-          We store your account details, the profile fields you provide, and the requests and offers you make. We never
-          ask for ID documents, medical reports or bank details.
+          We store your account details, the profile fields you provide, and the requests and offers
+          you make. We never ask for ID documents, medical reports or bank details.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -487,7 +514,9 @@ function SettingsPage() {
                 profile: user.profile,
                 donorProfile: user.donorProfile,
               };
-              const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+              const blob = new Blob([JSON.stringify(payload, null, 2)], {
+                type: "application/json",
+              });
               const url = URL.createObjectURL(blob);
               const anchor = document.createElement("a");
               anchor.href = url;
@@ -514,19 +543,23 @@ function SettingsPage() {
           <a className="font-semibold underline" href={`mailto:${BRAND.supportEmail}`}>
             {BRAND.supportEmail}
           </a>{" "}
-          from your registered address and we will remove your account, profile and contact details. Requests you raised
-          are removed as well; fulfilled donation counts are kept anonymously for reporting.
+          from your registered address and we will remove your account, profile and contact details.
+          Requests you raised are removed as well; fulfilled donation counts are kept anonymously
+          for reporting.
         </InfoNote>
       </section>
 
       {/* Danger zone */}
-      <section className="surface space-y-3 border-destructive/30 p-6" aria-labelledby="danger-heading">
+      <section
+        className="surface space-y-3 border-destructive/30 p-6"
+        aria-labelledby="danger-heading"
+      >
         <h2 id="danger-heading" className="font-display text-lg font-extrabold text-destructive">
           Sign out everywhere
         </h2>
         <p className="text-sm text-muted-foreground">
-          Signing out clears your session cookie on this device. If you suspect your account was accessed by someone
-          else, sign out and contact support immediately.
+          Signing out clears your session cookie on this device. If you suspect your account was
+          accessed by someone else, sign out and contact support immediately.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="destructive" onClick={() => void signOut()}>

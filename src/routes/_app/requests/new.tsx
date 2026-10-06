@@ -7,6 +7,7 @@ import { RequestForm } from "@/components/requests/request-form";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/providers/auth-provider";
 import { URGENCIES, type Urgency } from "@/lib/domain";
+import { pageHead } from "@/lib/seo";
 
 const searchSchema = z.object({
   urgency: z.enum(URGENCIES).optional(),
@@ -14,16 +15,13 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_app/requests/new")({
   validateSearch: (search) => searchSchema.parse(search),
-  head: () => ({
-    meta: [
-      { title: "Request help — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Raise a blood, platelet or medical assistance request with clear urgency, hospital and coordination details.",
-      },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Request help — Heal Connect",
+      description:
+        "Raise a blood, platelet or medical assistance request with clear urgency, hospital and coordination details.",
+      noIndex: true,
+    }),
   component: NewRequestPage,
 });
 

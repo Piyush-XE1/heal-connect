@@ -24,7 +24,8 @@ function NotFoundComponent() {
         <p className="font-display text-6xl font-extrabold text-primary">404</p>
         <h1 className="mt-4 font-display text-2xl font-bold">We could not find that page</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          The link may be broken, or the request you were looking for may have been cancelled or resolved.
+          The link may be broken, or the request you were looking for may have been cancelled or
+          resolved.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Button asChild>

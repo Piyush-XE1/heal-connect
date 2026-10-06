@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, BadgeCheck, CalendarClock, Droplet, Lock, MapPin, ShieldCheck, UserRound } from "lucide-react";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  CalendarClock,
+  Droplet,
+  Lock,
+  MapPin,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { BlockUserButton, ReportButton } from "@/components/common/dialogs";
@@ -25,11 +34,16 @@ import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, unwrapAction } from "@/lib/actions";
 import { fetchPublicProfile, updateLocation } from "@/server/api/profile";
 import { fetchMyBlockStatus } from "@/server/api/safety";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/donors/$userId")({
-  head: () => ({
-    meta: [{ title: "Donor profile — Heal Connect" }],
-  }),
+  head: () =>
+    pageHead({
+      title: "Donor profile — Heal Connect",
+      description:
+        "Public donor summary with blood group, city, availability and verification status. Contact details and exact locations are never public.",
+      noIndex: true,
+    }),
   component: DonorProfilePage,
 });
 
@@ -108,7 +122,10 @@ function DonorProfilePage() {
         ) : null}
       </div>
 
-      <PageHeader title={data.name} description={data.bio ?? "This member has not added an introduction yet."}>
+      <PageHeader
+        title={data.name}
+        description={data.bio ?? "This member has not added an introduction yet."}
+      >
         <div className="flex flex-wrap items-center gap-2">
           <VerificationBadge status={data.verificationStatus} />
           <AvailabilityBadge availability={data.availability} />
@@ -130,21 +147,37 @@ function DonorProfilePage() {
             <div>
               <p className="flex items-center gap-2 font-display text-lg font-bold">
                 <UserRound className="size-4 text-primary" aria-hidden="true" />
-                {data.role === "donor" ? "Donor" : data.role === "recipient" ? "Recipient" : "Donor & Recipient"}
+                {data.role === "donor"
+                  ? "Donor"
+                  : data.role === "recipient"
+                    ? "Recipient"
+                    : "Donor & Recipient"}
               </p>
               <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="size-4 text-primary" aria-hidden="true" />
                 {[data.area, data.city].filter(Boolean).join(", ") || "Location not shared"}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">Member since {formatDate(data.memberSince)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Member since {formatDate(data.memberSince)}
+              </p>
             </div>
           </div>
           <BloodGroupChip group={data.bloodGroup} size="lg" />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          <StatTile label="Completed donations" value={data.completedDonations} icon={Droplet} tone="blood" />
-          <StatTile label="Active requests" value={data.activeRequests} icon={CalendarClock} tone="primary" />
+          <StatTile
+            label="Completed donations"
+            value={data.completedDonations}
+            icon={Droplet}
+            tone="blood"
+          />
+          <StatTile
+            label="Active requests"
+            value={data.activeRequests}
+            icon={CalendarClock}
+            tone="primary"
+          />
           <StatTile
             label="Last donation"
             value={data.lastDonationDate ? formatDate(data.lastDonationDate) : "—"}
@@ -155,9 +188,9 @@ function DonorProfilePage() {
 
         {data.organizationType && data.organizationType !== "individual_donor" ? (
           <InfoNote tone="info" icon={BadgeCheck} title="Organisation account">
-            This account is registered as {data.organizationType.replace(/_/g, " ")} — verified information reviewed by
-            our trust &amp; safety team. Organisation accounts can be hospitals, blood banks, NGOs or patient support
-            groups.
+            This account is registered as {data.organizationType.replace(/_/g, " ")} — verified
+            information reviewed by our trust &amp; safety team. Organisation accounts can be
+            hospitals, blood banks, NGOs or patient support groups.
           </InfoNote>
         ) : null}
       </section>
@@ -169,8 +202,9 @@ function DonorProfilePage() {
         <div className="surface space-y-3 p-5">
           <h2 className="font-display text-sm font-bold">Need this donor's help?</h2>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Raise a request with the hospital and requirement details. Matching donors are notified automatically, and
-            they can offer to help. Direct messaging is intentionally not available before a match.
+            Raise a request with the hospital and requirement details. Matching donors are notified
+            automatically, and they can offer to help. Direct messaging is intentionally not
+            available before a match.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button asChild>

@@ -2,19 +2,11 @@
 
 Create a modern, premium landing page for a medical donation and assistance platform.
 
-
-
 The concept: users can become Donors or Recipients. Donors can help with blood/organ donation, while recipients can request medical donation assistance.
-
-
 
 For now, build ONLY the landing page — no backend, authentication, database, or functionality.
 
-
-
 Include:
-
-
 
 - Clean hero section with a strong headline
 
@@ -31,8 +23,6 @@ Include:
 - Fully responsive mobile and desktop layout
 
 - Smooth animations and polished UI
-
-
 
 Make it feel like a real modern healthcare startup website, not a generic medical template.
 

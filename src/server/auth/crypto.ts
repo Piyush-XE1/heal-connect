@@ -33,9 +33,13 @@ export function randomId(prefix: string): string {
 }
 
 async function pbkdf2(password: string, salt: Uint8Array, iterations: number): Promise<Uint8Array> {
-  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, [
-    "deriveBits",
-  ]);
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
   const bits = await crypto.subtle.deriveBits(
     { name: "PBKDF2", salt: salt as unknown as BufferSource, iterations, hash: "SHA-256" },
     key,
@@ -85,9 +89,16 @@ async function hmacKey(secret: string): Promise<CryptoKey> {
 }
 
 /** Compact, tamper-evident token used for OAuth `state` and similar values. */
-export async function signPayload(payload: Record<string, unknown>, secret: string): Promise<string> {
+export async function signPayload(
+  payload: Record<string, unknown>,
+  secret: string,
+): Promise<string> {
   const body = toBase64Url(new TextEncoder().encode(JSON.stringify(payload)));
-  const signature = await crypto.subtle.sign("HMAC", await hmacKey(secret), new TextEncoder().encode(body));
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    await hmacKey(secret),
+    new TextEncoder().encode(body),
+  );
   return `${body}.${toBase64Url(new Uint8Array(signature))}`;
 }
 
@@ -97,7 +108,11 @@ export async function verifyPayload<T = Record<string, unknown>>(
 ): Promise<T | null> {
   const [body, signature] = token.split(".");
   if (!body || !signature) return null;
-  const expected = await crypto.subtle.sign("HMAC", await hmacKey(secret), new TextEncoder().encode(body));
+  const expected = await crypto.subtle.sign(
+    "HMAC",
+    await hmacKey(secret),
+    new TextEncoder().encode(body),
+  );
   const expectedToken = toBase64Url(new Uint8Array(expected));
   if (expectedToken.length !== signature.length) return null;
   let mismatch = 0;

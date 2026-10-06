@@ -36,14 +36,15 @@ import { dueLabel, formatDate, relativeTime } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, unwrapAction } from "@/lib/actions";
 import { fetchMyRequests, updateRequestStatus } from "@/server/api/requests";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/my-requests")({
-  head: () => ({
-    meta: [
-      { title: "My requests — Heal Connect" },
-      { name: "description", content: "Track, edit and close the requests you raised." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "My requests — Heal Connect",
+      description: "Track, edit and close the requests you raised.",
+      noIndex: true,
+    }),
   component: MyRequestsPage,
 });
 
@@ -71,11 +72,13 @@ function MyRequestsPage() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       void queryClient.invalidateQueries({ queryKey: queryKeys.notifications("all") });
     },
-    onError: (error) => toast.error("Could not update the request", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not update the request", { description: errorMessage(error) }),
   });
 
   const publishMutation = useMutation({
-    mutationFn: async (id: string) => unwrapAction(await updateRequestStatus({ data: { id, status: "open" } })),
+    mutationFn: async (id: string) =>
+      unwrapAction(await updateRequestStatus({ data: { id, status: "open" } })),
     onSuccess: (_result, id) => {
       toast.success("Draft published", {
         description: "Matching donors nearby will be notified. You can track offers here.",
@@ -84,7 +87,8 @@ function MyRequestsPage() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       void queryClient.invalidateQueries({ queryKey: ["request", id] });
     },
-    onError: (error) => toast.error("Could not publish the draft", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not publish the draft", { description: errorMessage(error) }),
   });
 
   const renderList = (items: NonNullable<typeof data>["active"]) => (
@@ -188,7 +192,9 @@ function MyRequestsPage() {
                 }
               />
             ) : null}
-            {request.status === "fulfilled" || request.status === "cancelled" || request.status === "expired" ? (
+            {request.status === "fulfilled" ||
+            request.status === "cancelled" ||
+            request.status === "expired" ? (
               <Button
                 size="sm"
                 variant="outline"
@@ -199,7 +205,9 @@ function MyRequestsPage() {
                 Reopen
               </Button>
             ) : null}
-            {request.status !== "cancelled" && request.status !== "removed" && request.status !== "draft" ? (
+            {request.status !== "cancelled" &&
+            request.status !== "removed" &&
+            request.status !== "draft" ? (
               <ConfirmDialog
                 title="Cancel this request?"
                 description="Donors who offered help will be notified that no further action is needed."
@@ -209,7 +217,11 @@ function MyRequestsPage() {
                   await statusMutation.mutateAsync({ id: request.id, status: "cancelled" });
                 }}
                 trigger={
-                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:text-destructive"
+                  >
                     <Trash2 className="size-4" aria-hidden="true" />
                     Cancel
                   </Button>
@@ -272,7 +284,12 @@ function MyRequestsPage() {
               icon={Check}
               tone="success"
             />
-            <StatTile label="Closed requests" value={data.past.length} icon={Undo2} tone="neutral" />
+            <StatTile
+              label="Closed requests"
+              value={data.past.length}
+              icon={Undo2}
+              tone="neutral"
+            />
             <StatTile label="Drafts" value={data.drafts.length} icon={FileText} tone="warning" />
           </div>
 
@@ -303,7 +320,8 @@ function MyRequestsPage() {
               ) : (
                 <>
                   <InfoNote tone="info" title="Drafts are private">
-                    Nothing is visible to donors until you publish. Publishing notifies matching donors immediately.
+                    Nothing is visible to donors until you publish. Publishing notifies matching
+                    donors immediately.
                   </InfoNote>
                   {renderList(data.drafts)}
                 </>
@@ -323,8 +341,9 @@ function MyRequestsPage() {
           </Tabs>
 
           <InfoNote tone="info" title="Keeping requests accurate">
-            Close a request as soon as the need is met — it stops donors from travelling unnecessarily. If the
-            requirement changes, edit the request so everyone who offered help is updated automatically.
+            Close a request as soon as the need is met — it stops donors from travelling
+            unnecessarily. If the requirement changes, edit the request so everyone who offered help
+            is updated automatically.
           </InfoNote>
         </>
       )}

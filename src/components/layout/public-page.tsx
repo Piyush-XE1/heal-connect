@@ -39,8 +39,9 @@ export function PublicPage({
           </PageHeader>
           <div className="mt-8 space-y-6">{children}</div>
           <p className="mt-10 text-xs leading-relaxed text-muted-foreground">
-            {BRAND.name} is a coordination platform. It does not provide medical care, emergency services or medical
-            advice, and it never replaces doctors, hospitals, blood banks or government organ donation systems.
+            {BRAND.name} is a coordination platform. It does not provide medical care, emergency
+            services or medical advice, and it never replaces doctors, hospitals, blood banks or
+            government organ donation systems.
           </p>
         </div>
       </main>

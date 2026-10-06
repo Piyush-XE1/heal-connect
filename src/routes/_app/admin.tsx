@@ -38,15 +38,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/components/providers/auth-provider";
 import { REQUEST_TYPE_SHORT_LABELS, ROLE_LABELS, URGENCY_LABELS } from "@/lib/labels";
-import { USER_ROLES, VERIFICATION_STATUSES, type UserRole, type VerificationStatus } from "@/lib/domain";
+import {
+  USER_ROLES,
+  VERIFICATION_STATUSES,
+  type UserRole,
+  type VerificationStatus,
+} from "@/lib/domain";
 import { formatDate, relativeTime } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, unwrapAction } from "@/lib/actions";
+import { pageHead } from "@/lib/seo";
 import {
   adminReportAction,
   adminRequestAction,
@@ -62,13 +74,17 @@ import {
 
 export const Route = createFileRoute("/_app/admin")({
   validateSearch: (search) =>
-    z.object({ tab: z.enum(["overview", "users", "requests", "reports", "verifications"]).optional() }).parse(search),
-  head: () => ({
-    meta: [
-      { title: "Admin dashboard — Heal Connect" },
-      { name: "description", content: "Moderation workspace for users, requests, reports and verifications." },
-    ],
-  }),
+    z
+      .object({
+        tab: z.enum(["overview", "users", "requests", "reports", "verifications"]).optional(),
+      })
+      .parse(search),
+  head: () =>
+    pageHead({
+      title: "Admin dashboard — Heal Connect",
+      description: "Moderation workspace for users, requests, reports and verifications.",
+      noIndex: true,
+    }),
   component: AdminPage,
 });
 
@@ -93,9 +109,9 @@ function AdminPage() {
   const [requestUrgency, setRequestUrgency] = useState<"" | "normal" | "urgent" | "emergency">("");
   const [requestDemo, setRequestDemo] = useState<"all" | "demo" | "real">("all");
 
-  const [reportStatus, setReportStatus] = useState<"all" | "open" | "reviewing" | "resolved" | "dismissed">(
-    "open",
-  );
+  const [reportStatus, setReportStatus] = useState<
+    "all" | "open" | "reviewing" | "resolved" | "dismissed"
+  >("open");
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus | "">("pending");
   const [page, setPage] = useState(1);
 
@@ -105,7 +121,13 @@ function AdminPage() {
   });
 
   const usersQuery = useQuery({
-    queryKey: queryKeys.admin("users", { userQuery, userRole, userStatus, userVerification, userDemo }),
+    queryKey: queryKeys.admin("users", {
+      userQuery,
+      userRole,
+      userStatus,
+      userVerification,
+      userDemo,
+    }),
     queryFn: async () =>
       unwrapAction(
         await listAdminUsers({
@@ -123,7 +145,12 @@ function AdminPage() {
   });
 
   const requestsQuery = useQuery({
-    queryKey: queryKeys.admin("requests", { requestQuery, requestStatus, requestUrgency, requestDemo }),
+    queryKey: queryKeys.admin("requests", {
+      requestQuery,
+      requestStatus,
+      requestUrgency,
+      requestDemo,
+    }),
     queryFn: async () =>
       unwrapAction(
         await listAdminRequests({
@@ -150,7 +177,9 @@ function AdminPage() {
     queryKey: queryKeys.admin("verifications", { verificationStatus }),
     queryFn: async () =>
       unwrapAction(
-        await listAdminVerifications({ data: verificationStatus ? { status: verificationStatus } : {} }),
+        await listAdminVerifications({
+          data: verificationStatus ? { status: verificationStatus } : {},
+        }),
       ),
     enabled: tab === "verifications",
     placeholderData: keepPreviousData,
@@ -172,7 +201,8 @@ function AdminPage() {
       invalidateAdmin();
       setNote("");
     },
-    onError: (error) => toast.error("Could not update the user", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not update the user", { description: errorMessage(error) }),
   });
 
   const requestAction = useMutation({
@@ -187,18 +217,23 @@ function AdminPage() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.myRequests });
       setNote("");
     },
-    onError: (error) => toast.error("Could not update the request", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not update the request", { description: errorMessage(error) }),
   });
 
   const reportAction = useMutation({
-    mutationFn: async (input: { id: string; action: "review" | "resolve" | "dismiss"; note?: string }) =>
-      unwrapAction(await adminReportAction({ data: input })),
+    mutationFn: async (input: {
+      id: string;
+      action: "review" | "resolve" | "dismiss";
+      note?: string;
+    }) => unwrapAction(await adminReportAction({ data: input })),
     onSuccess: (_result, variables) => {
       toast.success(`Report ${variables.action} applied`);
       invalidateAdmin();
       setNote("");
     },
-    onError: (error) => toast.error("Could not update the report", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not update the report", { description: errorMessage(error) }),
   });
 
   const verificationAction = useMutation({
@@ -209,7 +244,8 @@ function AdminPage() {
       invalidateAdmin();
       setNote("");
     },
-    onError: (error) => toast.error("Could not update the verification", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not update the verification", { description: errorMessage(error) }),
   });
 
   const resetDemo = useMutation({
@@ -218,7 +254,8 @@ function AdminPage() {
       toast.success("Demo data restored", { description: result.note });
       invalidateAdmin();
     },
-    onError: (error) => toast.error("Could not reset demo data", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not reset demo data", { description: errorMessage(error) }),
   });
 
   const stats = overview.data?.stats;
@@ -287,8 +324,8 @@ function AdminPage() {
           </Pill>
           {overview.data ? (
             <Pill tone="neutral">
-              {overview.data.environment.demoRecords} demo records · {overview.data.environment.realRecords} real
-              records
+              {overview.data.environment.demoRecords} demo records ·{" "}
+              {overview.data.environment.realRecords} real records
             </Pill>
           ) : null}
           {overview.data && !overview.data.environment.googleConfigured ? (
@@ -298,9 +335,9 @@ function AdminPage() {
       </PageHeader>
 
       <InfoNote tone="info" icon={ShieldCheck} title="Moderation principles">
-        Act on safety first: remove payment-for-blood and organ-brokerage content immediately, verify organisations
-        carefully, and document every action with a note so decisions can be reviewed. Never ask members for medical
-        documents.
+        Act on safety first: remove payment-for-blood and organ-brokerage content immediately,
+        verify organisations carefully, and document every action with a note so decisions can be
+        reviewed. Never ask members for medical documents.
       </InfoNote>
 
       <Tabs
@@ -310,7 +347,9 @@ function AdminPage() {
           setPage(1);
           void navigate({
             to: "/admin",
-            search: { tab: value as "overview" | "users" | "requests" | "reports" | "verifications" },
+            search: {
+              tab: value as "overview" | "users" | "requests" | "reports" | "verifications",
+            },
             replace: true,
           });
         }}
@@ -332,18 +371,65 @@ function AdminPage() {
               ))}
             </div>
           ) : overview.isError || !stats ? (
-            <ErrorState description="We could not load platform statistics." onRetry={() => void overview.refetch()} />
+            <ErrorState
+              description="We could not load platform statistics."
+              onRetry={() => void overview.refetch()}
+            />
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <StatTile label="Members" value={stats.totalUsers} hint={`${stats.donors} donors · ${stats.recipients} recipients · ${stats.both} both`} icon={Users} />
-                <StatTile label="Open requests" value={stats.openRequests} hint={`${stats.emergencyRequests} emergency`} icon={Droplet} tone="blood" />
-                <StatTile label="Donor offers" value={stats.donorResponses} hint={`${stats.fulfilledRequests} requests fulfilled`} icon={Check} tone="success" />
-                <StatTile label="Open reports" value={stats.openReports} hint={`${stats.suspendedUsers} suspended accounts`} icon={Flag} tone="danger" />
-                <StatTile label="Verified members" value={stats.verifiedUsers} icon={BadgeCheck} tone="info" />
-                <StatTile label="Pending verifications" value={stats.pendingVerifications} icon={ShieldAlert} tone="warning" />
-                <StatTile label="Total requests" value={stats.totalRequests} icon={Siren} tone="primary" />
-                <StatTile label="Demo records" value={stats.demoRecords} hint={`${stats.realRecords} real records`} icon={FlaskConical} tone="neutral" />
+                <StatTile
+                  label="Members"
+                  value={stats.totalUsers}
+                  hint={`${stats.donors} donors · ${stats.recipients} recipients · ${stats.both} both`}
+                  icon={Users}
+                />
+                <StatTile
+                  label="Open requests"
+                  value={stats.openRequests}
+                  hint={`${stats.emergencyRequests} emergency`}
+                  icon={Droplet}
+                  tone="blood"
+                />
+                <StatTile
+                  label="Donor offers"
+                  value={stats.donorResponses}
+                  hint={`${stats.fulfilledRequests} requests fulfilled`}
+                  icon={Check}
+                  tone="success"
+                />
+                <StatTile
+                  label="Open reports"
+                  value={stats.openReports}
+                  hint={`${stats.suspendedUsers} suspended accounts`}
+                  icon={Flag}
+                  tone="danger"
+                />
+                <StatTile
+                  label="Verified members"
+                  value={stats.verifiedUsers}
+                  icon={BadgeCheck}
+                  tone="info"
+                />
+                <StatTile
+                  label="Pending verifications"
+                  value={stats.pendingVerifications}
+                  icon={ShieldAlert}
+                  tone="warning"
+                />
+                <StatTile
+                  label="Total requests"
+                  value={stats.totalRequests}
+                  icon={Siren}
+                  tone="primary"
+                />
+                <StatTile
+                  label="Demo records"
+                  value={stats.demoRecords}
+                  hint={`${stats.realRecords} real records`}
+                  icon={FlaskConical}
+                  tone="neutral"
+                />
               </div>
 
               <div className="grid gap-4 lg:grid-cols-2">
@@ -375,11 +461,16 @@ function AdminPage() {
                     Open demand by blood group
                   </h2>
                   {stats.bloodGroupDemand.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No open requests with a blood group right now.</p>
+                    <p className="text-xs text-muted-foreground">
+                      No open requests with a blood group right now.
+                    </p>
                   ) : (
                     <ul className="space-y-2">
                       {stats.bloodGroupDemand.map((entry) => {
-                        const max = Math.max(1, ...stats.bloodGroupDemand.map((item) => item.value));
+                        const max = Math.max(
+                          1,
+                          ...stats.bloodGroupDemand.map((item) => item.value),
+                        );
                         return (
                           <li key={entry.label} className="flex items-center gap-3 text-xs">
                             <span className="w-8 shrink-0 font-bold">{entry.label}</span>
@@ -407,7 +498,10 @@ function AdminPage() {
 
               <div className="grid gap-4 lg:grid-cols-2">
                 <section className="surface space-y-3 p-5" aria-labelledby="emergency-watch">
-                  <h2 id="emergency-watch" className="flex items-center gap-2 font-display text-sm font-bold">
+                  <h2
+                    id="emergency-watch"
+                    className="flex items-center gap-2 font-display text-sm font-bold"
+                  >
                     <Siren className="size-4 text-destructive" aria-hidden="true" />
                     Emergency watchlist
                   </h2>
@@ -455,7 +549,9 @@ function AdminPage() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-xs text-muted-foreground">No moderation actions recorded yet.</p>
+                    <p className="text-xs text-muted-foreground">
+                      No moderation actions recorded yet.
+                    </p>
                   )}
                 </section>
               </div>
@@ -501,7 +597,9 @@ function AdminPage() {
               <Label htmlFor="admin-user-status">Account status</Label>
               <Select
                 value={userStatus || "any"}
-                onValueChange={(value) => setUserStatus(value === "any" ? "" : (value as "active" | "suspended"))}
+                onValueChange={(value) =>
+                  setUserStatus(value === "any" ? "" : (value as "active" | "suspended"))
+                }
               >
                 <SelectTrigger id="admin-user-status">
                   <SelectValue />
@@ -536,7 +634,10 @@ function AdminPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="admin-user-demo">Data source</Label>
-              <Select value={userDemo} onValueChange={(value) => setUserDemo(value as typeof userDemo)}>
+              <Select
+                value={userDemo}
+                onValueChange={(value) => setUserDemo(value as typeof userDemo)}
+              >
                 <SelectTrigger id="admin-user-demo">
                   <SelectValue />
                 </SelectTrigger>
@@ -563,7 +664,10 @@ function AdminPage() {
           {usersQuery.isLoading ? (
             <SkeletonCard />
           ) : usersQuery.isError ? (
-            <ErrorState description="We could not load members." onRetry={() => void usersQuery.refetch()} />
+            <ErrorState
+              description="We could not load members."
+              onRetry={() => void usersQuery.refetch()}
+            />
           ) : pagedUsers.length === 0 ? (
             <EmptyState icon={Users} title="No members match these filters" />
           ) : (
@@ -584,7 +688,9 @@ function AdminPage() {
                         </p>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <Pill tone={row.accountStatus === "active" ? "success" : "danger"}>{row.accountStatus}</Pill>
+                        <Pill tone={row.accountStatus === "active" ? "success" : "danger"}>
+                          {row.accountStatus}
+                        </Pill>
                         <Pill
                           tone={
                             row.verificationStatus === "verified"
@@ -619,7 +725,11 @@ function AdminPage() {
                             });
                           }}
                           trigger={
-                            <Button size="sm" variant="outline" className="text-destructive hover:text-destructive">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-destructive hover:text-destructive"
+                            >
                               <ShieldAlert className="size-4" aria-hidden="true" />
                               Suspend
                             </Button>
@@ -630,7 +740,11 @@ function AdminPage() {
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            userAction.mutate({ userId: row.id, action: "reactivate", ...(note ? { note } : {}) })
+                            userAction.mutate({
+                              userId: row.id,
+                              action: "reactivate",
+                              ...(note ? { note } : {}),
+                            })
                           }
                           disabled={userAction.isPending}
                         >
@@ -657,7 +771,11 @@ function AdminPage() {
                         size="sm"
                         variant="ghost"
                         onClick={() =>
-                          userAction.mutate({ userId: row.id, action: "clear_verification", ...(note ? { note } : {}) })
+                          userAction.mutate({
+                            userId: row.id,
+                            action: "clear_verification",
+                            ...(note ? { note } : {}),
+                          })
                         }
                         disabled={userAction.isPending || row.verificationStatus === "unverified"}
                       >
@@ -675,7 +793,10 @@ function AdminPage() {
               </ul>
               <SimplePagination
                 currentPage={page}
-                totalPages={Math.max(1, Math.ceil((usersQuery.data?.items.length ?? 0) / PAGE_SIZE))}
+                totalPages={Math.max(
+                  1,
+                  Math.ceil((usersQuery.data?.items.length ?? 0) / PAGE_SIZE),
+                )}
                 onPageChange={setPage}
               />
             </>
@@ -708,11 +829,13 @@ function AdminPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="any">Any status</SelectItem>
-                  {["open", "in_progress", "fulfilled", "cancelled", "expired", "removed"].map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status.replace(/_/g, " ")}
-                    </SelectItem>
-                  ))}
+                  {["open", "in_progress", "fulfilled", "cancelled", "expired", "removed"].map(
+                    (status) => (
+                      <SelectItem key={status} value={status}>
+                        {status.replace(/_/g, " ")}
+                      </SelectItem>
+                    ),
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -721,7 +844,9 @@ function AdminPage() {
               <Select
                 value={requestUrgency || "any"}
                 onValueChange={(value) =>
-                  setRequestUrgency(value === "any" ? "" : (value as "normal" | "urgent" | "emergency"))
+                  setRequestUrgency(
+                    value === "any" ? "" : (value as "normal" | "urgent" | "emergency"),
+                  )
                 }
               >
                 <SelectTrigger id="admin-request-urgency">
@@ -737,7 +862,10 @@ function AdminPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="admin-request-demo">Data source</Label>
-              <Select value={requestDemo} onValueChange={(value) => setRequestDemo(value as typeof requestDemo)}>
+              <Select
+                value={requestDemo}
+                onValueChange={(value) => setRequestDemo(value as typeof requestDemo)}
+              >
                 <SelectTrigger id="admin-request-demo">
                   <SelectValue />
                 </SelectTrigger>
@@ -768,16 +896,18 @@ function AdminPage() {
                           {row.isDemo ? <DemoBadge /> : null}
                         </p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {REQUEST_TYPE_SHORT_LABELS[row.requestType]} · {row.bloodGroup ?? "no group"} ·{" "}
-                          {row.unitsFulfilled}/{row.unitsRequired} units · {row.hospitalName}, {row.city} · by{" "}
-                          {formatDate(row.requiredBy)}
+                          {REQUEST_TYPE_SHORT_LABELS[row.requestType]} ·{" "}
+                          {row.bloodGroup ?? "no group"} · {row.unitsFulfilled}/{row.unitsRequired}{" "}
+                          units · {row.hospitalName}, {row.city} · by {formatDate(row.requiredBy)}
                         </p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Raised by {row.requesterName} ({row.requesterEmail}) · {row.responseCount} offers ·{" "}
-                          {row.reportCount} reports
+                          Raised by {row.requesterName} ({row.requesterEmail}) · {row.responseCount}{" "}
+                          offers · {row.reportCount} reports
                         </p>
                         {row.moderationNote ? (
-                          <p className="mt-1 text-xs text-warning-foreground">Note: {row.moderationNote}</p>
+                          <p className="mt-1 text-xs text-warning-foreground">
+                            Note: {row.moderationNote}
+                          </p>
                         ) : null}
                       </div>
                       <BloodGroupChip group={row.bloodGroup as never} size="sm" />
@@ -814,7 +944,11 @@ function AdminPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() =>
-                            requestAction.mutate({ id: row.id, action: "mark_in_progress", ...(note ? { note } : {}) })
+                            requestAction.mutate({
+                              id: row.id,
+                              action: "mark_in_progress",
+                              ...(note ? { note } : {}),
+                            })
                           }
                           disabled={requestAction.isPending}
                         >
@@ -835,7 +969,11 @@ function AdminPage() {
                             });
                           }}
                           trigger={
-                            <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                            >
                               <Trash2 className="size-4" aria-hidden="true" />
                               Remove
                             </Button>
@@ -846,7 +984,11 @@ function AdminPage() {
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            requestAction.mutate({ id: row.id, action: "restore_request", ...(note ? { note } : {}) })
+                            requestAction.mutate({
+                              id: row.id,
+                              action: "restore_request",
+                              ...(note ? { note } : {}),
+                            })
                           }
                           disabled={requestAction.isPending}
                         >
@@ -859,7 +1001,10 @@ function AdminPage() {
               </ul>
               <SimplePagination
                 currentPage={page}
-                totalPages={Math.max(1, Math.ceil((requestsQuery.data?.items.length ?? 0) / PAGE_SIZE))}
+                totalPages={Math.max(
+                  1,
+                  Math.ceil((requestsQuery.data?.items.length ?? 0) / PAGE_SIZE),
+                )}
                 onPageChange={setPage}
               />
             </>
@@ -888,7 +1033,8 @@ function AdminPage() {
               </Select>
             </div>
             <p className="text-xs text-muted-foreground">
-              Reporter identities are visible to moderators only and are never shown to the reported member.
+              Reporter identities are visible to moderators only and are never shown to the reported
+              member.
             </p>
           </div>
 
@@ -925,7 +1071,9 @@ function AdminPage() {
                         </p>
                       ) : null}
                       {report.resolutionNote ? (
-                        <p className="mt-1 text-xs text-muted-foreground">Resolution: {report.resolutionNote}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Resolution: {report.resolutionNote}
+                        </p>
                       ) : null}
                     </div>
                     {report.targetType === "request" ? (
@@ -947,7 +1095,13 @@ function AdminPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => reportAction.mutate({ id: report.id, action: "review", ...(note ? { note } : {}) })}
+                      onClick={() =>
+                        reportAction.mutate({
+                          id: report.id,
+                          action: "review",
+                          ...(note ? { note } : {}),
+                        })
+                      }
                       disabled={reportAction.isPending}
                     >
                       Mark reviewing
@@ -1007,7 +1161,9 @@ function AdminPage() {
               <Label htmlFor="admin-verification-status">Status</Label>
               <Select
                 value={verificationStatus || "any"}
-                onValueChange={(value) => setVerificationStatus(value === "any" ? "" : (value as VerificationStatus))}
+                onValueChange={(value) =>
+                  setVerificationStatus(value === "any" ? "" : (value as VerificationStatus))
+                }
               >
                 <SelectTrigger id="admin-verification-status" className="w-56">
                   <SelectValue />
@@ -1023,7 +1179,8 @@ function AdminPage() {
               </Select>
             </div>
             <p className="text-xs text-muted-foreground">
-              Approving sets the verified badge. Rejecting asks the member for better information — always explain why.
+              Approving sets the verified badge. Rejecting asks the member for better information —
+              always explain why.
             </p>
           </div>
 
@@ -1038,7 +1195,15 @@ function AdminPage() {
                       <p className="flex flex-wrap items-center gap-2 font-display text-base font-bold">
                         {record.userName}
                         <Pill tone="neutral">{record.organizationType.replace(/_/g, " ")}</Pill>
-                        <Pill tone={record.status === "verified" ? "success" : record.status === "pending" ? "warning" : "danger"}>
+                        <Pill
+                          tone={
+                            record.status === "verified"
+                              ? "success"
+                              : record.status === "pending"
+                                ? "warning"
+                                : "danger"
+                          }
+                        >
                           {record.status}
                         </Pill>
                         {record.isDemo ? <DemoBadge /> : null}
@@ -1054,7 +1219,9 @@ function AdminPage() {
                         </p>
                       ) : null}
                       {record.reviewNote ? (
-                        <p className="mt-1 text-xs text-muted-foreground">Review note: {record.reviewNote}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Review note: {record.reviewNote}
+                        </p>
                       ) : null}
                     </div>
                     <Button asChild size="sm" variant="ghost">

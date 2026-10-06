@@ -12,12 +12,7 @@ import {
   Timer,
 } from "lucide-react";
 
-import {
-  EmptyState,
-  InfoNote,
-  Pill,
-  SkeletonGrid,
-} from "@/components/common/primitives";
+import { EmptyState, InfoNote, Pill, SkeletonGrid } from "@/components/common/primitives";
 import { PublicPage } from "@/components/layout/public-page";
 import { RequestCard } from "@/components/requests/request-card";
 import { Button } from "@/components/ui/button";
@@ -25,18 +20,17 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { EMERGENCY_DISCLAIMER, SAFETY_RULES } from "@/lib/brand";
 import { queryKeys } from "@/lib/query-keys";
 import { unwrapAction } from "@/lib/actions";
+import { pageHead } from "@/lib/seo";
 import { fetchEmergencyRequests } from "@/server/api/requests";
 
 export const Route = createFileRoute("/emergency")({
   head: () => ({
-    meta: [
-      { title: "Emergency requests — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Open emergency blood requests with hospital, group, units, location and timestamps. Heal Connect does not provide emergency care — contact emergency services first.",
-      },
-    ],
+    ...pageHead({
+      title: "Emergency requests — Heal Connect",
+      description:
+        "Open emergency blood requests with hospital, group, units, location and timestamps. Heal Connect does not provide emergency care — contact emergency services first.",
+      path: "/emergency",
+    }),
   }),
   component: EmergencyPage,
 });
@@ -149,7 +143,8 @@ function EmergencyPage() {
               Open emergency requests
             </h2>
             <p className="text-sm text-muted-foreground">
-              Sorted by the date help is needed. Contact details are only revealed after a match is confirmed.
+              Sorted by the date help is needed. Contact details are only revealed after a match is
+              confirmed.
             </p>
           </div>
           <Pill tone="warning">
@@ -194,9 +189,9 @@ function EmergencyPage() {
           </ul>
         </InfoNote>
         <InfoNote tone="neutral" title="How emergency requests are moderated">
-          Emergency requests require extra detail (ward, department or coordinating person), are highlighted across the
-          platform, and are reviewed by moderators. Requests that mention payment or brokerage are removed and the
-          account may be suspended.
+          Emergency requests require extra detail (ward, department or coordinating person), are
+          highlighted across the platform, and are reviewed by moderators. Requests that mention
+          payment or brokerage are removed and the account may be suspended.
         </InfoNote>
       </section>
     </PublicPage>

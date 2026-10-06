@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /**
  * Heal Connect service worker.
  *
@@ -44,11 +43,15 @@ const PRECACHE = [
   "/privacy",
 ];
 
-const DEV_HOST = /^(localhost|127\.0\.0\.1|0\.0\.0\.0|::1)$|\.e2b\.app$/i.test(self.location.hostname);
+const DEV_HOST = /^(localhost|127\.0\.0\.1|0\.0\.0\.0|::1)$|\.e2b\.app$/i.test(
+  self.location.hostname,
+);
 const DEV_PATH = /^\/(@|src\/|node_modules\/|__vite|__tsr|assets\/.*\?t=)/;
 
 const isStaticAsset = (url) =>
-  /\.(?:css|js|mjs|woff2?|ttf|otf|png|jpe?g|gif|svg|webp|avif|ico|webmanifest)$/i.test(url.pathname);
+  /\.(?:css|js|mjs|woff2?|ttf|otf|png|jpe?g|gif|svg|webp|avif|ico|webmanifest)$/i.test(
+    url.pathname,
+  );
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -74,7 +77,9 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(keys.filter((key) => !key.startsWith(VERSION)).map((key) => caches.delete(key)));
+      await Promise.all(
+        keys.filter((key) => !key.startsWith(VERSION)).map((key) => caches.delete(key)),
+      );
       if (self.registration.navigationPreload) {
         try {
           await self.registration.navigationPreload.disable();
@@ -119,13 +124,14 @@ async function handleNavigation(request) {
     }
     return response;
   } catch {
-    const cached = (await cache.match(request, { ignoreSearch: false })) ?? (await cache.match(request));
+    const cached =
+      (await cache.match(request, { ignoreSearch: false })) ?? (await cache.match(request));
     if (cached) return cached;
     const shell = await caches.open(SHELL_CACHE);
     const offline = (await shell.match(OFFLINE_URL)) ?? (await caches.match(OFFLINE_URL));
     if (offline) return offline;
     return new Response(
-      "<!doctype html><meta charset=utf-8><title>Offline</title><body style=\"font-family:system-ui;padding:2rem\"><h1>You are offline</h1><p>Reconnect to load Heal Connect.</p></body>",
+      '<!doctype html><meta charset=utf-8><title>Offline</title><body style="font-family:system-ui;padding:2rem"><h1>You are offline</h1><p>Reconnect to load Heal Connect.</p></body>',
       { status: 503, headers: { "content-type": "text/html; charset=utf-8" } },
     );
   }
@@ -147,7 +153,8 @@ async function handleAsset(request) {
   const cached = await cache.match(request);
   const network = fetch(request)
     .then((response) => {
-      if (response && response.ok && !DEV_HOST) cache.put(request, response.clone()).catch(() => {});
+      if (response && response.ok && !DEV_HOST)
+        cache.put(request, response.clone()).catch(() => {});
       return response;
     })
     .catch(() => undefined);
@@ -185,7 +192,8 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (url.origin !== self.location.origin) {
-    if (/fonts\.(googleapis|gstatic)\.com$/.test(url.hostname)) event.respondWith(handleFont(request));
+    if (/fonts\.(googleapis|gstatic)\.com$/.test(url.hostname))
+      event.respondWith(handleFont(request));
     return;
   }
 
@@ -230,7 +238,8 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const target = new URL(event.notification.data?.url || "/notifications", self.location.origin).href;
+  const target = new URL(event.notification.data?.url || "/notifications", self.location.origin)
+    .href;
   event.waitUntil(
     (async () => {
       const all = await self.clients.matchAll({ type: "window", includeUncontrolled: true });

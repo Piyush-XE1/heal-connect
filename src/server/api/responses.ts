@@ -19,7 +19,8 @@ function assertNotBlocked(
 ): void {
   const blocked = blocks.some(
     (row) =>
-      (row.userId === a && row.blockedUserId === b) || (row.userId === b && row.blockedUserId === a),
+      (row.userId === a && row.blockedUserId === b) ||
+      (row.userId === b && row.blockedUserId === a),
   );
   if (blocked) {
     throw forbidden("This connection is not available because of a block on this account.");
@@ -164,7 +165,6 @@ export const withdrawResponse = createServerFn({ method: "POST" })
             link: `/requests/${request.id}`,
           });
         }
-
       });
 
       return { withdrawn: true };
@@ -190,7 +190,11 @@ export const fetchMyActivity = createServerFn({ method: "GET" }).handler(
     const session = await requireUser();
     const database = await getDb();
     const donor = buildDonorContext(database, session.id);
-    const viewer: ViewerContext = { userId: session.id, isAdmin: session.isAdmin, point: donor.point };
+    const viewer: ViewerContext = {
+      userId: session.id,
+      isAdmin: session.isAdmin,
+      point: donor.point,
+    };
 
     const all = database.donorResponses
       .filter((row) => row.donorId === session.id)
@@ -238,7 +242,11 @@ export const listRequestResponses = createServerFn({ method: "GET" })
     }
 
     const donor = buildDonorContext(database, session.id);
-    const viewer: ViewerContext = { userId: session.id, isAdmin: session.isAdmin, point: donor.point };
+    const viewer: ViewerContext = {
+      userId: session.id,
+      isAdmin: session.isAdmin,
+      point: donor.point,
+    };
 
     return database.donorResponses
       .filter((row) => row.requestId === request.id)
@@ -304,7 +312,10 @@ export const updateResponseStatus = createServerFn({ method: "POST" })
         }
 
         if (status === "completed") {
-          const fulfilled = Math.min(request.unitsRequired, Math.max(1, request.unitsFulfilled + 1));
+          const fulfilled = Math.min(
+            request.unitsRequired,
+            Math.max(1, request.unitsFulfilled + 1),
+          );
           request.unitsFulfilled = fulfilled;
           request.updatedAt = timestamp;
           if (fulfilled >= request.unitsRequired) {

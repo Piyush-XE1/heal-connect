@@ -32,7 +32,10 @@ export function unwrapAction<T>(result: ActionResult<T> | T): T {
   return result;
 }
 
-export function errorMessage(error: unknown, fallback = "Something went wrong. Please try again."): string {
+export function errorMessage(
+  error: unknown,
+  fallback = "Something went wrong. Please try again.",
+): string {
   if (isActionError(error)) return error.message;
   if (error instanceof Error && error.message) return error.message;
   return fallback;

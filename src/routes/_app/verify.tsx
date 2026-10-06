@@ -25,7 +25,13 @@ import {
 } from "@/components/common/primitives";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/components/providers/auth-provider";
 import { ORGANIZATION_TYPE_LABELS } from "@/lib/labels";
@@ -34,18 +40,16 @@ import { formatDate, relativeTime } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, fieldErrors, unwrapAction } from "@/lib/actions";
 import { fetchMyVerification, submitVerification } from "@/server/api/verification";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/verify")({
-  head: () => ({
-    meta: [
-      { title: "Verification — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Request verification for your account. Verified information is clearly separated from self-reported details.",
-      },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Verification — Heal Connect",
+      description:
+        "Request verification for your account. Verified information is clearly separated from self-reported details.",
+      noIndex: true,
+    }),
   component: VerifyPage,
 });
 
@@ -71,14 +75,15 @@ function VerifyPage() {
             organizationType,
             organizationName: organizationName || "",
             evidenceNote,
-            consent: true as true,
+            consent: true as const,
           },
         }),
       ),
     onSuccess: async () => {
       setErrors({});
       toast.success("Verification submitted", {
-        description: "Our trust & safety team reviews requests manually. You will be notified of the decision.",
+        description:
+          "Our trust & safety team reviews requests manually. You will be notified of the decision.",
       });
       await refresh();
       void queryClient.invalidateQueries({ queryKey: queryKeys.myVerification });
@@ -119,7 +124,10 @@ function VerifyPage() {
           <SkeletonLines count={4} />
         </div>
       ) : isError || !data ? (
-        <ErrorState description="We could not load your verification details." onRetry={() => void refetch()} />
+        <ErrorState
+          description="We could not load your verification details."
+          onRetry={() => void refetch()}
+        />
       ) : (
         <>
           {/* Status */}
@@ -130,17 +138,17 @@ function VerifyPage() {
 
             {status === "verified" ? (
               <InfoNote tone="success" icon={BadgeCheck} title="Your account is verified">
-                Verified on {current?.reviewedAt ? formatDate(current.reviewedAt) : "record"}. Your requests and donor
-                offers display a verified badge, and the platform marks verified information separately from
-                self-reported details.
+                Verified on {current?.reviewedAt ? formatDate(current.reviewedAt) : "record"}. Your
+                requests and donor offers display a verified badge, and the platform marks verified
+                information separately from self-reported details.
               </InfoNote>
             ) : null}
 
             {status === "pending" ? (
               <InfoNote tone="warning" icon={Clock} title="Verification in review">
-                Submitted {current ? relativeTime(current.submittedAt) : "recently"}. Our team checks the information you
-                provided and aims to respond within 1–2 working days. You can keep using the platform normally while
-                this is pending.
+                Submitted {current ? relativeTime(current.submittedAt) : "recently"}. Our team
+                checks the information you provided and aims to respond within 1–2 working days. You
+                can keep using the platform normally while this is pending.
               </InfoNote>
             ) : null}
 
@@ -153,8 +161,8 @@ function VerifyPage() {
 
             {status === "unverified" ? (
               <InfoNote tone="info" icon={Info} title="Not verified yet">
-                Your profile is visible with a “self-reported” label. Verification is optional, and it does not change
-                which requests you can respond to.
+                Your profile is visible with a “self-reported” label. Verification is optional, and
+                it does not change which requests you can respond to.
               </InfoNote>
             ) : null}
 
@@ -163,7 +171,9 @@ function VerifyPage() {
                 <li key={requirement.label} className="flex items-center gap-3 text-sm">
                   <span
                     className={`grid size-6 shrink-0 place-items-center rounded-full ${
-                      requirement.met ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"
+                      requirement.met
+                        ? "bg-success/15 text-success"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {requirement.met ? (
@@ -172,7 +182,9 @@ function VerifyPage() {
                       <X className="size-3.5" aria-hidden="true" />
                     )}
                   </span>
-                  <span className={requirement.met ? "" : "text-muted-foreground"}>{requirement.label}</span>
+                  <span className={requirement.met ? "" : "text-muted-foreground"}>
+                    {requirement.label}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -185,8 +197,9 @@ function VerifyPage() {
                 Submit verification
               </h2>
               <p className="text-sm text-muted-foreground">
-                Tell us who you are and how you take part. This MVP uses a manual, admin-controlled review, and
-                eventually hospitals, blood banks, NGOs and authorised organisations will hold verified accounts.
+                Tell us who you are and how you take part. This MVP uses a manual, admin-controlled
+                review, and eventually hospitals, blood banks, NGOs and authorised organisations
+                will hold verified accounts.
               </p>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -208,13 +221,17 @@ function VerifyPage() {
                     </SelectContent>
                   </Select>
                   {errors["organizationType"] ? (
-                    <p className="text-xs font-medium text-destructive">{errors["organizationType"]}</p>
+                    <p className="text-xs font-medium text-destructive">
+                      {errors["organizationType"]}
+                    </p>
                   ) : null}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="org-name">
-                    {organizationType === "individual_donor" ? "Display name (optional)" : "Organisation name *"}
+                    {organizationType === "individual_donor"
+                      ? "Display name (optional)"
+                      : "Organisation name *"}
                   </Label>
                   <input
                     id="org-name"
@@ -228,7 +245,9 @@ function VerifyPage() {
                     }
                   />
                   {errors["organizationName"] ? (
-                    <p className="text-xs font-medium text-destructive">{errors["organizationName"]}</p>
+                    <p className="text-xs font-medium text-destructive">
+                      {errors["organizationName"]}
+                    </p>
                   ) : null}
                 </div>
 
@@ -246,7 +265,9 @@ function VerifyPage() {
                   {errors["evidenceNote"] ? (
                     <p className="text-xs font-medium text-destructive">{errors["evidenceNote"]}</p>
                   ) : (
-                    <p className="text-xs text-muted-foreground">{evidenceNote.length}/600 characters</p>
+                    <p className="text-xs text-muted-foreground">
+                      {evidenceNote.length}/600 characters
+                    </p>
                   )}
                 </div>
               </div>
@@ -261,8 +282,8 @@ function VerifyPage() {
                 <span>
                   <span className="font-semibold">I confirm the information above is accurate</span>
                   <span className="mt-1 block text-xs text-muted-foreground">
-                    I understand that verification is a platform trust signal, that it is not a medical certification,
-                    and that misuse may result in suspension.
+                    I understand that verification is a platform trust signal, that it is not a
+                    medical certification, and that misuse may result in suspension.
                   </span>
                 </span>
               </label>
@@ -292,14 +313,19 @@ function VerifyPage() {
           {/* Guidance */}
           <section className="grid gap-3 lg:grid-cols-2">
             {data.guidance.map((item, index) => (
-              <InfoNote key={item} tone={index === 0 ? "info" : "neutral"} icon={index === 0 ? Info : Building2} title={`Note ${index + 1}`}>
+              <InfoNote
+                key={item}
+                tone={index === 0 ? "info" : "neutral"}
+                icon={index === 0 ? Info : Building2}
+                title={`Note ${index + 1}`}
+              >
                 {item}
               </InfoNote>
             ))}
             <InfoNote tone="warning" title="What verification is not">
-              A verified badge does not certify that someone is medically eligible to donate, and it does not guarantee
-              a donor will be available. Every medical decision belongs to the hospital, blood bank and licensed
-              clinicians.
+              A verified badge does not certify that someone is medically eligible to donate, and it
+              does not guarantee a donor will be available. Every medical decision belongs to the
+              hospital, blood bank and licensed clinicians.
             </InfoNote>
           </section>
         </>

@@ -13,7 +13,11 @@ import {
   SkeletonGrid,
 } from "@/components/common/primitives";
 import { RequestCard } from "@/components/requests/request-card";
-import { RequestFilters, EMPTY_FILTERS, type FilterState } from "@/components/requests/request-filters";
+import {
+  RequestFilters,
+  EMPTY_FILTERS,
+  type FilterState,
+} from "@/components/requests/request-filters";
 import { RespondDialog } from "@/components/requests/respond-dialog";
 import { Button } from "@/components/ui/button";
 import { SimplePagination } from "@/components/common/pagination";
@@ -22,20 +26,22 @@ import { MATCHING_EXPLAINER, MEDICAL_DECISION_DISCLAIMER } from "@/lib/blood";
 import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, unwrapAction } from "@/lib/actions";
 import { updateLocation } from "@/server/api/profile";
-import { fetchRequestFiltersMeta, searchRequests, type RequestSearchItem } from "@/server/api/requests";
+import {
+  fetchRequestFiltersMeta,
+  searchRequests,
+  type RequestSearchItem,
+} from "@/server/api/requests";
 import type { BloodGroup, RequestType, Urgency } from "@/lib/domain";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/find-help")({
-  head: () => ({
-    meta: [
-      { title: "Find help requests — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Search open blood, platelet and medical assistance requests by blood group, city, area, distance and urgency.",
-      },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Find help requests — Heal Connect",
+      description:
+        "Search open blood, platelet and medical assistance requests by blood group, city, area, distance and urgency.",
+      noIndex: true,
+    }),
   component: FindHelpPage,
 });
 
@@ -55,9 +61,13 @@ function FindHelpPage() {
     staleTime: 5 * 60_000,
   });
 
-  const location = user?.profile.approxLat != null && user?.profile.approxLng != null
-    ? { lat: user.profile.approxLat, lng: user.profile.approxLng }
-    : null;
+  const location = useMemo(
+    () =>
+      user?.profile.approxLat != null && user?.profile.approxLng != null
+        ? { lat: user.profile.approxLat, lng: user.profile.approxLng }
+        : null,
+    [user?.profile.approxLat, user?.profile.approxLng],
+  );
 
   const queryInput = useMemo(() => {
     const input: Record<string, unknown> = {
@@ -199,7 +209,8 @@ function FindHelpPage() {
         <div className="space-y-4">
           {!user?.donorProfile?.bloodGroup && user?.role !== "recipient" ? (
             <InfoNote tone="warning" title="Complete your donor profile for smarter matches">
-              Add your blood group, availability and travel preference so requests are ranked for you.{" "}
+              Add your blood group, availability and travel preference so requests are ranked for
+              you.{" "}
               <Link to="/profile" className="font-semibold underline">
                 Open donor profile
               </Link>
@@ -219,7 +230,13 @@ function FindHelpPage() {
               title="No requests match these filters"
               description="Try widening the distance, clearing the urgency filter, or searching by city instead of area. New requests appear here as soon as they are posted."
               action={
-                <Button variant="outline" onClick={() => { setFilters(EMPTY_FILTERS); setPage(1); }}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setFilters(EMPTY_FILTERS);
+                    setPage(1);
+                  }}
+                >
                   Clear all filters
                 </Button>
               }

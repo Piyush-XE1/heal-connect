@@ -22,8 +22,7 @@ const GOOGLE_USERINFO_ENDPOINT = "https://openidconnect.googleapis.com/v1/userin
 export const OAUTH_STATE_COOKIE = "hc_oauth_state";
 
 function readEnv(key: string): string | null {
-  const fromProcess =
-    typeof process !== "undefined" && process.env ? process.env[key] : undefined;
+  const fromProcess = typeof process !== "undefined" && process.env ? process.env[key] : undefined;
   if (fromProcess) return fromProcess;
   return null;
 }

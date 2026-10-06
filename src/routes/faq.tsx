@@ -7,17 +7,16 @@ import { Button } from "@/components/ui/button";
 import { FAQ_ITEMS, type FaqItem } from "@/lib/faq";
 import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/faq")({
   head: () => ({
-    meta: [
-      { title: "Frequently asked questions — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Answers about medical boundaries, privacy, verification, payments, emergency requests and how matching works on Heal Connect.",
-      },
-    ],
+    ...pageHead({
+      title: "Frequently asked questions — Heal Connect",
+      description:
+        "Answers about medical boundaries, privacy, verification, payments, emergency requests and how matching works on Heal Connect.",
+      path: "/faq",
+    }),
   }),
   component: FaqPage,
 });
@@ -32,7 +31,9 @@ const CATEGORIES: { id: FaqItem["category"] | "all"; label: string }[] = [
 
 function FaqPage() {
   const [category, setCategory] = useState<FaqItem["category"] | "all">("all");
-  const items = FAQ_ITEMS.filter((item) => (category === "all" ? true : item.category === category));
+  const items = FAQ_ITEMS.filter((item) =>
+    category === "all" ? true : item.category === category,
+  );
 
   return (
     <PublicPage
@@ -89,8 +90,9 @@ function FaqPage() {
       </div>
 
       <InfoNote tone="warning" title="Still not sure about a medical decision?">
-        Please speak to the treating doctor, the hospital blood bank or a licensed clinician. {BRAND.name} does not
-        provide medical advice, and our team cannot tell you whether you are eligible to donate.
+        Please speak to the treating doctor, the hospital blood bank or a licensed clinician.{" "}
+        {BRAND.name} does not provide medical advice, and our team cannot tell you whether you are
+        eligible to donate.
       </InfoNote>
 
       <div className="surface flex flex-wrap items-center justify-between gap-4 p-6">
@@ -98,7 +100,10 @@ function FaqPage() {
           <h2 className="font-display text-lg font-extrabold">Have a question we missed?</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Email{" "}
-            <a className="font-semibold text-primary hover:underline" href={`mailto:${BRAND.supportEmail}`}>
+            <a
+              className="font-semibold text-primary hover:underline"
+              href={`mailto:${BRAND.supportEmail}`}
+            >
               {BRAND.supportEmail}
             </a>{" "}
             and we will add it to this list.

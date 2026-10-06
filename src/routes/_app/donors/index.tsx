@@ -1,6 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
-import { BadgeCheck, Droplet, HeartHandshake, MapPin, Search, ShieldCheck, Users } from "lucide-react";
+import {
+  BadgeCheck,
+  Droplet,
+  HeartHandshake,
+  MapPin,
+  Search,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -20,28 +28,37 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/components/providers/auth-provider";
 import { AVAILABILITY_LABELS, AVAILABILITY_TONES, BLOOD_GROUP_TONES } from "@/lib/labels";
-import { AVAILABILITY_STATES, BLOOD_GROUPS, type Availability, type BloodGroup } from "@/lib/domain";
+import {
+  AVAILABILITY_STATES,
+  BLOOD_GROUPS,
+  type Availability,
+  type BloodGroup,
+} from "@/lib/domain";
 import { formatDate, initials } from "@/lib/format";
 import { formatDistance } from "@/lib/geo";
 import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, unwrapAction } from "@/lib/actions";
 import { updateLocation } from "@/server/api/profile";
 import { listVolunteers } from "@/server/api/profile";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/donors/")({
-  head: () => ({
-    meta: [
-      { title: "Donor directory — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Browse voluntary donors by blood group, city, area and availability. Contact details stay private until a match is confirmed.",
-      },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Donor directory — Heal Connect",
+      description:
+        "Browse voluntary donors by blood group, city, area and availability. Contact details stay private until a match is confirmed.",
+      noIndex: true,
+    }),
   component: DonorsPage,
 });
 
@@ -57,9 +74,13 @@ function DonorsPage() {
   const [radiusKm, setRadiusKm] = useState("");
   const [page, setPage] = useState(1);
 
-  const location = user?.profile.approxLat != null && user?.profile.approxLng != null
-    ? { lat: user.profile.approxLat, lng: user.profile.approxLng }
-    : null;
+  const location = useMemo(
+    () =>
+      user?.profile.approxLat != null && user?.profile.approxLng != null
+        ? { lat: user.profile.approxLat, lng: user.profile.approxLng }
+        : null,
+    [user?.profile.approxLat, user?.profile.approxLng],
+  );
 
   const queryInput = useMemo(() => {
     const input: Record<string, unknown> = { page, perPage: PER_PAGE };
@@ -91,7 +112,8 @@ function DonorsPage() {
         }
         navigator.geolocation.getCurrentPosition(
           (position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }),
-          () => reject(new Error("We could not get your location. You can filter by city instead.")),
+          () =>
+            reject(new Error("We could not get your location. You can filter by city instead.")),
           { enableHighAccuracy: false, timeout: 10_000, maximumAge: 5 * 60_000 },
         );
       }),
@@ -143,9 +165,9 @@ function DonorsPage() {
       </PageHeader>
 
       <InfoNote tone="primary" title="Why you cannot contact donors directly here">
-        Direct outreach to donors invites misuse and pressure. Raise a request instead — matching donors are notified,
-        and contact details are exchanged only after a donor offers help and the coordinator accepts. Never ask donors
-        for payment.
+        Direct outreach to donors invites misuse and pressure. Raise a request instead — matching
+        donors are notified, and contact details are exchanged only after a donor offers help and
+        the coordinator accepts. Never ask donors for payment.
       </InfoNote>
 
       <div className="surface space-y-4 p-5">
@@ -262,7 +284,10 @@ function DonorsPage() {
       {isLoading ? (
         <SkeletonGrid count={6} />
       ) : isError || !data ? (
-        <ErrorState description="We could not load the donor directory." onRetry={() => void refetch()} />
+        <ErrorState
+          description="We could not load the donor directory."
+          onRetry={() => void refetch()}
+        />
       ) : data.items.length === 0 ? (
         <EmptyState
           icon={Users}
@@ -294,7 +319,11 @@ function DonorsPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
                       {donor.avatarUrl ? (
-                        <img src={donor.avatarUrl} alt="" className="size-11 rounded-2xl object-cover" />
+                        <img
+                          src={donor.avatarUrl}
+                          alt=""
+                          className="size-11 rounded-2xl object-cover"
+                        />
                       ) : (
                         <span className="grid size-11 place-items-center rounded-2xl bg-primary-soft font-display text-sm font-extrabold text-primary">
                           {initials(donor.name)}
@@ -303,7 +332,8 @@ function DonorsPage() {
                       <div className="min-w-0">
                         <p className="truncate font-display text-base font-bold">{donor.name}</p>
                         <p className="truncate text-xs text-muted-foreground">
-                          {[donor.area, donor.city].filter(Boolean).join(", ") || "Location not shared"}
+                          {[donor.area, donor.city].filter(Boolean).join(", ") ||
+                            "Location not shared"}
                         </p>
                       </div>
                     </div>
@@ -319,11 +349,19 @@ function DonorsPage() {
                   <dl className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                     <div>
                       <dt className="font-semibold text-foreground">Distance</dt>
-                      <dd>{donor.distanceKm != null ? formatDistance(donor.distanceKm) : "Not available"}</dd>
+                      <dd>
+                        {donor.distanceKm != null
+                          ? formatDistance(donor.distanceKm)
+                          : "Not available"}
+                      </dd>
                     </div>
                     <div>
                       <dt className="font-semibold text-foreground">Last donation</dt>
-                      <dd>{donor.lastDonationDate ? formatDate(donor.lastDonationDate) : "Not recorded"}</dd>
+                      <dd>
+                        {donor.lastDonationDate
+                          ? formatDate(donor.lastDonationDate)
+                          : "Not recorded"}
+                      </dd>
                     </div>
                   </dl>
 
@@ -347,19 +385,20 @@ function DonorsPage() {
           <SimplePagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
           <InfoNote tone="warning" title="Compatibility is not decided here">
-            {data.bloodGroupFilterSupport} Donor availability is self-reported and may be out of date — always confirm
-            through the hospital or blood bank before relying on it.
+            {data.bloodGroupFilterSupport} Donor availability is self-reported and may be out of
+            date — always confirm through the hospital or blood bank before relying on it.
           </InfoNote>
         </>
       )}
 
       <InfoNote tone="blood" title="Want to appear here?">
-        Donors can opt in from their donor profile by keeping “Visible to recipients” enabled, and by setting an
-        accurate availability status.{" "}
+        Donors can opt in from their donor profile by keeping “Visible to recipients” enabled, and
+        by setting an accurate availability status.{" "}
         <Link to="/profile" className="font-semibold underline">
           Open donor profile
         </Link>
-        . Availability labels: {AVAILABILITY_STATES.map((state) => AVAILABILITY_TONES[state]).length > 0 ? "" : ""}
+        . Availability labels:{" "}
+        {AVAILABILITY_STATES.map((state) => AVAILABILITY_TONES[state]).length > 0 ? "" : ""}
         available, available with notice, not available.
       </InfoNote>
 
@@ -367,8 +406,8 @@ function DonorsPage() {
         <div className="flex items-center gap-3">
           <Droplet className="size-5 text-blood" aria-hidden="true" />
           <p className="text-sm">
-            <span className="font-semibold">Ready to donate?</span> Keep your availability current so families are not
-            waiting on donors who cannot travel.
+            <span className="font-semibold">Ready to donate?</span> Keep your availability current
+            so families are not waiting on donors who cannot travel.
           </p>
         </div>
         <Button asChild variant="outline">

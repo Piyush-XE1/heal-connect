@@ -8,11 +8,16 @@ import { Button } from "@/components/ui/button";
 import { queryKeys } from "@/lib/query-keys";
 import { unwrapAction } from "@/lib/actions";
 import { fetchRequest } from "@/server/api/requests";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/requests/$requestId/edit")({
-  head: () => ({
-    meta: [{ title: "Edit request — Heal Connect" }],
-  }),
+  head: () =>
+    pageHead({
+      title: "Edit request — Heal Connect",
+      description:
+        "Update the blood group, units, date, urgency or coordination details of your request.",
+      noIndex: true,
+    }),
   component: EditRequestPage,
 });
 

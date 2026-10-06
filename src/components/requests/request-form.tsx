@@ -33,7 +33,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { areasForCity, cityOptions } from "@/lib/cities";
 import {
@@ -123,7 +129,8 @@ const STEPS: StepDefinition[] = [
   {
     id: "review",
     title: "Review",
-    blurb: "Check everything once, then publish it to matching donors or keep it as a private draft.",
+    blurb:
+      "Check everything once, then publish it to matching donors or keep it as a private draft.",
     icon: ShieldCheck,
     fields: [],
   },
@@ -144,7 +151,9 @@ const REQUEST_TYPE_HELP: Record<RequestType, string> = {
 function SummaryRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <dt className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">{label}</dt>
+      <dt className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+        {label}
+      </dt>
       <dd className="text-sm font-semibold">{value}</dd>
     </div>
   );
@@ -169,7 +178,9 @@ export function RequestForm({
   const queryClient = useQueryClient();
   const formRef = useRef<HTMLFormElement>(null);
   const [stepIndex, setStepIndex] = useState(0);
-  const [outcome, setOutcome] = useState<{ id: string; reference: string; draft: boolean } | null>(null);
+  const [outcome, setOutcome] = useState<{ id: string; reference: string; draft: boolean } | null>(
+    null,
+  );
 
   const initialValues: FormValues = {
     requestType: "blood",
@@ -282,12 +293,15 @@ export function RequestForm({
     },
     onSuccess: (result) => {
       invalidate();
-      toast.success(result.reference ? `Request ${result.reference} published` : "Request published", {
-        description:
-          mode === "edit"
-            ? "Any donors who offered help have been notified about the change."
-            : "Matching donors nearby have been notified. You can track offers under My requests.",
-      });
+      toast.success(
+        result.reference ? `Request ${result.reference} published` : "Request published",
+        {
+          description:
+            mode === "edit"
+              ? "Any donors who offered help have been notified about the change."
+              : "Matching donors nearby have been notified. You can track offers under My requests.",
+        },
+      );
       setOutcome({ id: result.id, reference: result.reference ?? "", draft: false });
       onSubmitted?.(result);
     },
@@ -340,7 +354,9 @@ export function RequestForm({
     },
     onSuccess: () => {
       invalidate();
-      toast.success("Draft published", { description: "Matching donors nearby have been notified." });
+      toast.success("Draft published", {
+        description: "Matching donors nearby have been notified.",
+      });
       setOutcome((current) => (current ? { ...current, draft: false } : current));
     },
     onError: (error) => {
@@ -426,13 +442,14 @@ export function RequestForm({
             <p className="text-sm text-muted-foreground">
               {published ? (
                 <>
-                  <span className="font-semibold text-foreground">{reference}</span> is live for matching donors
-                  nearby. We notified donors whose group, distance and availability fit.
+                  <span className="font-semibold text-foreground">{reference}</span> is live for
+                  matching donors nearby. We notified donors whose group, distance and availability
+                  fit.
                 </>
               ) : (
                 <>
-                  <span className="font-semibold text-foreground">{reference}</span> is a private draft. Nobody else
-                  can see it until you publish.
+                  <span className="font-semibold text-foreground">{reference}</span> is a private
+                  draft. Nobody else can see it until you publish.
                 </>
               )}
             </p>
@@ -443,7 +460,11 @@ export function RequestForm({
           <SummaryRow label="Type" value={REQUEST_TYPE_LABELS[summaryType]} />
           <SummaryRow
             label={summaryType === "medical_assistance" ? "People needed" : "Blood group"}
-            value={summaryType === "medical_assistance" ? `${summaryUnits}` : (summaryBloodGroup ?? "Not set")}
+            value={
+              summaryType === "medical_assistance"
+                ? `${summaryUnits}`
+                : (summaryBloodGroup ?? "Not set")
+            }
           />
           <SummaryRow
             label={summaryType === "medical_assistance" ? "Volunteers needed" : "Units needed"}
@@ -496,8 +517,9 @@ export function RequestForm({
         </div>
 
         <InfoNote tone="primary" icon={PhoneCall} title="What happens next">
-          Donors who can help will offer through the platform. You accept an offer to unlock their contact details,
-          then the hospital or blood bank confirms final compatibility and eligibility.
+          Donors who can help will offer through the platform. You accept an offer to unlock their
+          contact details, then the hospital or blood bank confirms final compatibility and
+          eligibility.
         </InfoNote>
       </section>
     );
@@ -555,7 +577,8 @@ export function RequestForm({
         <ol className="flex flex-wrap gap-2">
           {steps.map((item, index) => {
             const Icon = item.icon;
-            const state = index === activeIndex ? "current" : index < activeIndex ? "done" : "upcoming";
+            const state =
+              index === activeIndex ? "current" : index < activeIndex ? "done" : "upcoming";
             return (
               <li key={item.id}>
                 <button
@@ -631,12 +654,14 @@ export function RequestForm({
               ))}
             </RadioGroup>
             {form.formState.errors.requestType ? (
-              <p className="text-xs font-medium text-destructive">{form.formState.errors.requestType.message}</p>
+              <p className="text-xs font-medium text-destructive">
+                {form.formState.errors.requestType.message}
+              </p>
             ) : null}
             {requestType === "medical_assistance" ? (
               <InfoNote tone="primary" icon={HeartPulse} title="Non-blood assistance">
-                Blood-group matching does not apply here. Describe what is needed in the next steps and keep
-                everything free of charge.
+                Blood-group matching does not apply here. Describe what is needed in the next steps
+                and keep everything free of charge.
               </InfoNote>
             ) : null}
           </div>
@@ -648,9 +673,14 @@ export function RequestForm({
               <Label htmlFor="bloodGroup">Blood group needed *</Label>
               <Select
                 value={(form.watch("bloodGroup") as string) ?? ""}
-                onValueChange={(value) => form.setValue("bloodGroup", value as BloodGroup, { shouldValidate: true })}
+                onValueChange={(value) =>
+                  form.setValue("bloodGroup", value as BloodGroup, { shouldValidate: true })
+                }
               >
-                <SelectTrigger id="bloodGroup" aria-invalid={Boolean(form.formState.errors.bloodGroup)}>
+                <SelectTrigger
+                  id="bloodGroup"
+                  aria-invalid={Boolean(form.formState.errors.bloodGroup)}
+                >
                   <SelectValue placeholder="Select group" />
                 </SelectTrigger>
                 <SelectContent>
@@ -662,11 +692,13 @@ export function RequestForm({
                 </SelectContent>
               </Select>
               {form.formState.errors.bloodGroup ? (
-                <p className="text-xs font-medium text-destructive">{form.formState.errors.bloodGroup.message}</p>
+                <p className="text-xs font-medium text-destructive">
+                  {form.formState.errors.bloodGroup.message}
+                </p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  The hospital or blood bank decides the final compatible match. We use red-cell compatibility only
-                  as a guide for matching.
+                  The hospital or blood bank decides the final compatible match. We use red-cell
+                  compatibility only as a guide for matching.
                 </p>
               )}
             </div>
@@ -682,12 +714,16 @@ export function RequestForm({
                 step={1}
                 value={Number(units) || ""}
                 onChange={(event) =>
-                  form.setValue("unitsRequired", Number(event.target.value), { shouldValidate: true })
+                  form.setValue("unitsRequired", Number(event.target.value), {
+                    shouldValidate: true,
+                  })
                 }
                 aria-invalid={Boolean(form.formState.errors.unitsRequired)}
               />
               {form.formState.errors.unitsRequired ? (
-                <p className="text-xs font-medium text-destructive">{form.formState.errors.unitsRequired.message}</p>
+                <p className="text-xs font-medium text-destructive">
+                  {form.formState.errors.unitsRequired.message}
+                </p>
               ) : (
                 <p className="text-xs text-muted-foreground">
                   For more than 20 units, coordinate directly with the hospital blood bank.
@@ -696,7 +732,11 @@ export function RequestForm({
             </div>
 
             <div className="sm:col-span-2">
-              <InfoNote tone="warning" icon={AlertTriangle} title="Medical decisions are not ours to make">
+              <InfoNote
+                tone="warning"
+                icon={AlertTriangle}
+                title="Medical decisions are not ours to make"
+              >
                 {EMERGENCY_DISCLAIMER}
               </InfoNote>
             </div>
@@ -717,7 +757,9 @@ export function RequestForm({
                 aria-invalid={Boolean(form.formState.errors.hospitalName)}
               />
               {form.formState.errors.hospitalName ? (
-                <p className="text-xs font-medium text-destructive">{form.formState.errors.hospitalName.message}</p>
+                <p className="text-xs font-medium text-destructive">
+                  {form.formState.errors.hospitalName.message}
+                </p>
               ) : null}
             </div>
 
@@ -741,14 +783,19 @@ export function RequestForm({
                   ))}
                 </datalist>
                 {form.formState.errors.city ? (
-                  <p className="text-xs font-medium text-destructive">{form.formState.errors.city.message}</p>
+                  <p className="text-xs font-medium text-destructive">
+                    {form.formState.errors.city.message}
+                  </p>
                 ) : null}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="area">Area or locality</Label>
                 {areas.length > 0 ? (
-                  <Select value={form.watch("area") ?? ""} onValueChange={(value) => form.setValue("area", value)}>
+                  <Select
+                    value={form.watch("area") ?? ""}
+                    onValueChange={(value) => form.setValue("area", value)}
+                  >
                     <SelectTrigger id="area">
                       <SelectValue placeholder="Select area" />
                     </SelectTrigger>
@@ -795,7 +842,9 @@ export function RequestForm({
                 aria-invalid={Boolean(form.formState.errors.requiredBy)}
               />
               {form.formState.errors.requiredBy ? (
-                <p className="text-xs font-medium text-destructive">{form.formState.errors.requiredBy.message}</p>
+                <p className="text-xs font-medium text-destructive">
+                  {form.formState.errors.requiredBy.message}
+                </p>
               ) : null}
             </div>
 
@@ -803,7 +852,9 @@ export function RequestForm({
               <Label id="urgency-label">Urgency *</Label>
               <RadioGroup
                 value={urgency}
-                onValueChange={(value) => form.setValue("urgency", value as Urgency, { shouldValidate: true })}
+                onValueChange={(value) =>
+                  form.setValue("urgency", value as Urgency, { shouldValidate: true })
+                }
                 className="grid gap-3 sm:grid-cols-3"
                 aria-labelledby="urgency-label"
               >
@@ -811,7 +862,11 @@ export function RequestForm({
                   const Icon = URGENCY_ICONS[option];
                   return (
                     <div key={option}>
-                      <RadioGroupItem value={option} id={`urgency-${option}`} className="peer sr-only" />
+                      <RadioGroupItem
+                        value={option}
+                        id={`urgency-${option}`}
+                        className="peer sr-only"
+                      />
                       <Label
                         htmlFor={`urgency-${option}`}
                         className={`flex h-full cursor-pointer flex-col gap-1 rounded-2xl border p-4 transition hover:bg-accent/50 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary-soft ${
@@ -821,27 +876,33 @@ export function RequestForm({
                         <span className="flex items-center gap-2 text-sm font-bold">
                           <Icon
                             className={
-                              option === "emergency" ? "size-4 text-destructive" : "size-4 text-primary"
+                              option === "emergency"
+                                ? "size-4 text-destructive"
+                                : "size-4 text-primary"
                             }
                             aria-hidden="true"
                           />
                           {URGENCY_LABELS[option]}
                         </span>
-                        <span className="text-xs text-muted-foreground">{URGENCY_DESCRIPTIONS[option]}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {URGENCY_DESCRIPTIONS[option]}
+                        </span>
                       </Label>
                     </div>
                   );
                 })}
               </RadioGroup>
               {form.formState.errors.urgency ? (
-                <p className="text-xs font-medium text-destructive">{form.formState.errors.urgency.message}</p>
+                <p className="text-xs font-medium text-destructive">
+                  {form.formState.errors.urgency.message}
+                </p>
               ) : null}
             </div>
 
             {urgency === "emergency" ? (
               <InfoNote tone="danger" icon={Siren} title="Emergency requests need extra detail">
-                {EMERGENCY_DISCLAIMER} Add the ward or coordinating person in the next step so a donor can act
-                quickly, and contact the hospital blood bank in parallel.
+                {EMERGENCY_DISCLAIMER} Add the ward or coordinating person in the next step so a
+                donor can act quickly, and contact the hospital blood bank in parallel.
               </InfoNote>
             ) : null}
           </div>
@@ -942,12 +1003,15 @@ export function RequestForm({
                   aria-invalid={Boolean(form.formState.errors.consent)}
                 />
                 <span className="text-muted-foreground">
-                  I confirm this request is genuine, that I have consent from the patient (or their family) to share
-                  these details, and that no payment, gift or compensation is being offered or requested. *
+                  I confirm this request is genuine, that I have consent from the patient (or their
+                  family) to share these details, and that no payment, gift or compensation is being
+                  offered or requested. *
                 </span>
               </label>
               {form.formState.errors.consent ? (
-                <p className="text-xs font-medium text-destructive">{form.formState.errors.consent.message}</p>
+                <p className="text-xs font-medium text-destructive">
+                  {form.formState.errors.consent.message}
+                </p>
               ) : null}
             </div>
 
@@ -986,7 +1050,10 @@ export function RequestForm({
                 }`}
               />
               <SummaryRow label="Needed by" value={form.watch("requiredBy") || "Not set"} />
-              <SummaryRow label="Coordinating person" value={form.watch("contactName") || "Not set"} />
+              <SummaryRow
+                label="Coordinating person"
+                value={form.watch("contactName") || "Not set"}
+              />
               <SummaryRow
                 label="Contact number"
                 value={form.watch("contactPhone") || "Not set"}
@@ -1075,11 +1142,20 @@ export function RequestForm({
                 ) : (
                   <Send className="size-4" aria-hidden="true" />
                 )}
-                {mode === "edit" ? (isDraft ? "Publish request" : "Save changes") : "Publish request"}
+                {mode === "edit"
+                  ? isDraft
+                    ? "Publish request"
+                    : "Save changes"
+                  : "Publish request"}
               </Button>
             </>
           ) : (
-            <Button type="button" onClick={() => void goNext()} disabled={busy} className="sm:min-w-32">
+            <Button
+              type="button"
+              onClick={() => void goNext()}
+              disabled={busy}
+              className="sm:min-w-32"
+            >
               Continue
               <ArrowRight className="size-4" aria-hidden="true" />
             </Button>

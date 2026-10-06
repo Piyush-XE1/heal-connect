@@ -14,6 +14,7 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { errorMessage, fieldErrors, unwrapAction } from "@/lib/actions";
 import { queryKeys } from "@/lib/query-keys";
 import { fetchAuthConfig, signUpWithPassword } from "@/server/api/auth";
+import { pageHead } from "@/lib/seo";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -22,16 +23,13 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/register")({
   validateSearch: (search) => searchSchema.parse(search),
-  head: () => ({
-    meta: [
-      { title: "Create your account — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Join Heal Connect as a donor, a recipient or both. Free, privacy-first, and moderated for safety.",
-      },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Create your account — Heal Connect",
+      description:
+        "Join Heal Connect as a donor, a recipient or both. Free, privacy-first, and moderated for safety.",
+      path: "/register",
+    }),
   component: RegisterPage,
 });
 
@@ -51,7 +49,9 @@ function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accepted, setAccepted] = useState(false);
-  const [formError, setFormError] = useState<string | null>(error ? ERROR_MESSAGES[error] ?? null : null);
+  const [formError, setFormError] = useState<string | null>(
+    error ? (ERROR_MESSAGES[error] ?? null) : null,
+  );
   const [fieldErrorState, setFieldErrorState] = useState<Record<string, string>>({});
 
   const { data: config } = useQuery({
@@ -203,7 +203,8 @@ function RegisterPage() {
               <Link to="/privacy" className="font-semibold text-primary hover:underline">
                 Privacy Policy
               </Link>
-              , and I understand that Heal Connect does not provide medical care or emergency services.
+              , and I understand that Heal Connect does not provide medical care or emergency
+              services.
             </span>
           </label>
 
@@ -218,8 +219,8 @@ function RegisterPage() {
         </form>
 
         <InfoNote tone="primary" icon={ShieldCheck} title="What we will never ask for">
-          We never ask for ID documents, medical reports, bank details or payment. Registration is free, and
-          paying for blood or organs is prohibited on the platform.
+          We never ask for ID documents, medical reports, bank details or payment. Registration is
+          free, and paying for blood or organs is prohibited on the platform.
         </InfoNote>
       </div>
     </AuthShell>

@@ -17,7 +17,8 @@ export const queryKeys = {
   volunteers: (filters: Record<string, unknown>) => ["volunteers", filters] as const,
   publicProfile: (id: string) => ["public-profile", id] as const,
   cityOptions: ["city-options"] as const,
-  admin: (section: string, filters: Record<string, unknown>) => ["admin", section, filters] as const,
+  admin: (section: string, filters: Record<string, unknown>) =>
+    ["admin", section, filters] as const,
 } as const;
 
 type QueryKey = readonly unknown[];

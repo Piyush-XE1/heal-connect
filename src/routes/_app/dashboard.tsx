@@ -51,14 +51,15 @@ import { queryKeys } from "@/lib/query-keys";
 import { unwrapAction } from "@/lib/actions";
 import { fetchDashboard } from "@/server/api/requests";
 import type { RequestSearchItem } from "@/server/api/requests";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/dashboard")({
-  head: () => ({
-    meta: [
-      { title: "Dashboard — Heal Connect" },
-      { name: "description", content: "Your matches, requests, activity and notifications at a glance." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Dashboard — Heal Connect",
+      description: "Your matches, requests, activity and notifications at a glance.",
+      noIndex: true,
+    }),
   component: DashboardPage,
 });
 
@@ -169,7 +170,10 @@ function DashboardPage() {
           <SkeletonGrid count={3} />
         </div>
       ) : isError || !data ? (
-        <ErrorState description="We could not load your dashboard." onRetry={() => void refetch()} />
+        <ErrorState
+          description="We could not load your dashboard."
+          onRetry={() => void refetch()}
+        />
       ) : (
         <>
           {/* Quick actions + completion */}
@@ -185,14 +189,21 @@ function DashboardPage() {
                     to={action.to}
                     className="surface surface-hover flex items-center gap-4 p-4"
                   >
-                    <span className={`grid size-11 shrink-0 place-items-center rounded-2xl ${action.accent}`}>
+                    <span
+                      className={`grid size-11 shrink-0 place-items-center rounded-2xl ${action.accent}`}
+                    >
                       <action.icon className="size-5" aria-hidden="true" />
                     </span>
                     <span className="min-w-0">
                       <span className="block font-display text-sm font-bold">{action.label}</span>
-                      <span className="block truncate text-xs text-muted-foreground">{action.description}</span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {action.description}
+                      </span>
                     </span>
-                    <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <ArrowRight
+                      className="ml-auto size-4 shrink-0 text-muted-foreground"
+                      aria-hidden="true"
+                    />
                   </Link>
                 ))}
               </div>
@@ -210,16 +221,24 @@ function DashboardPage() {
                       <MapPin className="size-3.5" aria-hidden="true" />
                       {data.hasLocation ? "Location set" : "Location missing"}
                     </Pill>
-                    <Pill tone={user?.donorProfile?.availability === "available" ? "success" : "neutral"}>
-                      Availability: {user?.donorProfile?.availability?.replace(/_/g, " ") ?? "not set"}
+                    <Pill
+                      tone={
+                        user?.donorProfile?.availability === "available" ? "success" : "neutral"
+                      }
+                    >
+                      Availability:{" "}
+                      {user?.donorProfile?.availability?.replace(/_/g, " ") ?? "not set"}
                     </Pill>
                     <Pill tone="neutral">
-                      Last donation: {user?.donorProfile?.lastDonationDate ? formatDate(user.donorProfile.lastDonationDate) : "not recorded"}
+                      Last donation:{" "}
+                      {user?.donorProfile?.lastDonationDate
+                        ? formatDate(user.donorProfile.lastDonationDate)
+                        : "not recorded"}
                     </Pill>
                   </div>
                   <p className="text-xs leading-relaxed text-muted-foreground">
-                    Keep availability accurate so families are not waiting on donors who cannot travel. You can pause
-                    at any time from your donor profile.
+                    Keep availability accurate so families are not waiting on donors who cannot
+                    travel. You can pause at any time from your donor profile.
                   </p>
                   <Button asChild size="sm" variant="outline">
                     <Link to="/profile">Update donor profile</Link>
@@ -271,7 +290,9 @@ function DashboardPage() {
                             aria-hidden="true"
                           />
                           <span className="min-w-0">
-                            <span className="block truncate text-xs font-semibold">{notification.title}</span>
+                            <span className="block truncate text-xs font-semibold">
+                              {notification.title}
+                            </span>
                             <span className="block text-[11px] text-muted-foreground">
                               {relativeTime(notification.createdAt)}
                             </span>
@@ -309,7 +330,11 @@ function DashboardPage() {
                 <StatTile
                   label="Matched requests"
                   value={data.stats.matchedRequests}
-                  hint={data.stats.emergencyNearby > 0 ? `${data.stats.emergencyNearby} emergency nearby` : "Ranked by compatibility and distance"}
+                  hint={
+                    data.stats.emergencyNearby > 0
+                      ? `${data.stats.emergencyNearby} emergency nearby`
+                      : "Ranked by compatibility and distance"
+                  }
                   icon={Heart}
                   tone="blood"
                 />
@@ -356,9 +381,7 @@ function DashboardPage() {
 
               {!data.hasBloodGroup || !data.hasLocation ? (
                 <InfoNote tone="warning" title="Improve your matches">
-                  {!data.hasBloodGroup
-                    ? "Add your blood group to see compatible requests. "
-                    : ""}
+                  {!data.hasBloodGroup ? "Add your blood group to see compatible requests. " : ""}
                   {!data.hasLocation
                     ? "Add your city or share your coarse location so we can rank requests by distance."
                     : ""}
@@ -462,7 +485,10 @@ function DashboardPage() {
           {/* Activity + emergencies */}
           <section className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
             <div className="space-y-4">
-              <SectionHeading title="Recent activity" description="Everything you did lately, newest first." />
+              <SectionHeading
+                title="Recent activity"
+                description="Everything you did lately, newest first."
+              />
               {data.recentActivity.length === 0 ? (
                 <EmptyState
                   icon={Activity}
@@ -491,11 +517,18 @@ function DashboardPage() {
                         )}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <Link to={entry.link} className="block text-sm font-semibold hover:text-primary">
+                        <Link
+                          to={entry.link}
+                          className="block text-sm font-semibold hover:text-primary"
+                        >
                           {entry.title}
                         </Link>
-                        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{entry.description}</p>
-                        <p className="mt-1 text-[11px] text-muted-foreground">{relativeTime(entry.at)}</p>
+                        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                          {entry.description}
+                        </p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {relativeTime(entry.at)}
+                        </p>
                       </div>
                     </li>
                   ))}
@@ -506,8 +539,8 @@ function DashboardPage() {
             <div className="space-y-4">
               <EmergencyPeek />
               <InfoNote tone="primary" icon={Stethoscope} title="Our role, and yours">
-                {MEDICAL_DISCLAIMER} Confirm everything with the hospital blood bank before travelling, and report
-                anything that feels unsafe or asks for money.
+                {MEDICAL_DISCLAIMER} Confirm everything with the hospital blood bank before
+                travelling, and report anything that feels unsafe or asks for money.
               </InfoNote>
               <div className="surface space-y-3 p-5">
                 <h3 className="flex items-center gap-2 font-display text-sm font-bold">
@@ -515,13 +548,15 @@ function DashboardPage() {
                   Get verified
                 </h3>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Verified accounts stand out in donor offers and request lists. Verification is reviewed manually by
-                  our team.
+                  Verified accounts stand out in donor offers and request lists. Verification is
+                  reviewed manually by our team.
                 </p>
                 <Button asChild size="sm" variant="outline">
                   <Link to="/verify">
                     <BadgeCheck className="size-4" aria-hidden="true" />
-                    {data.verificationStatus === "verified" ? "View verification" : "Start verification"}
+                    {data.verificationStatus === "verified"
+                      ? "View verification"
+                      : "Start verification"}
                   </Link>
                 </Button>
               </div>
@@ -530,7 +565,11 @@ function DashboardPage() {
         </>
       )}
 
-      <RespondDialog item={respondItem} open={Boolean(respondItem)} onOpenChange={(open) => !open && setRespondItem(null)} />
+      <RespondDialog
+        item={respondItem}
+        open={Boolean(respondItem)}
+        onOpenChange={(open) => !open && setRespondItem(null)}
+      />
     </div>
   );
 }
@@ -564,8 +603,8 @@ function EmergencyPeek() {
         </ul>
       ) : (
         <p className="text-xs text-muted-foreground">
-          No open emergency requests right now. In an emergency, always contact emergency services and the hospital
-          blood bank first.
+          No open emergency requests right now. In an emergency, always contact emergency services
+          and the hospital blood bank first.
         </p>
       )}
       <Button asChild size="sm" variant="outline" className="w-full">

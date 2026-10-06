@@ -44,7 +44,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/components/providers/auth-provider";
 import {
-    EMERGENCY_DISCLAIMER,
+  EMERGENCY_DISCLAIMER,
   MEDICAL_DISCLAIMER,
   PAYMENT_PROHIBITION,
   SAFETY_RULES,
@@ -55,20 +55,17 @@ import { distanceBand } from "@/lib/geo";
 import { REQUEST_STATUS_LABELS, REQUEST_TYPE_LABELS } from "@/lib/labels";
 import { invalidationGroups, queryKeys } from "@/lib/query-keys";
 import { errorMessage, unwrapAction } from "@/lib/actions";
-import {
-  fetchRequest,
-  updateRequestStatus,
-  type RequestSearchItem,
-} from "@/server/api/requests";
+import { fetchRequest, updateRequestStatus, type RequestSearchItem } from "@/server/api/requests";
 import { updateResponseStatus, withdrawResponse } from "@/server/api/responses";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/requests/$requestId/")({
-  head: () => ({
-    meta: [
-      { title: "Request details — Heal Connect" },
-      { name: "description", content: "Coordination details, donor offers and status for a Heal Connect request." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Request details — Heal Connect",
+      description: "Coordination details, donor offers and status for a Heal Connect request.",
+      noIndex: true,
+    }),
   component: RequestDetailPage,
 });
 
@@ -93,8 +90,7 @@ function RequestDetailPage() {
   };
 
   const respondMutation = useMutation({
-    mutationFn: async (id: string) =>
-      unwrapAction(await withdrawResponse({ data: { id } })),
+    mutationFn: async (id: string) => unwrapAction(await withdrawResponse({ data: { id } })),
     onSuccess: () => {
       toast.success("Offer withdrawn", {
         description: "The coordinator has been notified. Thank you for letting them know.",
@@ -105,8 +101,11 @@ function RequestDetailPage() {
   });
 
   const responseStatus = useMutation({
-    mutationFn: async (input: { id: string; status: "accepted" | "declined" | "completed"; note?: string }) =>
-      unwrapAction(await updateResponseStatus({ data: input })),
+    mutationFn: async (input: {
+      id: string;
+      status: "accepted" | "declined" | "completed";
+      note?: string;
+    }) => unwrapAction(await updateResponseStatus({ data: input })),
     onSuccess: (_result, variables) => {
       const messages: Record<string, string> = {
         accepted: "Donor confirmed. Coordination details are now visible to them.",
@@ -116,7 +115,8 @@ function RequestDetailPage() {
       toast.success(messages[variables.status] ?? "Offer updated");
       invalidate();
     },
-    onError: (error) => toast.error("Could not update the offer", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not update the offer", { description: errorMessage(error) }),
   });
 
   const statusMutation = useMutation({
@@ -135,7 +135,8 @@ function RequestDetailPage() {
       invalidate();
       void queryClient.invalidateQueries({ queryKey: queryKeys.myRequests });
     },
-    onError: (error) => toast.error("Could not update the request", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not update the request", { description: errorMessage(error) }),
   });
 
   if (isLoading) {
@@ -191,8 +192,8 @@ function RequestDetailPage() {
 
       {request.status === "draft" ? (
         <InfoNote tone="warning" icon={FileText} title="Private draft — not visible to donors">
-          Nothing has been shared yet. Publish the request when the hospital details are confirmed and matching
-          donors will be notified immediately.
+          Nothing has been shared yet. Publish the request when the hospital details are confirmed
+          and matching donors will be notified immediately.
           {isOwner ? (
             <div className="mt-3">
               <ConfirmDialog
@@ -226,7 +227,10 @@ function RequestDetailPage() {
               <RequestStatusBadge status={request.status} />
               <Pill tone="info">{REQUEST_TYPE_LABELS[request.requestType]}</Pill>
             </div>
-            <h1 id="request-title" className="font-display text-2xl leading-tight font-extrabold text-balance">
+            <h1
+              id="request-title"
+              className="font-display text-2xl leading-tight font-extrabold text-balance"
+            >
               {isEmergency ? "Emergency: " : ""}
               {request.bloodGroup
                 ? `${request.bloodGroup} ${request.requestType} required`
@@ -270,7 +274,11 @@ function RequestDetailPage() {
           </Pill>
           <Pill tone="neutral">Requester: {request.requesterName}</Pill>
           {user?.id && !isOwner ? (
-            <BlockUserButton userId={request.requesterId} name={request.requesterName} blocked={false} />
+            <BlockUserButton
+              userId={request.requesterId}
+              name={request.requesterName}
+              blocked={false}
+            />
           ) : null}
           {!isOwner ? <ReportButton targetType="request" targetId={request.id} /> : null}
         </div>
@@ -286,7 +294,8 @@ function RequestDetailPage() {
 
         {request.status === "fulfilled" && request.resolvedAt ? (
           <InfoNote tone="success" icon={Check} title="This request is fulfilled">
-            Marked fulfilled on {formatDate(request.resolvedAt)}. Thank you to everyone who offered help.
+            Marked fulfilled on {formatDate(request.resolvedAt)}. Thank you to everyone who offered
+            help.
           </InfoNote>
         ) : null}
 
@@ -298,12 +307,11 @@ function RequestDetailPage() {
                 className={isEmergency ? "gradient-life text-white hover:opacity-95" : undefined}
                 onClick={() => setRespondOpen(true)}
               >
-                <Droplet className="size-4" aria-hidden="true" />
-                I can help
+                <Droplet className="size-4" aria-hidden="true" />I can help
               </Button>
               <p className="w-full text-xs text-muted-foreground">
-                Offering help does not confirm a medical match — the hospital blood bank confirms compatibility and
-                eligibility.
+                Offering help does not confirm a medical match — the hospital blood bank confirms
+                compatibility and eligibility.
               </p>
             </>
           ) : null}
@@ -386,7 +394,9 @@ function RequestDetailPage() {
                 <PhoneCall className="size-4 text-primary" aria-hidden="true" />
                 {request.contact.name}
               </p>
-              <Pill tone="success"><Eye className="size-3.5" aria-hidden="true" /> Visible to you</Pill>
+              <Pill tone="success">
+                <Eye className="size-3.5" aria-hidden="true" /> Visible to you
+              </Pill>
             </div>
             <p className="text-sm text-muted-foreground">
               {request.contact.phone || "Phone number not shared"}
@@ -395,14 +405,15 @@ function RequestDetailPage() {
               <p className="text-sm text-muted-foreground">{request.contact.instructions}</p>
             ) : null}
             <p className="text-xs text-muted-foreground">
-              Unlocked because: {request.contact.unlockedBy.replace(/_/g, " ")}. Never share money, ID documents or
-              bank details with anyone you met here.
+              Unlocked because: {request.contact.unlockedBy.replace(/_/g, " ")}. Never share money,
+              ID documents or bank details with anyone you met here.
             </p>
           </div>
         ) : (
           <InfoNote tone="primary" icon={ShieldCheck} title="Contact details are protected">
-            The requester's name and number are shared only with the requester themselves, a moderator, or a donor
-            whose offer has been accepted. Until then, coordination happens through the platform.
+            The requester's name and number are shared only with the requester themselves, a
+            moderator, or a donor whose offer has been accepted. Until then, coordination happens
+            through the platform.
           </InfoNote>
         )}
       </section>
@@ -441,16 +452,21 @@ function RequestDetailPage() {
                       ) : null}
                       <ResponseStatusBadge status={offer.status} />
                     </div>
-                    <span className="text-xs text-muted-foreground">{relativeTime(offer.createdAt)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {relativeTime(offer.createdAt)}
+                    </span>
                   </div>
 
                   <p className="text-sm text-muted-foreground">
                     {offer.donorCity ? `${offer.donorCity} · ` : ""}
-                    {offer.donorBloodGroup ?? "Group not provided"} · phone {maskPhone(offer.contact?.phone)}
+                    {offer.donorBloodGroup ?? "Group not provided"} · phone{" "}
+                    {maskPhone(offer.contact?.phone)}
                   </p>
 
                   {offer.message ? (
-                    <p className="rounded-xl bg-muted/50 p-3 text-sm text-muted-foreground">“{offer.message}”</p>
+                    <p className="rounded-xl bg-muted/50 p-3 text-sm text-muted-foreground">
+                      “{offer.message}”
+                    </p>
                   ) : null}
 
                   <div className="flex flex-wrap gap-2">
@@ -459,7 +475,9 @@ function RequestDetailPage() {
                         <Button
                           size="sm"
                           disabled={responseStatus.isPending}
-                          onClick={() => responseStatus.mutate({ id: offer.id, status: "accepted" })}
+                          onClick={() =>
+                            responseStatus.mutate({ id: offer.id, status: "accepted" })
+                          }
                         >
                           <Check className="size-4" aria-hidden="true" />
                           Accept offer
@@ -530,7 +548,11 @@ function RequestDetailPage() {
           </h2>
           <MatchDisclosure match={match} />
           {match.blockers.length > 0 ? (
-            <InfoNote tone="warning" icon={ShieldCheck} title="This request is not a fit for your profile">
+            <InfoNote
+              tone="warning"
+              icon={ShieldCheck}
+              title="This request is not a fit for your profile"
+            >
               {match.blockers.join(" ")}
             </InfoNote>
           ) : null}
@@ -543,7 +565,10 @@ function RequestDetailPage() {
           <h2 className="font-display text-lg font-extrabold">Your offer</h2>
           <div className="surface space-y-3 p-5">
             <p className="text-sm text-muted-foreground">
-              Your offer is {request.myResponseStatus === "accepted" ? "accepted — please coordinate with the contact above." : "waiting for the coordinator to confirm."}
+              Your offer is{" "}
+              {request.myResponseStatus === "accepted"
+                ? "accepted — please coordinate with the contact above."
+                : "waiting for the coordinator to confirm."}
             </p>
             {responses
               .filter((offer) => offer.donorId === user?.id)
@@ -576,18 +601,31 @@ function RequestDetailPage() {
         </h2>
         <ol className="surface divide-y divide-border">
           {[
-            { label: `Request published (${REQUEST_STATUS_LABELS["open"]})`, at: request.createdAt },
+            {
+              label: `Request published (${REQUEST_STATUS_LABELS["open"]})`,
+              at: request.createdAt,
+            },
             ...(request.status === "in_progress"
               ? [{ label: "Donor accepted — coordination in progress", at: request.updatedAt }]
               : []),
             ...(request.resolvedAt
-              ? [{ label: `Marked ${REQUEST_STATUS_LABELS[request.status]}`, at: request.resolvedAt }]
+              ? [
+                  {
+                    label: `Marked ${REQUEST_STATUS_LABELS[request.status]}`,
+                    at: request.resolvedAt,
+                  },
+                ]
               : []),
             { label: "Last updated", at: request.updatedAt },
           ].map((entry, index) => (
-            <li key={`${entry.label}-${index}`} className="flex items-center justify-between gap-4 p-4 text-sm">
+            <li
+              key={`${entry.label}-${index}`}
+              className="flex items-center justify-between gap-4 p-4 text-sm"
+            >
               <span>{entry.label}</span>
-              <span className="shrink-0 text-xs text-muted-foreground">{formatDateTime(entry.at)}</span>
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {formatDateTime(entry.at)}
+              </span>
             </li>
           ))}
         </ol>

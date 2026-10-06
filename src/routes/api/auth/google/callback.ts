@@ -121,7 +121,9 @@ export const Route = createFileRoute("/api/auth/google/callback")({
 
         await createSession(userId);
 
-        const target = needsOnboarding ? `/onboarding?redirect=${encodeURIComponent(parsed.redirectTo)}` : parsed.redirectTo;
+        const target = needsOnboarding
+          ? `/onboarding?redirect=${encodeURIComponent(parsed.redirectTo)}`
+          : parsed.redirectTo;
         return Response.redirect(`${origin}${target}`, 302);
       },
     },

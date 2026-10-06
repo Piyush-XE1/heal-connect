@@ -24,7 +24,10 @@ export function SimplePagination({
   if (totalPages <= 1) return null;
 
   const windowSize = 5;
-  const start = Math.max(1, Math.min(currentPage - Math.floor(windowSize / 2), totalPages - windowSize + 1));
+  const start = Math.max(
+    1,
+    Math.min(currentPage - Math.floor(windowSize / 2), totalPages - windowSize + 1),
+  );
   const end = Math.min(totalPages, start + windowSize - 1);
   const pages: number[] = [];
   for (let page = Math.max(1, start); page <= end; page += 1) pages.push(page);

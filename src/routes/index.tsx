@@ -29,36 +29,40 @@ import {
 
 import careImage from "@/assets/livora-care.jpg";
 import { CompatibilityMatrix } from "@/components/common/compatibility-matrix";
-import { BloodGroupChip, InfoNote, Pill, Reveal, SectionHeading, StatTile, UrgencyBadge } from "@/components/common/primitives";
+import {
+  BloodGroupChip,
+  InfoNote,
+  Pill,
+  Reveal,
+  SectionHeading,
+  StatTile,
+  UrgencyBadge,
+} from "@/components/common/primitives";
 import { MarketingHeader } from "@/components/layout/marketing";
 import { SiteFooter } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/providers/auth-provider";
-import { BRAND, EMERGENCY_DISCLAIMER, ORGAN_DONATION_NOTICE, PAYMENT_PROHIBITION, PRIVACY_PROMISE } from "@/lib/brand";
+import {
+  BRAND,
+  EMERGENCY_DISCLAIMER,
+  ORGAN_DONATION_NOTICE,
+  PAYMENT_PROHIBITION,
+  PRIVACY_PROMISE,
+} from "@/lib/brand";
 import { FAQ_ITEMS, LANDING_FAQ_IDS } from "@/lib/faq";
 import { MATCHING_WEIGHTS } from "@/lib/blood";
 import { queryKeys } from "@/lib/query-keys";
+import { pageHead } from "@/lib/seo";
 import { fetchPublicStats, type PublicStats } from "@/server/api/requests";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Heal Connect — Give. Receive. Save lives." },
-      {
-        name: "description",
-        content:
-          "Heal Connect connects people willing to help with people who need legitimate medical donation assistance: verified blood, platelet and medical assistance requests, matched safely with nearby donors.",
-      },
-      { property: "og:title", content: "Heal Connect — Give. Receive. Save lives." },
-      {
-        property: "og:description",
-        content:
-          "One platform to connect people willing to help with people who need legitimate medical donation assistance.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Heal Connect — Give. Receive. Save lives.",
+      description:
+        "Heal Connect connects people willing to help with people who need legitimate medical donation assistance: verified blood, platelet and medical assistance requests, matched safely with nearby donors.",
+      path: "/",
+    }),
   loader: async (): Promise<{ stats: PublicStats | null }> => {
     try {
       const stats = await fetchPublicStats();
@@ -212,12 +216,17 @@ function LandingPage() {
                 <span className="text-gradient-brand">legitimate medical donation assistance</span>.
               </h1>
               <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Raise a clear request for blood, platelets or medical assistance. Offer help if you are eligible.
-                Coordinate safely — with privacy built in, hospitals in charge, and no money changing hands.
+                Raise a clear request for blood, platelets or medical assistance. Offer help if you
+                are eligible. Coordinate safely — with privacy built in, hospitals in charge, and no
+                money changing hands.
               </p>
 
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg" className="gradient-life h-12 text-white hover:opacity-95">
+                <Button
+                  asChild
+                  size="lg"
+                  className="gradient-life h-12 text-white hover:opacity-95"
+                >
                   <Link to={user ? "/requests/new" : "/register"}>
                     Request Help
                     <ArrowRight className="size-4" aria-hidden="true" />
@@ -299,7 +308,8 @@ function LandingPage() {
                 ))}
                 <p className="flex items-center gap-2 text-[11px] text-muted-foreground">
                   <Info className="size-3.5" aria-hidden="true" />
-                  Product preview with sample data. Contact details stay hidden until a match is confirmed.
+                  Product preview with sample data. Contact details stay hidden until a match is
+                  confirmed.
                 </p>
               </div>
 
@@ -371,7 +381,9 @@ function LandingPage() {
                     </span>
                   </div>
                   <h3 className="font-display text-lg font-bold">{step.title}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{step.description}</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </p>
                 </article>
               </Reveal>
             ))}
@@ -379,7 +391,10 @@ function LandingPage() {
         </section>
 
         {/* Participate ---------------------------------------------- */}
-        <section id="participate" className="scroll-mt-24 border-y border-border bg-muted/40 py-16 lg:py-20">
+        <section
+          id="participate"
+          className="scroll-mt-24 border-y border-border bg-muted/40 py-16 lg:py-20"
+        >
           <div className="page-shell space-y-10">
             <SectionHeading
               eyebrow="Two ways to take part"
@@ -395,10 +410,13 @@ function LandingPage() {
                     </span>
                     <Pill tone="blood">For donors</Pill>
                   </div>
-                  <h3 className="font-display text-2xl font-extrabold">Build a donor profile once, help when it matters</h3>
+                  <h3 className="font-display text-2xl font-extrabold">
+                    Build a donor profile once, help when it matters
+                  </h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Store your blood group, city, availability, donation preferences and last donation date. We use it to
-                    show requests that plausibly fit you — and nothing else. You can pause availability at any time.
+                    Store your blood group, city, availability, donation preferences and last
+                    donation date. We use it to show requests that plausibly fit you — and nothing
+                    else. You can pause availability at any time.
                   </p>
                   <ul className="space-y-2 text-sm">
                     {[
@@ -408,7 +426,10 @@ function LandingPage() {
                       "Donation history kept in one place",
                     ].map((item) => (
                       <li key={item} className="flex items-start gap-2">
-                        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                        <CheckCircle2
+                          className="mt-0.5 size-4 shrink-0 text-primary"
+                          aria-hidden="true"
+                        />
                         <span className="text-muted-foreground">{item}</span>
                       </li>
                     ))}
@@ -430,10 +451,13 @@ function LandingPage() {
                     </span>
                     <Pill tone="primary">For recipients</Pill>
                   </div>
-                  <h3 className="font-display text-2xl font-extrabold">A structured request that donors can act on</h3>
+                  <h3 className="font-display text-2xl font-extrabold">
+                    A structured request that donors can act on
+                  </h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Raise a request for yourself or someone you are coordinating for: request type, blood group, units,
-                    hospital, city and area, the date help is needed and how a donor should reach you.
+                    Raise a request for yourself or someone you are coordinating for: request type,
+                    blood group, units, hospital, city and area, the date help is needed and how a
+                    donor should reach you.
                   </p>
                   <ul className="space-y-2 text-sm">
                     {[
@@ -443,7 +467,10 @@ function LandingPage() {
                       "Contact details revealed only to a confirmed donor",
                     ].map((item) => (
                       <li key={item} className="flex items-start gap-2">
-                        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                        <CheckCircle2
+                          className="mt-0.5 size-4 shrink-0 text-primary"
+                          aria-hidden="true"
+                        />
                         <span className="text-muted-foreground">{item}</span>
                       </li>
                     ))}
@@ -471,9 +498,21 @@ function LandingPage() {
               />
               <div className="space-y-3">
                 {[
-                  { label: "Compatible blood group", weight: MATCHING_WEIGHTS.bloodGroup, icon: Droplet },
-                  { label: "Location and travel distance", weight: MATCHING_WEIGHTS.distance, icon: MapPin },
-                  { label: "Donor availability", weight: MATCHING_WEIGHTS.availability, icon: CalendarCheck },
+                  {
+                    label: "Compatible blood group",
+                    weight: MATCHING_WEIGHTS.bloodGroup,
+                    icon: Droplet,
+                  },
+                  {
+                    label: "Location and travel distance",
+                    weight: MATCHING_WEIGHTS.distance,
+                    icon: MapPin,
+                  },
+                  {
+                    label: "Donor availability",
+                    weight: MATCHING_WEIGHTS.availability,
+                    icon: CalendarCheck,
+                  },
                   { label: "Request urgency", weight: MATCHING_WEIGHTS.urgency, icon: Timer },
                 ].map((factor) => (
                   <div key={factor.label} className="surface flex items-center gap-4 p-4">
@@ -483,7 +522,9 @@ function LandingPage() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-sm font-semibold">{factor.label}</p>
-                        <span className="text-xs font-bold text-muted-foreground">{factor.weight}%</span>
+                        <span className="text-xs font-bold text-muted-foreground">
+                          {factor.weight}%
+                        </span>
                       </div>
                       <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
                         <div
@@ -496,14 +537,17 @@ function LandingPage() {
                 ))}
               </div>
               <InfoNote title="Ranking, not a medical decision">
-                Matching only decides which requests are shown first. Compatibility and eligibility are always
-                confirmed by qualified medical professionals and the blood bank — the platform never makes that call.
+                Matching only decides which requests are shown first. Compatibility and eligibility
+                are always confirmed by qualified medical professionals and the blood bank — the
+                platform never makes that call.
               </InfoNote>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-display text-xl font-extrabold">General compatibility reference</h3>
+                <h3 className="font-display text-xl font-extrabold">
+                  General compatibility reference
+                </h3>
                 <Pill tone="info">
                   <Filter className="size-3.5" aria-hidden="true" />
                   Educational
@@ -515,7 +559,10 @@ function LandingPage() {
         </section>
 
         {/* Trust --------------------------------------------------- */}
-        <section id="trust" className="scroll-mt-24 border-y border-border bg-muted/40 py-16 lg:py-20">
+        <section
+          id="trust"
+          className="scroll-mt-24 border-y border-border bg-muted/40 py-16 lg:py-20"
+        >
           <div className="page-shell space-y-10">
             <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div className="space-y-6">
@@ -547,7 +594,9 @@ function LandingPage() {
                         <card.icon className="size-5" aria-hidden="true" />
                       </span>
                       <h3 className="font-display text-base font-bold">{card.title}</h3>
-                      <p className="text-sm leading-relaxed text-muted-foreground">{card.description}</p>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {card.description}
+                      </p>
                     </article>
                   </Reveal>
                 ))}
@@ -583,8 +632,9 @@ function LandingPage() {
                     Emergency requests are visible, structured and clearly labelled
                   </h2>
                   <p className="max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                    Emergency requests carry a strong visual label with the hospital, required blood group, units,
-                    location and a timestamp — so a donor can decide quickly whether they can help.
+                    Emergency requests carry a strong visual label with the hospital, required blood
+                    group, units, location and a timestamp — so a donor can decide quickly whether
+                    they can help.
                   </p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {[
@@ -593,8 +643,14 @@ function LandingPage() {
                       { icon: Timer, label: "Timestamped and date-driven" },
                       { icon: BellRing, label: "Instant donor notifications" },
                     ].map((item) => (
-                      <div key={item.label} className="flex items-center gap-2 rounded-xl border border-border bg-card p-3 text-sm">
-                        <item.icon className="size-4 shrink-0 text-destructive" aria-hidden="true" />
+                      <div
+                        key={item.label}
+                        className="flex items-center gap-2 rounded-xl border border-border bg-card p-3 text-sm"
+                      >
+                        <item.icon
+                          className="size-4 shrink-0 text-destructive"
+                          aria-hidden="true"
+                        />
                         {item.label}
                       </div>
                     ))}
@@ -612,8 +668,9 @@ function LandingPage() {
                   </div>
                 </div>
                 <InfoNote tone="danger" title="Heal Connect does not provide emergency care">
-                  {EMERGENCY_DISCLAIMER} Contact your local emergency number, the hospital blood bank, or the treating
-                  hospital's help desk. Never delay treatment to wait for a platform response.
+                  {EMERGENCY_DISCLAIMER} Contact your local emergency number, the hospital blood
+                  bank, or the treating hospital's help desk. Never delay treatment to wait for a
+                  platform response.
                 </InfoNote>
               </div>
             </div>
@@ -621,7 +678,10 @@ function LandingPage() {
         </section>
 
         {/* FAQ ----------------------------------------------------- */}
-        <section id="faq" className="scroll-mt-24 border-t border-border bg-muted/40 py-16 lg:py-20">
+        <section
+          id="faq"
+          className="scroll-mt-24 border-t border-border bg-muted/40 py-16 lg:py-20"
+        >
           <div className="page-shell grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="space-y-4">
               <SectionHeading
@@ -647,7 +707,9 @@ function LandingPage() {
                       +
                     </span>
                   </summary>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.answer}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {item.answer}
+                  </p>
                 </details>
               ))}
             </div>
@@ -662,8 +724,8 @@ function LandingPage() {
                 Somebody nearby can help. Somebody nearby needs help.
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/90 sm:text-base">
-                {BRAND.positioning} Join in less than a minute — choose your role, add what matters, and start saving
-                lives responsibly.
+                {BRAND.positioning} Join in less than a minute — choose your role, add what matters,
+                and start saving lives responsibly.
               </p>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <Button asChild size="lg" className="h-12 bg-white text-primary hover:bg-white/90">
@@ -672,7 +734,12 @@ function LandingPage() {
                     <ArrowRight className="size-4" aria-hidden="true" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="ghost" className="h-12 border border-white/40 text-white hover:bg-white/10">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="ghost"
+                  className="h-12 border border-white/40 text-white hover:bg-white/10"
+                >
                   <Link to="/find-help">Browse open requests</Link>
                 </Button>
               </div>

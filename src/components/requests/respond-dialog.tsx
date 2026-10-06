@@ -68,7 +68,8 @@ export function RespondDialog({
       }
       if (item) void queryClient.invalidateQueries({ queryKey: ["request", item.id] });
     },
-    onError: (error) => toast.error("Could not send your offer", { description: errorMessage(error) }),
+    onError: (error) =>
+      toast.error("Could not send your offer", { description: errorMessage(error) }),
   });
 
   if (!item) return null;
@@ -79,8 +80,8 @@ export function RespondDialog({
         <DialogHeader>
           <DialogTitle>Confirm you can help</DialogTitle>
           <DialogDescription>
-            The requester or coordinator is notified as soon as you send this. Nothing is final — you can withdraw
-            at any time.
+            The requester or coordinator is notified as soon as you send this. Nothing is final —
+            you can withdraw at any time.
           </DialogDescription>
         </DialogHeader>
 
@@ -124,7 +125,8 @@ export function RespondDialog({
                 Share my contact number with the coordinator
               </span>
               <span className="mt-1 block text-xs text-muted-foreground">
-                Only the person coordinating this request can see it, and only if they accept your offer.
+                Only the person coordinating this request can see it, and only if they accept your
+                offer.
               </span>
             </span>
           </label>
@@ -138,16 +140,19 @@ export function RespondDialog({
             />
             <span>
               <span className="flex items-center gap-2 font-semibold">
-                <ShieldCheck className="size-4 text-primary" aria-hidden="true" />
-                I understand the medical boundary
+                <ShieldCheck className="size-4 text-primary" aria-hidden="true" />I understand the
+                medical boundary
               </span>
-              <span className="mt-1 block text-xs text-muted-foreground">{MEDICAL_DECISION_DISCLAIMER}</span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                {MEDICAL_DECISION_DISCLAIMER}
+              </span>
             </span>
           </label>
 
           <InfoNote tone="warning" icon={AlertTriangle} title="Before you travel">
-            {COMPATIBILITY_DISCLAIMER} Confirm the ward, timing and documents with the hospital blood bank, and
-            never share money, bank details or identity documents with anyone you met here.
+            {COMPATIBILITY_DISCLAIMER} Confirm the ward, timing and documents with the hospital
+            blood bank, and never share money, bank details or identity documents with anyone you
+            met here.
           </InfoNote>
 
           <div className="flex flex-wrap gap-2">
@@ -157,7 +162,11 @@ export function RespondDialog({
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={mutation.isPending}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={mutation.isPending}
+          >
             Not now
           </Button>
           <Button

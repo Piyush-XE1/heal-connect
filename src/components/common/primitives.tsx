@@ -120,7 +120,8 @@ export function BloodGroupChip({
 }
 
 export function UrgencyBadge({ urgency, className }: { urgency: Urgency; className?: string }) {
-  const tone: Tone = urgency === "emergency" ? "danger" : urgency === "urgent" ? "warning" : "neutral";
+  const tone: Tone =
+    urgency === "emergency" ? "danger" : urgency === "urgent" ? "warning" : "neutral";
   const Icon = urgency === "emergency" ? ShieldAlert : urgency === "urgent" ? Clock : CalendarClock;
   return (
     <Pill tone={tone} className={cn(urgency === "emergency" && "animate-pulse-ring", className)}>
@@ -168,7 +169,14 @@ export function VerificationBadge({
   label?: string | null;
   compact?: boolean;
 }) {
-  const Icon = status === "verified" ? BadgeCheck : status === "pending" ? Clock : status === "rejected" ? AlertTriangle : ShieldCheck;
+  const Icon =
+    status === "verified"
+      ? BadgeCheck
+      : status === "pending"
+        ? Clock
+        : status === "rejected"
+          ? AlertTriangle
+          : ShieldCheck;
   return (
     <Pill tone={VERIFICATION_TONES_SAFE(status)}>
       <Icon className="size-3.5" aria-hidden="true" />
@@ -200,7 +208,8 @@ export function DemoBadge({ className }: { className?: string }) {
 }
 
 export function RequestTypeBadge({ type }: { type: RequestType }) {
-  const label = type === "blood" ? "Blood" : type === "platelets" ? "Platelets" : "Medical assistance";
+  const label =
+    type === "blood" ? "Blood" : type === "platelets" ? "Platelets" : "Medical assistance";
   const Icon = type === "medical_assistance" ? HeartPulse : undefined;
   return (
     <Pill tone={type === "platelets" ? "info" : "primary"}>
@@ -222,7 +231,9 @@ export function LocationLine({
   className?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-sm text-muted-foreground", className)}>
+    <span
+      className={cn("inline-flex items-center gap-1.5 text-sm text-muted-foreground", className)}
+    >
       <MapPin className="size-4 shrink-0 text-primary" aria-hidden="true" />
       <span className="truncate">
         {[area, city].filter(Boolean).join(", ")}
@@ -258,7 +269,9 @@ export function SectionHeading({
         {title}
       </h2>
       {description ? (
-        <p className="mt-4 text-base leading-relaxed text-muted-foreground text-pretty">{description}</p>
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground text-pretty">
+          {description}
+        </p>
       ) : null}
     </div>
   );
@@ -278,7 +291,9 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between", className)}>
+    <header
+      className={cn("flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between", className)}
+    >
       <div className="space-y-2">
         <h1 className="font-display text-2xl leading-tight font-extrabold sm:text-3xl">{title}</h1>
         {description ? (
@@ -309,9 +324,13 @@ export function StatTile({
   return (
     <div className={cn("surface surface-hover p-4 sm:p-5", className)}>
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{label}</p>
+        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          {label}
+        </p>
         {Icon ? (
-          <span className={cn("grid size-9 place-items-center rounded-xl border", TONE_CLASSES[tone])}>
+          <span
+            className={cn("grid size-9 place-items-center rounded-xl border", TONE_CLASSES[tone])}
+          >
             <Icon className="size-4" aria-hidden="true" />
           </span>
         ) : null}
@@ -335,12 +354,17 @@ export function InfoNote({
   icon?: LucideIcon;
   className?: string;
 }) {
-  const FallbackIcon = tone === "danger" || tone === "blood" ? ShieldAlert : tone === "warning" ? AlertTriangle : Info;
+  const FallbackIcon =
+    tone === "danger" || tone === "blood" ? ShieldAlert : tone === "warning" ? AlertTriangle : Info;
   const ResolvedIcon = Icon ?? FallbackIcon;
   return (
     <div
       role="note"
-      className={cn("flex gap-3 rounded-2xl border p-4 text-sm leading-relaxed", TONE_CLASSES[tone], className)}
+      className={cn(
+        "flex gap-3 rounded-2xl border p-4 text-sm leading-relaxed",
+        TONE_CLASSES[tone],
+        className,
+      )}
     >
       <ResolvedIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <div className="space-y-1">
@@ -395,7 +419,10 @@ export function ErrorState({
   className?: string;
 }) {
   return (
-    <div className={cn("surface border-destructive/30 bg-destructive/5 p-6 text-center", className)} role="alert">
+    <div
+      className={cn("surface border-destructive/30 bg-destructive/5 p-6 text-center", className)}
+      role="alert"
+    >
       <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-destructive/10 text-destructive">
         <AlertTriangle className="size-5" aria-hidden="true" />
       </span>
@@ -433,7 +460,11 @@ export function SkeletonCard({ className }: { className?: string }) {
 
 export function SkeletonGrid({ count = 6, className }: { count?: number; className?: string }) {
   return (
-    <div className={cn("grid gap-4 sm:grid-cols-2 xl:grid-cols-3", className)} aria-busy="true" aria-live="polite">
+    <div
+      className={cn("grid gap-4 sm:grid-cols-2 xl:grid-cols-3", className)}
+      aria-busy="true"
+      aria-live="polite"
+    >
       {Array.from({ length: count }).map((_, index) => (
         <SkeletonCard key={index} />
       ))}
@@ -446,7 +477,11 @@ export function SkeletonLines({ count = 4, className }: { count?: number; classN
   return (
     <div className={cn("space-y-3", className)} aria-hidden="true">
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="skeleton-shimmer h-4 rounded-full" style={{ width: `${90 - index * 8}%` }} />
+        <div
+          key={index}
+          className="skeleton-shimmer h-4 rounded-full"
+          style={{ width: `${90 - index * 8}%` }}
+        />
       ))}
     </div>
   );
@@ -460,7 +495,10 @@ export function SuccessNote({ children, className }: { children: ReactNode; clas
   return (
     <div
       role="status"
-      className={cn("flex items-center gap-2 rounded-xl border border-success/30 bg-success/10 p-3 text-sm text-success", className)}
+      className={cn(
+        "flex items-center gap-2 rounded-xl border border-success/30 bg-success/10 p-3 text-sm text-success",
+        className,
+      )}
     >
       <CheckCircle2 className="size-4 shrink-0" aria-hidden="true" />
       <span>{children}</span>

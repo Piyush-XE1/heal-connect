@@ -31,6 +31,8 @@ export function invalid(message: string, fields?: Record<string, string>): AppEr
   return new AppError(message, { status: 422, code: "invalid", ...(fields ? { fields } : {}) });
 }
 
-export function rateLimited(message = "Too many attempts. Please try again in a moment."): AppError {
+export function rateLimited(
+  message = "Too many attempts. Please try again in a moment.",
+): AppError {
   return new AppError(message, { status: 429, code: "rate_limited" });
 }

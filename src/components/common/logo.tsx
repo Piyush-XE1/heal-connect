@@ -14,7 +14,14 @@ export function LogoMark({ className, title }: { className?: string; title?: str
       className={cn("size-9 shrink-0", className)}
     >
       <defs>
-        <linearGradient id="hc-mark-gradient" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="hc-mark-gradient"
+          x1="6"
+          y1="4"
+          x2="58"
+          y2="60"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#1FA8A0" />
           <stop offset="0.55" stopColor="#0E8C86" />
           <stop offset="1" stopColor="#1B6FA8" />

@@ -40,7 +40,14 @@ export type AdminOverview = {
     createdAt: string;
     requesterName: string;
   }[];
-  auditTrail: { id: string; action: string; targetType: string; note: string | null; at: string; actorName: string }[];
+  auditTrail: {
+    id: string;
+    action: string;
+    targetType: string;
+    note: string | null;
+    at: string;
+    actorName: string;
+  }[];
   environment: {
     demoLoginEnabled: boolean;
     demoRecords: number;
@@ -51,7 +58,9 @@ export type AdminOverview = {
 
 function buildStats(db: Awaited<ReturnType<typeof getDb>>): AdminStats {
   const requests = db.helpRequests.map((row) => ({ ...row, status: effectiveStatus(row) }));
-  const openRequests = requests.filter((row) => row.status === "open" || row.status === "in_progress");
+  const openRequests = requests.filter(
+    (row) => row.status === "open" || row.status === "in_progress",
+  );
 
   const bloodGroupDemand = BLOOD_GROUPS.map((group) => ({
     label: group,
@@ -88,7 +97,8 @@ function buildStats(db: Awaited<ReturnType<typeof getDb>>): AdminStats {
     fulfilledRequests: requests.filter((row) => row.status === "fulfilled").length,
     totalRequests: requests.length,
     donorResponses: db.donorResponses.length,
-    openReports: db.reports.filter((row) => row.status === "open" || row.status === "reviewing").length,
+    openReports: db.reports.filter((row) => row.status === "open" || row.status === "reviewing")
+      .length,
     demoRecords:
       db.users.filter((row) => row.isDemo).length +
       db.helpRequests.filter((row) => row.isDemo).length,
@@ -134,7 +144,8 @@ export const fetchAdminOverview = createServerFn({ method: "GET" }).handler(
         unitsRequired: row.unitsRequired,
         requiredBy: row.requiredBy,
         createdAt: row.createdAt,
-        requesterName: database.users.find((user) => user.id === row.requesterId)?.name ?? "Unknown",
+        requesterName:
+          database.users.find((user) => user.id === row.requesterId)?.name ?? "Unknown",
       }));
 
     const auditTrail = database.auditLog.slice(0, 8).map((row) => ({
@@ -528,7 +539,9 @@ export const adminRequestAction = createServerFn({ method: "POST" })
 /* ------------------------------------------------------------------ */
 
 export const listAdminReports = createServerFn({ method: "GET" })
-  .validator(z.object({ status: z.enum(["all", "open", "reviewing", "resolved", "dismissed"]).optional() }))
+  .validator(
+    z.object({ status: z.enum(["all", "open", "reviewing", "resolved", "dismissed"]).optional() }),
+  )
   .handler(async ({ data }) => {
     await requireAdmin();
     const database = await getDb();
@@ -556,7 +569,11 @@ export const adminReportAction = createServerFn({ method: "POST" })
         const report = db.reports.find((row) => row.id === data.id);
         if (!report) throw notFound("Report not found.");
         report.status =
-          data.action === "review" ? "reviewing" : data.action === "resolve" ? "resolved" : "dismissed";
+          data.action === "review"
+            ? "reviewing"
+            : data.action === "resolve"
+              ? "resolved"
+              : "dismissed";
         report.resolutionNote = data.note ?? null;
         report.handledBy = admin.id;
         report.updatedAt = timestamp;
@@ -630,7 +647,8 @@ export const adminVerificationAction = createServerFn({ method: "POST" })
         createNotification(db, {
           userId: record.userId,
           type: "verification_update",
-          title: data.action === "approve" ? "You are verified" : "Verification could not be approved",
+          title:
+            data.action === "approve" ? "You are verified" : "Verification could not be approved",
           body:
             data.action === "approve"
               ? "Your account now shows a verified badge. Verified information is separated from self-reported details across the platform."
@@ -685,5 +703,9 @@ export const adminResetDemoData = createServerFn({ method: "POST" }).handler(asy
       await seedDemoData(db);
     });
 
-    return { reset: true, note: `Demo dataset restored by ${admin.name} at ${relativeTime(nowIso())}.` };
-  }));
+    return {
+      reset: true,
+      note: `Demo dataset restored by ${admin.name} at ${relativeTime(nowIso())}.`,
+    };
+  }),
+);

@@ -14,6 +14,7 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { errorMessage, fieldErrors, unwrapAction } from "@/lib/actions";
 import { queryKeys } from "@/lib/query-keys";
 import { fetchAuthConfig, signInAsDemoAccount, signInWithPassword } from "@/server/api/auth";
+import { pageHead } from "@/lib/seo";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -33,16 +34,13 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search) => searchSchema.parse(search),
-  head: () => ({
-    meta: [
-      { title: "Sign in — Heal Connect" },
-      {
-        name: "description",
-        content:
-          "Sign in to Heal Connect to raise a medical donation request, offer help as a donor, and track your matches.",
-      },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Sign in — Heal Connect",
+      description:
+        "Sign in to Heal Connect to raise a medical donation request, offer help as a donor, and track your matches.",
+      path: "/login",
+    }),
   component: LoginPage,
 });
 
@@ -54,7 +52,9 @@ function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [formError, setFormError] = useState<string | null>(error ? ERROR_MESSAGES[error] ?? "Sign-in failed. Please try again." : null);
+  const [formError, setFormError] = useState<string | null>(
+    error ? (ERROR_MESSAGES[error] ?? "Sign-in failed. Please try again.") : null,
+  );
   const [fieldErrorState, setFieldErrorState] = useState<Record<string, string>>({});
 
   const { data: config } = useQuery({
@@ -70,8 +70,7 @@ function LoginPage() {
   }, [navigate, redirect, user]);
 
   const passwordLogin = useMutation({
-    mutationFn: async () =>
-      unwrapAction(await signInWithPassword({ data: { email, password } })),
+    mutationFn: async () => unwrapAction(await signInWithPassword({ data: { email, password } })),
     onSuccess: async (data) => {
       await refresh();
       await queryClient.invalidateQueries();
@@ -134,8 +133,8 @@ function LoginPage() {
         ) : (
           <InfoNote tone="info" title="Google sign-in is not configured here">
             Add <code className="rounded bg-background/60 px-1">GOOGLE_CLIENT_ID</code> and{" "}
-            <code className="rounded bg-background/60 px-1">GOOGLE_CLIENT_SECRET</code> to enable it. Until
-            then, use an email sign-in or one of the demo accounts below.
+            <code className="rounded bg-background/60 px-1">GOOGLE_CLIENT_SECRET</code> to enable
+            it. Until then, use an email sign-in or one of the demo accounts below.
           </InfoNote>
         )}
 
@@ -203,7 +202,12 @@ function LoginPage() {
             ) : null}
           </div>
 
-          <Button type="submit" size="lg" className="h-12 w-full" disabled={passwordLogin.isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            className="h-12 w-full"
+            disabled={passwordLogin.isPending}
+          >
             {passwordLogin.isPending ? (
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
             ) : (
@@ -226,7 +230,8 @@ function LoginPage() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               Populated accounts for evaluating the product. Passwords:{" "}
               <code className="rounded bg-muted px-1">{config.demoPassword}</code> for members,{" "}
-              <code className="rounded bg-muted px-1">{config.demoAdminPassword}</code> for the admin.
+              <code className="rounded bg-muted px-1">{config.demoAdminPassword}</code> for the
+              admin.
             </p>
             <ul className="space-y-2">
               {config.demoAccounts.map((account) => (
@@ -239,9 +244,13 @@ function LoginPage() {
                   >
                     <span>
                       <span className="block text-sm font-semibold">{account.name}</span>
-                      <span className="block text-xs text-muted-foreground">{account.description}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {account.description}
+                      </span>
                     </span>
-                    <span className="shrink-0 text-xs font-bold text-primary">{account.roleLabel}</span>
+                    <span className="shrink-0 text-xs font-bold text-primary">
+                      {account.roleLabel}
+                    </span>
                   </button>
                 </li>
               ))}
@@ -250,8 +259,8 @@ function LoginPage() {
         ) : null}
 
         <InfoNote tone="primary" icon={ShieldCheck} title="Your privacy is the default">
-          We only store what you provide, we never ask for ID documents, and contact details stay hidden
-          until a request is matched.
+          We only store what you provide, we never ask for ID documents, and contact details stay
+          hidden until a request is matched.
         </InfoNote>
       </div>
     </AuthShell>

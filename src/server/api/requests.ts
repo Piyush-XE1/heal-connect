@@ -69,7 +69,7 @@ export const searchRequests = createServerFn({ method: "GET" })
     const page = data.page ?? 1;
     const statusFilter = data.status ? new Set([data.status]) : OPEN_STATUSES;
 
-    let rows = database.helpRequests.filter((row) => {
+    const rows = database.helpRequests.filter((row) => {
       const status = effectiveStatus(row);
       if (!statusFilter.has(status)) return false;
       if (status === "removed" && !session?.isAdmin) return false;
@@ -79,7 +79,8 @@ export const searchRequests = createServerFn({ method: "GET" })
       if (data.urgency && row.urgency !== data.urgency) return false;
       if (data.requestType && row.requestType !== data.requestType) return false;
       if (data.city && row.city.toLowerCase() !== data.city.toLowerCase()) return false;
-      if (data.area && !(row.area ?? "").toLowerCase().includes(data.area.toLowerCase())) return false;
+      if (data.area && !(row.area ?? "").toLowerCase().includes(data.area.toLowerCase()))
+        return false;
       if (data.requiredFrom && row.requiredBy < data.requiredFrom) return false;
       if (data.requiredTo && row.requiredBy > data.requiredTo) return false;
       if (data.q) {
@@ -152,14 +153,22 @@ export const fetchMatchedRequests = createServerFn({ method: "GET" })
     const session = await requireUser();
     const database = await getDb();
     const donor = buildDonorContext(database, session.id);
-    const viewer: ViewerContext = { userId: session.id, isAdmin: session.isAdmin, point: donor.point };
+    const viewer: ViewerContext = {
+      userId: session.id,
+      isAdmin: session.isAdmin,
+      point: donor.point,
+    };
 
     const items = database.helpRequests
       .filter((row) => OPEN_STATUSES.has(effectiveStatus(row)) && row.requesterId !== session.id)
       .map((row) => {
         const request = { ...row, status: effectiveStatus(row) };
         const match = scoreRequestForDonor(database, request, donor);
-        return { ...toRequestView(request, database, viewer), match, isOwn: row.requesterId === session.id };
+        return {
+          ...toRequestView(request, database, viewer),
+          match,
+          isOwn: row.requesterId === session.id,
+        };
       })
       .filter((item) => item.match.eligible);
 
@@ -225,13 +234,14 @@ export const fetchRequest = createServerFn({ method: "GET" })
     const request = { ...row, status };
     const isOwner = session?.id === row.requesterId;
 
-    const responses = isOwner || session?.isAdmin
-      ? database.donorResponses
-          .filter((item) => item.requestId === row.id)
-          .map((item) => toDonorResponseView(item, database, viewer))
-          .filter((item): item is NonNullable<typeof item> => item !== null)
-          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-      : [];
+    const responses =
+      isOwner || session?.isAdmin
+        ? database.donorResponses
+            .filter((item) => item.requestId === row.id)
+            .map((item) => toDonorResponseView(item, database, viewer))
+            .filter((item): item is NonNullable<typeof item> => item !== null)
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        : [];
 
     const match =
       donor.userId && !isOwner && (session?.role === "donor" || session?.role === "both")
@@ -246,10 +256,10 @@ export const fetchRequest = createServerFn({ method: "GET" })
       isAdmin: Boolean(session?.isAdmin),
       canRespond: Boolean(
         session &&
-          !isOwner &&
-          (session.role === "donor" || session.role === "both") &&
-          status === "open" &&
-          session.accountStatus === "active",
+        !isOwner &&
+        (session.role === "donor" || session.role === "both") &&
+        status === "open" &&
+        session.accountStatus === "active",
       ),
     };
   });
@@ -354,7 +364,8 @@ export const createRequestDraft = createServerFn({ method: "POST" })
           area: data.area ? data.area : null,
           approxLat: point ? roundCoord(point.lat) : null,
           approxLng: point ? roundCoord(point.lng) : null,
-          requiredBy: data.requiredBy ?? new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+          requiredBy:
+            data.requiredBy ?? new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
           urgency: data.urgency ?? "normal",
           status: "draft",
           additionalInfo: data.additionalInfo ? data.additionalInfo : null,
@@ -376,9 +387,7 @@ export const createRequestDraft = createServerFn({ method: "POST" })
     }),
   );
 
-const updateRequestSchema = requestBaseSchema
-  .partial()
-  .extend({ id: z.string().trim().min(1) });
+const updateRequestSchema = requestBaseSchema.partial().extend({ id: z.string().trim().min(1) });
 
 export const updateRequest = createServerFn({ method: "POST" })
   .validator(updateRequestSchema)
@@ -495,7 +504,8 @@ export const updateRequestStatus = createServerFn({ method: "POST" })
         const previous = row.status;
         row.status = data.status;
         row.updatedAt = timestamp;
-        row.resolvedAt = data.status === "fulfilled" || data.status === "cancelled" ? timestamp : null;
+        row.resolvedAt =
+          data.status === "fulfilled" || data.status === "cancelled" ? timestamp : null;
         if (data.note) row.moderationNote = data.note;
 
         const responders = db.donorResponses.filter(
@@ -569,7 +579,11 @@ export const fetchMyRequests = createServerFn({ method: "GET" }).handler(async (
   const session = await requireUser();
   const database = await getDb();
   const donor = buildDonorContext(database, session.id);
-  const viewer: ViewerContext = { userId: session.id, isAdmin: session.isAdmin, point: donor.point };
+  const viewer: ViewerContext = {
+    userId: session.id,
+    isAdmin: session.isAdmin,
+    point: donor.point,
+  };
 
   const rows = database.helpRequests
     .filter((row) => row.requesterId === session.id)
@@ -591,7 +605,9 @@ export const fetchMyRequests = createServerFn({ method: "GET" }).handler(async (
   return {
     drafts: rows.filter((row) => row.status === "draft"),
     active: rows.filter((row) => row.status === "open" || row.status === "in_progress"),
-    past: rows.filter((row) => row.status !== "open" && row.status !== "in_progress" && row.status !== "draft"),
+    past: rows.filter(
+      (row) => row.status !== "open" && row.status !== "in_progress" && row.status !== "draft",
+    ),
     total: rows.length,
   };
 });
@@ -643,7 +659,11 @@ export const fetchDashboard = createServerFn({ method: "GET" }).handler(
     const session = await requireUser();
     const database = await getDb();
     const donor = buildDonorContext(database, session.id);
-    const viewer: ViewerContext = { userId: session.id, isAdmin: session.isAdmin, point: donor.point };
+    const viewer: ViewerContext = {
+      userId: session.id,
+      isAdmin: session.isAdmin,
+      point: donor.point,
+    };
     const isDonor = session.role === "donor" || session.role === "both";
     const isRecipient = session.role === "recipient" || session.role === "both";
 
@@ -773,7 +793,11 @@ export const fetchRequestFiltersMeta = createServerFn({ method: "GET" }).handler
   const database = await getDb();
   const cities = Array.from(new Set(database.helpRequests.map((row) => row.city))).sort();
   const areas = Array.from(
-    new Set(database.helpRequests.map((row) => row.area).filter((value): value is string => Boolean(value))),
+    new Set(
+      database.helpRequests
+        .map((row) => row.area)
+        .filter((value): value is string => Boolean(value)),
+    ),
   ).sort();
   return {
     cities,

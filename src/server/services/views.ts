@@ -233,7 +233,9 @@ export function toRequestView(
     approxLat: request.approxLat,
     approxLng: request.approxLng,
     distanceKm:
-      requestPoint && viewer.point ? Math.round(distanceKm(viewer.point, requestPoint) * 10) / 10 : null,
+      requestPoint && viewer.point
+        ? Math.round(distanceKm(viewer.point, requestPoint) * 10) / 10
+        : null,
     requestType: request.requestType,
     bloodGroup: request.bloodGroup,
     unitsRequired: request.unitsRequired,
@@ -310,7 +312,9 @@ export function toDonorResponseView(
     donorName: donor.name,
     donorVerified: donorVerification?.status === "verified",
     donorBloodGroup: donorProfile?.bloodGroup ?? null,
-    donorCity: donorProfile ? (db.profiles.find((row) => row.userId === donor.id)?.city ?? null) : null,
+    donorCity: donorProfile
+      ? (db.profiles.find((row) => row.userId === donor.id)?.city ?? null)
+      : null,
     donorDistanceKm:
       isRequester && viewer.point && requestPoint
         ? Math.round(distanceKm(viewer.point, requestPoint) * 10) / 10
@@ -411,8 +415,7 @@ export function toVolunteerSummary(
     availability: donorProfile?.availability ?? null,
     verificationStatus: verification?.status ?? "unverified",
     isDemo: user.isDemo,
-    distanceKm:
-      viewerPoint && point ? Math.round(distanceKm(viewerPoint, point) * 10) / 10 : null,
+    distanceKm: viewerPoint && point ? Math.round(distanceKm(viewerPoint, point) * 10) / 10 : null,
     lastDonationDate: donorProfile?.lastDonationDate ?? null,
   };
 }

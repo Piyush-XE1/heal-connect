@@ -136,8 +136,12 @@ export const updateLocation = createServerFn({ method: "POST" })
 
       let nearest: { city: string; distance: number } | null = null;
       for (const record of CITIES) {
-        const km = distanceKm({ lat: data.lat, lng: data.lng }, { lat: record.lat, lng: record.lng });
-        if (!nearest || km < nearest.distance) nearest = { city: record.city, distance: Math.round(km) };
+        const km = distanceKm(
+          { lat: data.lat, lng: data.lng },
+          { lat: record.lat, lng: record.lng },
+        );
+        if (!nearest || km < nearest.distance)
+          nearest = { city: record.city, distance: Math.round(km) };
       }
 
       await mutate((db) => {
@@ -318,7 +322,8 @@ export const fetchPublicProfile = createServerFn({ method: "GET" })
         (row) => row.donorId === user.id && row.status === "completed",
       ).length,
       activeRequests: database.helpRequests.filter(
-        (row) => row.requesterId === user.id && (row.status === "open" || row.status === "in_progress"),
+        (row) =>
+          row.requesterId === user.id && (row.status === "open" || row.status === "in_progress"),
       ).length,
       bio: profile?.bio ?? null,
       privacyNote: `Phone number, exact address${city ? ` and precise location in ${city.city}` : ""} are never shown publicly on Heal Connect.`,
