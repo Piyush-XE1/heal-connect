@@ -23,7 +23,7 @@ export const fetchMyProfile = createServerFn({ method: "GET" }).handler(async ()
   const database = await getDb();
   const session = await requireUser();
   const fresh = database.users.find((row) => row.id === session.id);
-  if (!fresh) throw notFound("Account not found");
+  if (!fresh) throw notFound("We could not find your account. Please sign in again.");
   const { buildSessionUser } = await import("../services/views");
   return buildSessionUser(database, session.id);
 });
@@ -38,13 +38,13 @@ export const updateProfile = createServerFn({ method: "POST" })
 
       await mutate((db) => {
         const user = db.users.find((row) => row.id === session.id);
-        if (!user) throw notFound("Account not found");
+        if (!user) throw notFound("We could not find your account. Please sign in again.");
         user.name = data.name;
         user.avatarUrl = data.avatarUrl === undefined ? user.avatarUrl : data.avatarUrl;
         user.updatedAt = timestamp;
 
         const profile = db.profiles.find((row) => row.userId === session.id);
-        if (!profile) throw notFound("Profile not found");
+        if (!profile) throw notFound("We could not find this profile.");
         cityChanged = profile.city !== data.city;
         profile.city = data.city;
         profile.area = data.area ? data.area : null;
@@ -81,7 +81,7 @@ export const updateDonorProfile = createServerFn({ method: "POST" })
 
       await mutate((db) => {
         const user = db.users.find((row) => row.id === session.id);
-        if (!user) throw notFound("Account not found");
+        if (!user) throw notFound("We could not find your account. Please sign in again.");
         if (user.role === "recipient") {
           throw invalid("Switch your role to Donor or Donor & Recipient to save donor details.");
         }
@@ -146,7 +146,7 @@ export const updateLocation = createServerFn({ method: "POST" })
 
       await mutate((db) => {
         const profile = db.profiles.find((row) => row.userId === session.id);
-        if (!profile) throw notFound("Profile not found");
+        if (!profile) throw notFound("We could not find this profile.");
         profile.approxLat = approxLat;
         profile.approxLng = approxLng;
         if (!profile.city && nearest && nearest.distance <= 150) {

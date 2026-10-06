@@ -23,10 +23,10 @@ import {
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import type { z } from "zod";
+import { z } from "zod";
 
 import { InfoNote, Pill, UrgencyBadge } from "@/components/common/primitives";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ import {
 } from "@/lib/domain";
 import { EMERGENCY_DISCLAIMER, PAYMENT_PROHIBITION, PRIVACY_PROMISE } from "@/lib/brand";
 import { REQUEST_TYPE_LABELS, URGENCY_DESCRIPTIONS, URGENCY_LABELS } from "@/lib/labels";
-import { requestSchema } from "@/lib/validation";
+import { requestBaseSchema, requestSchema } from "@/lib/validation";
 import { errorMessage, fieldErrors, unwrapAction } from "@/lib/actions";
 import { invalidationGroups } from "@/lib/query-keys";
 import {
@@ -63,6 +63,69 @@ import {
 } from "@/server/api/requests";
 
 type FormValues = z.input<typeof requestSchema>;
+
+/** Every field the wizard owns, registered so step validation can report errors. */
+const FORM_FIELD_NAMES = [
+  "requestType",
+  "bloodGroup",
+  "unitsRequired",
+  "hospitalName",
+  "city",
+  "area",
+  "requiredBy",
+  "urgency",
+  "additionalInfo",
+  "contactName",
+  "contactPhone",
+  "contactInstructions",
+  "consent",
+] as const;
+
+/**
+ * Per-step validation schemas. Field rules come from the shared base schema so
+ * the client and the server can never drift; only the "which fields belong to
+ * this step" grouping lives here.
+ */
+function stepSchema(id: StepId, urgency: Urgency | undefined): z.ZodTypeAny | null {
+  switch (id) {
+    case "type":
+      return requestBaseSchema.pick({ requestType: true });
+    case "blood":
+      return z.object({
+        // Nullable in the shared schema, but this step only appears for blood
+        // and platelet requests, where a group is required.
+        bloodGroup: z.enum(BLOOD_GROUPS, {
+          errorMap: () => ({ message: "Select the blood group needed" }),
+        }),
+        unitsRequired: requestBaseSchema.shape.unitsRequired,
+      });
+    case "location":
+      return requestBaseSchema.pick({ hospitalName: true, city: true, area: true });
+    case "urgency":
+      return requestBaseSchema.pick({ requiredBy: true, urgency: true });
+    case "details":
+      return requestBaseSchema
+        .pick({
+          additionalInfo: true,
+          contactName: true,
+          contactPhone: true,
+          contactInstructions: true,
+          consent: true,
+        })
+        .superRefine((value, ctx) => {
+          if (urgency === "emergency" && !value.additionalInfo) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["additionalInfo"],
+              message:
+                "For emergency requests, add a short note (ward, department or coordinating person).",
+            });
+          }
+        });
+    default:
+      return null;
+  }
+}
 
 /** Locally typed payload so field access stays explicit and type-safe. */
 type RequestPayload = {
@@ -204,6 +267,15 @@ export function RequestForm({
     defaultValues: initialValues,
     mode: "onBlur",
   });
+
+  // The wizard drives every input through controlled values, so the fields are
+  // registered explicitly: React Hook Form only validates and reports errors for
+  // registered fields when a step validates with `trigger()`.
+  useEffect(() => {
+    for (const name of FORM_FIELD_NAMES) {
+      form.register(name as never);
+    }
+  }, [form]);
 
   const requestType = form.watch("requestType");
   const urgency = form.watch("urgency");
@@ -370,11 +442,39 @@ export function RequestForm({
     });
   };
 
-  const goNext = async () => {
-    if (step.fields.length > 0) {
-      const valid = await form.trigger(step.fields as never, { shouldFocus: true });
-      if (!valid) return;
+  /**
+   * Validates one step with the same field rules the server enforces. The
+   * step's own fields block progress; issues on other steps are left for the
+   * step that owns them.
+   */
+  const validateStep = async (index: number): Promise<boolean> => {
+    const target = steps[index];
+    if (!target) return true;
+    const values = form.getValues();
+    const schema = stepSchema(target.id, values["urgency"] as Urgency | undefined);
+    if (!schema) return true;
+
+    const result = schema.safeParse(values);
+    if (result.success) {
+      form.clearErrors(target.fields as never);
+      return true;
     }
+
+    const issues = result.error.issues.filter((issue) =>
+      target.fields.includes(issue.path[0] as keyof FormValues),
+    );
+    if (issues.length === 0) return true;
+    for (const issue of issues) {
+      form.setError(issue.path[0] as keyof FormValues, {
+        type: "manual",
+        message: issue.message,
+      });
+    }
+    return false;
+  };
+
+  const goNext = async () => {
+    if (!(await validateStep(activeIndex))) return;
     setStepIndex((current) => Math.min(current + 1, steps.length - 1));
     focusFormTop();
   };
@@ -392,10 +492,7 @@ export function RequestForm({
     }
     // Only allow jumping ahead through steps that already validate.
     for (let index = activeIndex; index < target; index += 1) {
-      const current = steps[index] as StepDefinition;
-      if (current.fields.length === 0) continue;
-      const valid = await form.trigger(current.fields as never, { shouldFocus: true });
-      if (!valid) {
+      if (!(await validateStep(index))) {
         setStepIndex(index);
         return;
       }

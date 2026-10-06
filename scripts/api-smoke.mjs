@@ -558,6 +558,157 @@ await check("a member cannot act on another member's request", async () => {
   return value.message.slice(0, 60);
 });
 
+section("Draft lifecycle");
+
+await check("a draft is private to its author", async () => {
+  const recipient = await signIn("recipient@healconnect.demo", "demo1234");
+  const donor = await signIn("donor@healconnect.demo", "demo1234");
+
+  const created = unwrap(
+    (
+      await call(api.requests.createRequestDraft, {
+        session: recipient,
+        data: {
+          requestType: "blood",
+          bloodGroup: "AB+",
+          unitsRequired: 1,
+          hospitalName: "Draft Lifecycle Hospital",
+          city: "Delhi",
+          area: "Rohini",
+          requiredBy: new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10),
+          urgency: "normal",
+          contactName: "Draft Author",
+          contactPhone: "9800000000",
+        },
+      })
+    ).value,
+    "createRequestDraft",
+  );
+  assert(created.id && created.draft === true, `unexpected draft payload ${shape(created)}`);
+
+  // The author sees it under drafts, never under active or past.
+  const mine = unwrap(
+    (await call(api.requests.fetchMyRequests, { session: recipient })).value,
+    "fetchMyRequests",
+  );
+  assert(Array.isArray(mine.drafts), `drafts bucket missing: ${shape(mine)}`);
+  assert(
+    mine.drafts.some((row) => row.id === created.id),
+    "the author cannot see their own draft",
+  );
+  assert(
+    [...mine.active, ...mine.past].every((row) => row.id !== created.id),
+    "a draft leaked into active or past requests",
+  );
+
+  // Another member cannot discover, read or respond to it.
+  const search = unwrap(
+    (
+      await call(api.requests.searchRequests, {
+        session: donor,
+        data: { q: "Draft Lifecycle Hospital" },
+      })
+    ).value,
+    "searchRequests",
+  );
+  assert(
+    !search.items.some((row) => row.id === created.id),
+    "a draft appeared in donor search results",
+  );
+
+  let readBlocked = false;
+  try {
+    const detail = await call(api.requests.fetchRequest, {
+      session: donor,
+      data: { id: created.id },
+    });
+    readBlocked = detail.value === null || detail.value?.ok === false;
+  } catch {
+    readBlocked = true;
+  }
+  assert(readBlocked, "another member could read a private draft");
+
+  let offerBlocked = false;
+  try {
+    const offer = await call(api.responses.createDonorResponse, {
+      session: donor,
+      data: { requestId: created.id, message: "Happy to help" },
+    });
+    offerBlocked = offer.value?.ok === false;
+  } catch {
+    offerBlocked = true;
+  }
+  assert(offerBlocked, "a donor could offer help on an unpublished draft");
+
+  // Publishing makes it discoverable and notifies the author.
+  const notificationsBefore = unwrap(
+    (
+      await call(api.notifications.listNotifications, {
+        session: recipient,
+        data: { filter: "all" },
+      })
+    ).value,
+    "listNotifications",
+  ).total;
+
+  unwrap(
+    (
+      await call(api.requests.updateRequestStatus, {
+        session: recipient,
+        data: { id: created.id, status: "open" },
+      })
+    ).value,
+    "updateRequestStatus(draft → open)",
+  );
+
+  const published = unwrap(
+    (await call(api.requests.fetchRequest, { session: recipient, data: { id: created.id } })).value,
+    "fetchRequest after publish",
+  );
+  assert(published.request.status === "open", `draft did not publish: ${published.request.status}`);
+
+  const donorSearch = unwrap(
+    (
+      await call(api.requests.searchRequests, {
+        session: donor,
+        data: { q: "Draft Lifecycle Hospital" },
+      })
+    ).value,
+    "searchRequests after publish",
+  );
+  assert(
+    donorSearch.items.some((row) => row.id === created.id),
+    "a published draft is still hidden from discovery",
+  );
+
+  const notificationsAfter = unwrap(
+    (
+      await call(api.notifications.listNotifications, {
+        session: recipient,
+        data: { filter: "all" },
+      })
+    ).value,
+    "listNotifications after publish",
+  ).total;
+  assert(
+    notificationsAfter > notificationsBefore,
+    "publishing a draft did not confirm the change to the author",
+  );
+
+  // Cancel it so the rest of the suite sees a clean request list.
+  unwrap(
+    (
+      await call(api.requests.updateRequestStatus, {
+        session: recipient,
+        data: { id: created.id, status: "cancelled" },
+      })
+    ).value,
+    "updateRequestStatus(cancel)",
+  );
+
+  return `${created.reference} stayed private, published, then cancelled`;
+});
+
 section("Write flows");
 let createdRequestId = "";
 
