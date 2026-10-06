@@ -1,3 +1,6 @@
+# Runtime data (JSON store used by the MVP backend)
+.data/
+
 # Logs
 logs
 *.log

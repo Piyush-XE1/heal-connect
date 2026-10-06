@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0E8C86" />
+    <meta name="robots" content="noindex" />
+    <title>You are offline — Heal Connect</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <style>
+      :root {
+        color-scheme: light;
+        --primary: #0e8c86;
+        --ink: #0f1f22;
+        --muted: #5b6b6e;
+        --bg: #f7faf9;
+        --border: #dbe7e4;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(120% 90% at 10% -10%, #e4f6f4 0%, transparent 55%),
+          radial-gradient(120% 90% at 100% 0%, #eef3fb 0%, transparent 50%), var(--bg);
+        color: var(--ink);
+        font-family:
+          "DM Sans",
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+      main {
+        width: 100%;
+        max-width: 520px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 36px 28px;
+        box-shadow: 0 24px 60px -32px rgb(14 140 134 / 0.35);
+        text-align: center;
+      }
+      .mark {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 18px;
+        border-radius: 20px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(140deg, #1fa8a0, #1b6fa8);
+      }
+      .mark svg {
+        width: 38px;
+        height: 38px;
+        stroke: #fff;
+        fill: none;
+        stroke-width: 3.2;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.5rem;
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0 0 20px;
+        color: var(--muted);
+        line-height: 1.6;
+        font-size: 0.95rem;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 22px;
+      }
+      button,
+      a.button {
+        font: inherit;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 12px 22px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      button {
+        background: var(--primary);
+        color: #fff;
+      }
+      a.button.ghost {
+        background: #fff;
+        color: var(--primary);
+        border-color: var(--border);
+      }
+      .note {
+        text-align: left;
+        border-radius: 18px;
+        background: #fff8e6;
+        border: 1px solid #f3e0b5;
+        padding: 14px 16px;
+        font-size: 0.85rem;
+        color: #6b5312;
+        line-height: 1.55;
+      }
+      strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #8a6a12;
+      }
+      ul {
+        margin: 14px 0 0;
+        padding-left: 20px;
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.7;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64">
+          <path
+            d="M32 50C24 44 16.8 37.6 16.8 29.6A9.3 9.3 0 0 1 32 22.8a9.3 9.3 0 0 1 15.2 6.8C47.2 37.6 40 44 32 50Z"
+          />
+          <path d="M19.5 31.5h6.2l3.1-6.6 4.6 13.2 3.2-6.6h8.4" />
+        </svg>
+      </div>
+      <h1>You are offline</h1>
+      <p>
+        Heal Connect needs a connection to load live requests, offers and notifications. Pages you
+        already opened in this session are still available from the menu.
+      </p>
+      <div class="actions">
+        <button type="button" onclick="window.location.reload()">Try again</button>
+        <a class="button ghost" href="/">Go to home</a>
+      </div>
+      <div class="note">
+        <strong>Medical emergency?</strong>
+        Do not wait for a connection. Call your local emergency number and contact the hospital's
+        blood bank directly — they are the fastest and only reliable route for emergency blood.
+      </div>
+      <ul>
+        <li>Blood, platelets and organ donation can never involve payment.</li>
+        <li>Heal Connect does not provide medical advice or confirm compatibility.</li>
+        <li>
+          Screening, eligibility and cross-matching are always done by licensed professionals.
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>
