@@ -39,6 +39,30 @@ const PAGE = 1000;
 let cache: { db: Database; at: number } | null = null;
 let writeQueue: Promise<void> = Promise.resolve();
 let seedPromise: Promise<void> | null = null;
+/**
+ * Sessions whose user was removed and is expected back with the same id (the
+ * demo reset deletes then re-seeds deterministic demo accounts). Postgres
+ * cascades would drop them, so they are re-attached once the user exists again.
+ */
+let pendingSessions: Database["sessions"] = [];
+
+function reattachSessions(database: Database): void {
+  const userIds = new Set(database.users.map((row) => row.id));
+  const present = new Set(database.sessions.map((row) => row.id));
+  const now = new Date().toISOString();
+  pendingSessions = pendingSessions.filter((row) => row.expiresAt > now);
+  const ready = pendingSessions.filter((row) => userIds.has(row.userId) && !present.has(row.id));
+  database.sessions.push(...ready);
+  pendingSessions = pendingSessions.filter((row) => !userIds.has(row.userId));
+}
+
+function holdOrphanSessions(database: Database): void {
+  const userIds = new Set(database.users.map((row) => row.id));
+  const orphans = database.sessions.filter((row) => !userIds.has(row.userId));
+  if (!orphans.length) return;
+  pendingSessions.push(...orphans);
+  database.sessions = database.sessions.filter((row) => userIds.has(row.userId));
+}
 
 const toSnake = (key: string) => key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
 const toCamel = (key: string) => key.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
@@ -167,6 +191,8 @@ export async function mutate<T>(fn: (database: Database) => T | Promise<T>): Pro
       const committed = await fresh();
       const before = structuredClone(committed);
       result = await fn(committed);
+      reattachSessions(committed);
+      holdOrphanSessions(committed);
       try {
         await apply(diff(before, committed));
         cache = { db: committed, at: Date.now() };
@@ -194,4 +220,5 @@ export function __resetStoreForTests(): void {
   cache = null;
   writeQueue = Promise.resolve();
   seedPromise = null;
+  pendingSessions = [];
 }
