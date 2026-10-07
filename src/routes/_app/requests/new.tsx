@@ -30,7 +30,7 @@ function NewRequestPage() {
   const { user } = useAuth();
 
   return (
-    <div className="page-shell max-w-3xl space-y-6 py-8">
+    <div className="page-shell max-w-3xl space-y-6 page-y">
       <PageHeader
         title="Request help"
         description="Tell donors exactly what is needed. The clearer the request, the faster a compatible donor can act."

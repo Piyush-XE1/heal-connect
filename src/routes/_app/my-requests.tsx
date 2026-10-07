@@ -94,7 +94,7 @@ function MyRequestsPage() {
   const renderList = (items: NonNullable<typeof data>["active"]) => (
     <ul className="space-y-4">
       {items.map((request) => (
-        <li key={request.id} className="surface space-y-4 p-5">
+        <li key={request.id} className="surface space-y-4 p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <UrgencyBadge urgency={request.urgency} />
@@ -235,7 +235,7 @@ function MyRequestsPage() {
   );
 
   return (
-    <div className="page-shell space-y-6 py-8">
+    <div className="page-shell space-y-6 page-y">
       <PageHeader
         title="My requests"
         description="Everything you raised, with the offers you have received and the actions available to you."

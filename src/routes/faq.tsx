@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { FAQ_ITEMS, type FaqItem } from "@/lib/faq";
 import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
-import { pageHead } from "@/lib/seo";
+import { faqJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/faq")({
   head: () => ({
@@ -17,6 +17,7 @@ export const Route = createFileRoute("/faq")({
         "Answers about medical boundaries, privacy, verification, payments, emergency requests and how matching works on Heal Connect.",
       path: "/faq",
     }),
+    scripts: [faqJsonLd(FAQ_ITEMS)],
   }),
   component: FaqPage,
 });

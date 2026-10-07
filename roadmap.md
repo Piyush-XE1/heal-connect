@@ -16,6 +16,8 @@
 
 ## Next
 
+- [ ] Launch checklist: set `VITE_SITE_URL` to the production origin, confirm `SESSION_SECRET` and
+      Google OAuth credentials in the production environment, and keep `HEAL_CONNECT_DEMO_LOGIN=false`.
 - [ ] Swap the JSON store adapter in `src/server/db/store.ts` for Postgres/Supabase and add migrations.
 - [ ] Real Google OAuth credentials and production session/cookie hardening review.
 - [ ] Web-push delivery on top of the existing notification records (`pushEnabled` flag already surfaced).

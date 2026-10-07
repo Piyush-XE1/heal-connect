@@ -156,7 +156,11 @@ function TermsPage() {
 
       <div className="space-y-6">
         {SECTIONS.map((section) => (
-          <section key={section.id} id={section.id} className="surface space-y-3 p-6 scroll-mt-24">
+          <section
+            key={section.id}
+            id={section.id}
+            className="surface space-y-3 p-4 sm:p-6 scroll-mt-24"
+          >
             <h2 className="flex items-center gap-2 font-display text-lg font-extrabold">
               <FileText className="size-4 text-primary" aria-hidden="true" />
               {section.title}
@@ -181,7 +185,7 @@ function TermsPage() {
 
       <InfoNote tone="primary" icon={ShieldCheck} title="Questions about these terms">
         Email{" "}
-        <a className="font-semibold underline" href={`mailto:${BRAND.supportEmail}`}>
+        <a className="tap-link font-semibold underline" href={`mailto:${BRAND.supportEmail}`}>
           {BRAND.supportEmail}
         </a>{" "}
         and we will route your question to the right person.

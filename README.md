@@ -102,6 +102,32 @@ scripts/              api-smoke.mjs, check-links.mjs
   make medical eligibility decisions.
 - Terms and Privacy pages are explicitly marked as drafts pending legal review.
 
+## Performance and responsive behaviour
+
+The launch pass tightened both ends of the screen-size range and removed the work that made the app
+feel slow on mid-range phones:
+
+- **Density**: `.page-shell`, `.section-y` and `.page-y` scale gutters and vertical rhythm from phone
+  → tablet → desktop, so mobile screens stop paying 128px of padding per marketing section and
+  multi-column card grids collapse sensibly. Tap targets are `>= 40px` via `.tap-link` / `.tap-row`.
+- **No horizontal overflow**: grid/flex children default to `min-width: 0` (with controls opted back
+  out), and the compatibility table scrolls inside its own container instead of stretching the page.
+- **Smaller payload**: the entry bundle dropped from ~530 kB raw / 900 kB total JS to ~130 kB
+  gzipped, mainly by removing a Supabase client that was being pulled into the browser bundle for no
+  reason. Only the design-system files actually used are scanned for CSS classes.
+- **Self-hosted fonts**: DM Sans and Manrope are bundled and preloaded, so first paint no longer waits
+  on (or fails behind) `fonts.googleapis.com`.
+- **Less repaint**: sticky bars use an opaque fill instead of `backdrop-filter`, the emergency pulse
+  animates on the compositor, hover motion is limited to pointer devices, and off-screen marketing
+  sections are skipped with `content-visibility`.
+- **Fewer requests**: sensible React Query defaults (30s `staleTime`, no refetch-on-focus storm), one
+  shared notification query for the bell and popover, route preloading on intent, and a leaner
+  service-worker precache that also serves hashed assets cache-first.
+- **Compressed output**: `nitro.compressPublicAssets` emits `.gz`/`.br` siblings for every client
+  asset, so hosts that serve files from disk send ~130 kB instead of ~530 kB.
+- **Launch ergonomics**: `/healthz` for uptime checks, and `robots.txt` / `sitemap.xml` served from
+  the app so they always match the canonical origin in `VITE_SITE_URL`.
+
 ## Deployment
 
 `npm run build` produces a Nitro bundle (`.output/`) targeting Cloudflare Workers by default; the
@@ -115,10 +141,10 @@ This project was built with [Lovable](https://lovable.dev) and continues to sync
 
 All data access goes through `src/server/db/store.ts`, a small facade that picks a driver at call time:
 
-| Driver | When it is used | Where data lives |
-| --- | --- | --- |
-| Postgres (`src/server/db/drivers/postgres.ts`) | `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set (always true on the deployed app) | Lovable Cloud database |
-| JSON (`src/server/db/drivers/json.ts`) | Neither is set — zero-config local default | `.data/heal-connect-db.json` |
+| Driver                                         | When it is used                                                                          | Where data lives             |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------- |
+| Postgres (`src/server/db/drivers/postgres.ts`) | `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set (always true on the deployed app) | Lovable Cloud database       |
+| JSON (`src/server/db/drivers/json.ts`)         | Neither is set — zero-config local default                                               | `.data/heal-connect-db.json` |
 
 Force one with `HEAL_CONNECT_STORE=json` or `HEAL_CONNECT_STORE=postgres`.
 

@@ -114,7 +114,7 @@ function DashboardPage() {
   ] as const;
 
   return (
-    <div className="page-shell space-y-8 py-8">
+    <div className="page-shell space-y-6 page-y sm:space-y-8">
       <PageHeader
         title={`${greeting()}, ${firstName}`}
         description={
@@ -177,7 +177,10 @@ function DashboardPage() {
       ) : (
         <>
           {/* Quick actions + completion */}
-          <section aria-labelledby="quick-actions" className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+          <section
+            aria-labelledby="quick-actions"
+            className="grid gap-4 sm:gap-6 lg:grid-cols-[1.6fr_1fr]"
+          >
             <div className="space-y-4">
               <h2 id="quick-actions" className="sr-only">
                 Quick actions
@@ -209,7 +212,7 @@ function DashboardPage() {
               </div>
 
               {data.isDonor ? (
-                <div className="surface space-y-3 p-5">
+                <div className="surface space-y-3 p-4 sm:p-5">
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="font-display text-sm font-bold">Donor readiness</h3>
                     <Pill tone={data.hasBloodGroup ? "success" : "warning"}>
@@ -248,7 +251,7 @@ function DashboardPage() {
             </div>
 
             <aside className="space-y-4">
-              <div className="surface space-y-3 p-5">
+              <div className="surface space-y-3 p-4 sm:p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="font-display text-sm font-bold">Profile completion</h3>
                   <span className="font-display text-lg font-extrabold">{completion}%</span>
@@ -266,7 +269,7 @@ function DashboardPage() {
                 ) : null}
               </div>
 
-              <div className="surface space-y-3 p-5">
+              <div className="surface space-y-3 p-4 sm:p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="font-display text-sm font-bold">Notifications</h3>
                   <Button asChild variant="ghost" size="sm">
@@ -443,7 +446,7 @@ function DashboardPage() {
               ) : (
                 <div className="grid gap-4 lg:grid-cols-2">
                   {data.activeRequests.map((request) => (
-                    <article key={request.id} className="surface space-y-3 p-5">
+                    <article key={request.id} className="surface space-y-3 p-4 sm:p-5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-2">
                           <UrgencyBadge urgency={request.urgency} />
@@ -483,7 +486,7 @@ function DashboardPage() {
           ) : null}
 
           {/* Activity + emergencies */}
-          <section className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+          <section className="grid gap-4 sm:gap-6 lg:grid-cols-[1.5fr_1fr]">
             <div className="space-y-4">
               <SectionHeading
                 title="Recent activity"
@@ -498,7 +501,7 @@ function DashboardPage() {
               ) : (
                 <ol className="space-y-3">
                   {data.recentActivity.map((entry) => (
-                    <li key={entry.id} className="surface flex gap-4 p-4">
+                    <li key={entry.id} className="surface flex gap-3 p-3.5 sm:gap-4 sm:p-4">
                       <span
                         className={`grid size-9 shrink-0 place-items-center rounded-xl ${
                           entry.kind === "offer"
@@ -519,7 +522,7 @@ function DashboardPage() {
                       <div className="min-w-0 flex-1">
                         <Link
                           to={entry.link}
-                          className="block text-sm font-semibold hover:text-primary"
+                          className="tap-link text-sm font-semibold hover:text-primary"
                         >
                           {entry.title}
                         </Link>
@@ -542,7 +545,7 @@ function DashboardPage() {
                 {MEDICAL_DISCLAIMER} Confirm everything with the hospital blood bank before
                 travelling, and report anything that feels unsafe or asks for money.
               </InfoNote>
-              <div className="surface space-y-3 p-5">
+              <div className="surface space-y-3 p-4 sm:p-5">
                 <h3 className="flex items-center gap-2 font-display text-sm font-bold">
                   <TrendingUp className="size-4 text-primary" aria-hidden="true" />
                   Get verified

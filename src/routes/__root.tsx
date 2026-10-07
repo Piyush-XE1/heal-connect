@@ -91,7 +91,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Heal Connect connects people willing to help with people who need legitimate medical donation assistance.",
       },
-      { name: "theme-color", content: "#0E8C86" },
+      { name: "theme-color", content: "#0E8C86", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#0F1B1D", media: "(prefers-color-scheme: dark)" },
+      { name: "color-scheme", content: "light dark" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Heal Connect" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
@@ -112,16 +114,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      // Preload the self-hosted fonts the first screen always uses.
+      {
+        rel: "preload",
+        href: "/fonts/dm-sans-latin-variable.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "preload",
+        href: "/fonts/manrope-latin-variable.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
       { rel: "icon", href: "/icons/icon.svg", type: "image/svg+xml" },
       { rel: "icon", href: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { rel: "icon", href: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
       { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png", sizes: "180x180" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;750;800&display=swap",
-      },
     ],
   }),
   beforeLoad: async () => {

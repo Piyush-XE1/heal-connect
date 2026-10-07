@@ -51,30 +51,31 @@ import { cn } from "@/lib/utils";
 import { unwrapAction } from "@/lib/actions";
 import { listNotifications, markNotifications } from "@/server/api/notifications";
 
-function useUnreadCount() {
+/**
+ * One query key, one request: the bell badge and the popover list share the
+ * same feed payload, so opening the popover never fires a duplicate call.
+ */
+function useNotifications(enabled: boolean) {
   const { user } = useAuth();
-  const { data } = useQuery({
-    queryKey: queryKeys.notifications("unread"),
-    queryFn: async () =>
-      unwrapAction(await listNotifications({ data: { unreadOnly: true, limit: 20 } })),
-    enabled: Boolean(user),
-    staleTime: 30_000,
-    refetchInterval: 60_000,
+  return useQuery({
+    queryKey: queryKeys.notifications("bell"),
+    queryFn: async () => unwrapAction(await listNotifications({ data: { limit: 8 } })),
+    enabled: Boolean(user) && enabled,
+    staleTime: 60_000,
+    // Poll only while the tab is visible — background tabs stay quiet.
+    refetchInterval: (query) => (query.state.data ? 120_000 : false),
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
-  return data?.unread ?? 0;
 }
 
 function NotificationBell() {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const unread = useUnreadCount();
-
-  const { data } = useQuery({
-    queryKey: queryKeys.notifications("all"),
-    queryFn: async () => unwrapAction(await listNotifications({ data: { limit: 6 } })),
-    enabled: Boolean(user) && open,
-  });
+  const { data } = useNotifications(true);
+  const unread = data?.unread ?? 0;
+  const items = data?.items ?? [];
 
   const markAll = useMutation({
     mutationFn: async () => unwrapAction(await markNotifications({ data: { all: true } })),
@@ -102,7 +103,7 @@ function NotificationBell() {
           ) : null}
         </button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[min(24rem,calc(100vw-2rem))] p-0">
+      <PopoverContent align="end" className="w-[min(24rem,calc(100vw-1.5rem))] p-0">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <p className="font-display text-sm font-bold">Notifications</p>
           {unread > 0 ? (
@@ -117,8 +118,8 @@ function NotificationBell() {
           ) : null}
         </div>
         <div className="max-h-80 overflow-y-auto scroll-thin">
-          {data?.items.length ? (
-            data.items.map((item) => (
+          {items.length ? (
+            items.map((item) => (
               <Link
                 key={item.id}
                 to={item.link ?? "/notifications"}
@@ -288,7 +289,7 @@ function DesktopNav() {
   const location = useLocation();
 
   return (
-    <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+    <nav className="hidden items-center gap-0.5 md:flex lg:gap-1" aria-label="Primary">
       {DESKTOP_LINKS.map((link) => {
         const target = link.to === "/dashboard" && !user ? "/login" : link.to;
         const active =
@@ -299,7 +300,7 @@ function DesktopNav() {
             to={target}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "rounded-full px-3.5 py-2 text-sm font-semibold transition",
+              "rounded-full px-2.5 py-2 text-sm font-semibold whitespace-nowrap transition lg:px-3.5",
               active
                 ? "bg-primary-soft text-primary"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -314,7 +315,7 @@ function DesktopNav() {
           to="/admin"
           aria-current={location.pathname.startsWith("/admin") ? "page" : undefined}
           className={cn(
-            "rounded-full px-3.5 py-2 text-sm font-semibold transition",
+            "rounded-full px-2.5 py-2 text-sm font-semibold transition lg:px-3.5",
             location.pathname.startsWith("/admin")
               ? "bg-primary-soft text-primary"
               : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -342,16 +343,16 @@ function MobileBottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md safe-bottom md:hidden"
+      className="sticky-bar-solid fixed inset-x-0 bottom-0 z-40 safe-bottom md:hidden"
     >
-      <div className="mx-auto flex max-w-xl items-stretch justify-between px-2 pt-1.5 pb-2">
+      <div className="mx-auto flex max-w-xl items-stretch justify-between px-1.5 pt-1 pb-1">
         {items.map((item) => {
           if (item.authOnly && !user) {
             return (
               <Link
                 key={item.to}
                 to="/login"
-                className="flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-semibold text-muted-foreground"
+                className="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[11px] font-semibold text-muted-foreground"
               >
                 <item.icon className="size-5" aria-hidden="true" />
                 {item.label}
@@ -366,7 +367,7 @@ function MobileBottomNav() {
               to={item.to}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-semibold transition",
+                "flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[11px] font-semibold transition",
                 active ? "text-primary" : "text-muted-foreground",
               )}
             >
@@ -383,7 +384,7 @@ function MobileBottomNav() {
         <Link
           to="/requests/new"
           aria-label="Request help"
-          className="absolute -top-6 left-1/2 grid size-14 -translate-x-1/2 place-items-center rounded-full gradient-life text-white shadow-glow transition active:scale-95"
+          className="absolute -top-5 left-1/2 grid size-12 -translate-x-1/2 place-items-center rounded-full gradient-life text-white shadow-glow transition active:scale-95"
         >
           <Plus className="size-6" aria-hidden="true" strokeWidth={2.6} />
         </Link>
@@ -478,7 +479,7 @@ export function SuspendedBanner() {
           <p className="font-semibold">Your account is suspended</p>
           <p className="text-destructive/90">
             You can still browse, but publishing requests and offers is disabled. Contact{" "}
-            <a className="underline" href={`mailto:${BRAND.supportEmail}`}>
+            <a className="underline underline-offset-2" href={`mailto:${BRAND.supportEmail}`}>
               {BRAND.supportEmail}
             </a>{" "}
             to appeal.
@@ -491,9 +492,9 @@ export function SuspendedBanner() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-border bg-muted/40">
-      <div className="page-shell grid gap-10 py-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-        <div className="space-y-3">
+    <footer className="mt-10 border-t border-border bg-muted/40 sm:mt-16">
+      <div className="page-shell grid grid-cols-2 gap-x-6 gap-y-7 py-8 sm:grid-cols-3 sm:gap-8 sm:py-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-10 lg:py-12">
+        <div className="col-span-2 space-y-3 sm:col-span-3 lg:col-span-1">
           <Logo showTagline />
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
             {BRAND.positioning}
@@ -505,78 +506,78 @@ export function SiteFooter() {
             <Pill tone="success">No payments for donation</Pill>
           </div>
         </div>
-        <nav aria-label="Platform" className="space-y-3 text-sm">
+        <nav aria-label="Platform" className="space-y-2 text-sm sm:space-y-3">
           <p className="font-display text-sm font-bold">Platform</p>
-          <ul className="space-y-2 text-muted-foreground">
+          <ul className="text-muted-foreground">
             <li>
-              <Link to="/find-help" className="hover:text-primary">
+              <Link to="/find-help" className="tap-link hover:text-primary">
                 Find help
               </Link>
             </li>
             <li>
-              <Link to="/donors" className="hover:text-primary">
+              <Link to="/donors" className="tap-link hover:text-primary">
                 Become a donor
               </Link>
             </li>
             <li>
-              <Link to="/requests/new" className="hover:text-primary">
+              <Link to="/requests/new" className="tap-link hover:text-primary">
                 Request help
               </Link>
             </li>
             <li>
-              <Link to="/emergency" className="hover:text-primary">
+              <Link to="/emergency" className="tap-link hover:text-primary">
                 Emergency requests
               </Link>
             </li>
             <li>
-              <Link to="/verify" className="hover:text-primary">
+              <Link to="/verify" className="tap-link hover:text-primary">
                 Get verified
               </Link>
             </li>
           </ul>
         </nav>
-        <nav aria-label="Trust and safety" className="space-y-3 text-sm">
+        <nav aria-label="Trust and safety" className="space-y-2 text-sm sm:space-y-3">
           <p className="font-display text-sm font-bold">Trust &amp; safety</p>
-          <ul className="space-y-2 text-muted-foreground">
+          <ul className="text-muted-foreground">
             <li>
-              <Link to="/safety" className="hover:text-primary">
+              <Link to="/safety" className="tap-link hover:text-primary">
                 Safety guidelines
               </Link>
             </li>
             <li>
-              <Link to="/privacy" className="hover:text-primary">
+              <Link to="/privacy" className="tap-link hover:text-primary">
                 Privacy policy
               </Link>
             </li>
             <li>
-              <Link to="/terms" className="hover:text-primary">
+              <Link to="/terms" className="tap-link hover:text-primary">
                 Terms &amp; conditions
               </Link>
             </li>
             <li>
-              <Link to="/settings" className="hover:text-primary">
+              <Link to="/settings" className="tap-link hover:text-primary">
                 Report or block someone
               </Link>
             </li>
           </ul>
         </nav>
-        <div className="space-y-3 text-sm">
+        <div className="space-y-2 text-sm sm:space-y-3">
           <p className="font-display text-sm font-bold">Support</p>
-          <ul className="space-y-2 text-muted-foreground">
+          <ul className="text-muted-foreground">
             <li>
-              <a className="hover:text-primary" href={`mailto:${BRAND.supportEmail}`}>
+              <a className="tap-link hover:text-primary" href={`mailto:${BRAND.supportEmail}`}>
                 {BRAND.supportEmail}
               </a>
             </li>
             <li>
-              <Link to="/faq" className="hover:text-primary">
+              <Link to="/faq" className="tap-link hover:text-primary">
                 FAQ
               </Link>
             </li>
           </ul>
         </div>
       </div>
-      <div className="page-shell space-y-3 border-t border-border py-6 text-xs leading-relaxed text-muted-foreground">
+      <div className="page-shell space-y-2 border-t border-border py-5 text-[11px] leading-relaxed text-muted-foreground sm:space-y-3 sm:py-6 sm:text-xs">
         <p>{MEDICAL_DISCLAIMER}</p>
         <p>{EMERGENCY_DISCLAIMER}</p>
         <p>{ORGAN_DONATION_NOTICE}</p>
@@ -607,20 +608,21 @@ export function AppShell({
       <UpdateReadyBanner />
       <OfflineBanner />
       <SuspendedBanner />
-      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
-        <div className="page-shell flex h-16 items-center justify-between gap-3">
+      <header className="safe-top sticky top-0 z-40 sticky-bar">
+        <div className="page-shell flex h-14 items-center justify-between gap-2 sm:h-16 sm:gap-3">
           <Link
             to={user ? "/dashboard" : "/"}
-            className="flex items-center"
+            className="-ml-1 flex items-center p-1"
             aria-label={`${BRAND.name} home`}
           >
             <Logo compact className="hidden sm:inline-flex" />
-            <LogoMark className="sm:hidden" />
+            <LogoMark className="size-8 sm:hidden" />
           </Link>
           <DesktopNav />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {user ? (
               <Button
+                size="sm"
                 className="hidden gradient-life text-white hover:opacity-95 md:inline-flex"
                 onClick={() => void navigate({ to: "/requests/new" })}
               >

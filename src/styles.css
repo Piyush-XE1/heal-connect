@@ -1,6 +1,95 @@
 @import "tailwindcss" source(none);
 @import "tw-animate-css";
 @source "../src";
+/*
+ * Only the components the product actually renders are scanned, so the shipped
+ * stylesheet stays small. Unused design-system primitives under
+ * `src/components/ui` are excluded — add them back here if you start using one.
+ */
+@source not "../src/components/ui/accordion.tsx";
+@source not "../src/components/ui/alert.tsx";
+@source not "../src/components/ui/aspect-ratio.tsx";
+@source not "../src/components/ui/avatar.tsx";
+@source not "../src/components/ui/breadcrumb.tsx";
+@source not "../src/components/ui/calendar.tsx";
+@source not "../src/components/ui/card.tsx";
+@source not "../src/components/ui/carousel.tsx";
+@source not "../src/components/ui/chart.tsx";
+@source not "../src/components/ui/checkbox.tsx";
+@source not "../src/components/ui/collapsible.tsx";
+@source not "../src/components/ui/command.tsx";
+@source not "../src/components/ui/context-menu.tsx";
+@source not "../src/components/ui/drawer.tsx";
+@source not "../src/components/ui/form.tsx";
+@source not "../src/components/ui/hover-card.tsx";
+@source not "../src/components/ui/input-otp.tsx";
+@source not "../src/components/ui/menubar.tsx";
+@source not "../src/components/ui/navigation-menu.tsx";
+@source not "../src/components/ui/pagination.tsx";
+@source not "../src/components/ui/resizable.tsx";
+@source not "../src/components/ui/scroll-area.tsx";
+@source not "../src/components/ui/separator.tsx";
+@source not "../src/components/ui/sidebar.tsx";
+@source not "../src/components/ui/skeleton.tsx";
+@source not "../src/components/ui/slider.tsx";
+@source not "../src/components/ui/table.tsx";
+@source not "../src/components/ui/toggle.tsx";
+@source not "../src/components/ui/toggle-group.tsx";
+@source not "../src/components/ui/tooltip.tsx";
+/*
+ * Self-hosted variable fonts.
+ *
+ * These were previously loaded from fonts.googleapis.com, which added a
+ * render-blocking round trip to a third party (and simply failed on restricted
+ * networks). Both families are SIL Open Font License 1.1 — the licence files sit
+ * next to the woff2 files in `public/fonts`.
+ */
+@font-face {
+  font-family: "DM Sans Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 1000;
+  src: url("/fonts/dm-sans-latin-variable.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "DM Sans Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 1000;
+  src: url("/fonts/dm-sans-latin-ext-variable.woff2") format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Manrope Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("/fonts/manrope-latin-variable.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Manrope Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("/fonts/manrope-latin-ext-variable.woff2") format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /* ------------------------------------------------------------------ *
@@ -10,8 +99,9 @@
  * ------------------------------------------------------------------ */
 
 @theme inline {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Manrope", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans Variable", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    "Manrope Variable", "Manrope", "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -77,7 +167,6 @@
   --animate-fade-in: fade-in 0.4s ease-out both;
   --animate-scale-in: scale-in 0.24s cubic-bezier(0.22, 0.68, 0.24, 1) both;
   --animate-slide-up: slide-up 0.32s cubic-bezier(0.22, 0.68, 0.24, 1) both;
-  --animate-pulse-ring: pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-shimmer: shimmer 1.8s linear infinite;
   --animate-float: float 7s ease-in-out infinite;
 }
@@ -177,7 +266,7 @@
 @layer base {
   /* In-page anchors must not hide under the sticky header. */
   [id] {
-    scroll-margin-top: 5.5rem;
+    scroll-margin-top: 5rem;
   }
 
   * {
@@ -186,8 +275,16 @@
 
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 6rem;
+    scroll-padding-top: 5rem;
     -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+    /* Keeps the page from jumping when a modal locks the body on iOS. */
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+  }
+
+  .dark {
+    color-scheme: dark;
   }
 
   body {
@@ -209,6 +306,7 @@
     letter-spacing: -0.02em;
     font-weight: 700;
     margin: 0;
+    text-wrap: balance;
   }
 
   p {
@@ -224,6 +322,39 @@
   a,
   [role="button"] {
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Images/SVGs never overflow their container on narrow screens. */
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
+  /*
+   * Grid/flex children default to `min-width: auto`, so one non-wrapping line
+   * (`truncate`, a table, a long word) can force an entire track wider than the
+   * viewport — the classic "page is wider than the phone" bug. Every layout in
+   * this product is a card/column that should shrink, so make that the default
+   * and opt back in with `min-w-max` where a control must not shrink.
+   */
+  .grid > *,
+  .flex > * {
+    min-width: 0;
+  }
+
+  /* Interactive controls keep their intrinsic width so labels are never clipped. */
+  .flex > button,
+  .flex > a,
+  .flex > [role="button"],
+  .grid > button,
+  .grid > a,
+  .grid > [role="button"],
+  .flex > .shrink-0,
+  .flex > .min-w-max {
+    min-width: auto;
   }
 
   :focus-visible {
@@ -253,11 +384,22 @@
 }
 
 @layer components {
+  /*
+   * Horizontal rhythm. Mobile gets a comfortable 16px gutter instead of 20px so
+   * content uses more of the screen; the wider breakpoints keep the original
+   * generous spacing.
+   */
   .page-shell {
     width: 100%;
     max-width: 1240px;
     margin-inline: auto;
-    padding-inline: 1.25rem;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 480px) {
+    .page-shell {
+      padding-inline: 1.25rem;
+    }
   }
 
   @media (min-width: 768px) {
@@ -270,6 +412,47 @@
     .page-shell {
       padding-inline: 2.5rem;
     }
+  }
+
+  /*
+   * Vertical rhythm for marketing/legal sections. Mobile screens were being
+   * eaten by 128px of padding per section, so the scale now starts compact and
+   * opens up from tablet upwards.
+   */
+  .section-y {
+    padding-block: 2.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .section-y {
+      padding-block: 3.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-y {
+      padding-block: 5rem;
+    }
+  }
+
+  /* Lighter variant for in-app pages. */
+  .page-y {
+    padding-block: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .page-y {
+      padding-block: 2rem;
+    }
+  }
+
+  /*
+   * Long marketing pages: let the browser skip layout/paint for off-screen
+   * sections. `contain-intrinsic-size` keeps the scrollbar stable.
+   */
+  .content-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 640px;
   }
 
   /* Softly elevated surface used for request cards, stat tiles, panels */
@@ -287,10 +470,13 @@
       border-color 0.25s ease;
   }
 
-  .surface-hover:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-    border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+  /* Hover motion only where a real pointer exists — touch devices skip the work. */
+  @media (hover: hover) and (pointer: fine) {
+    .surface-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+    }
   }
 
   .gradient-brand {
@@ -348,9 +534,43 @@
       box-shadow 0.35s ease;
   }
 
-  .lift-on-hover:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-xl);
+  @media (hover: hover) and (pointer: fine) {
+    .lift-on-hover:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+    }
+  }
+
+  /*
+   * Sticky bars. A 92%-opaque fill reads as translucent without the cost of a
+   * backdrop-filter, which forces a full-screen re-composite on every scroll
+   * frame and is the main cause of jank on mid-range Android phones.
+   */
+  .sticky-bar {
+    background: color-mix(in oklab, var(--background) 94%, transparent);
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  }
+
+  .sticky-bar-solid {
+    background: color-mix(in oklab, var(--card) 96%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  }
+
+  /* Anchor targets inside long lists keep a comfortable thumb size on mobile. */
+  .tap-row {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+  }
+
+  .tap-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   .safe-bottom {
@@ -358,13 +578,60 @@
   }
 
   .pb-mobile-nav {
-    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
   }
 
   @media (min-width: 768px) {
     .pb-mobile-nav {
       padding-bottom: 2rem;
     }
+    .safe-top {
+      padding-top: 0;
+    }
+  }
+
+  /*
+   * Composited attention ring for emergency badges. Animating `box-shadow`
+   * repaints the element every frame; a scaled pseudo-element stays on the
+   * compositor.
+   */
+  .pulse-ring {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .pulse-ring::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: color-mix(in oklab, var(--destructive) 42%, transparent);
+    animation: ring-out 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    pointer-events: none;
+    z-index: -1;
+    will-change: transform, opacity;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-ring::after {
+      animation: none;
+      display: none;
+    }
+  }
+}
+
+@keyframes ring-out {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
   }
 }
 
@@ -407,18 +674,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in oklab, var(--destructive) 45%, transparent);
-  }
-  70% {
-    box-shadow: 0 0 0 12px color-mix(in oklab, var(--destructive) 0%, transparent);
-  }
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in oklab, var(--destructive) 0%, transparent);
   }
 }
 

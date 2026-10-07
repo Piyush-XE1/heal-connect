@@ -106,7 +106,20 @@ export function PwaProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    void register();
+    /*
+     * Register once the page is idle. Registering during hydration competes with
+     * the first paint, the fonts and the API calls for a slow mobile connection.
+     */
+    let idleHandle: number | undefined;
+    const afterLoad = () => {
+      if (typeof window.requestIdleCallback === "function") {
+        idleHandle = window.requestIdleCallback(() => void register(), { timeout: 3000 });
+      } else {
+        idleHandle = window.setTimeout(() => void register(), 1200);
+      }
+    };
+    if (document.readyState === "complete") afterLoad();
+    else window.addEventListener("load", afterLoad, { once: true });
 
     const handleControllerChange = () => {
       // A new worker took control: reload once so the shell matches.
@@ -118,6 +131,11 @@ export function PwaProvider({ children }: { children: ReactNode }) {
 
     return () => {
       cancelled = true;
+      window.removeEventListener("load", afterLoad);
+      if (idleHandle !== undefined) {
+        if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idleHandle);
+        else window.clearTimeout(idleHandle);
+      }
       navigator.serviceWorker.removeEventListener("controllerchange", handleControllerChange);
     };
   }, []);

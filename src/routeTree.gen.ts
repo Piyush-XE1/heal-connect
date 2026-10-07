@@ -13,11 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as HealthzRouteImport } from './routes/healthz'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SafetyRouteImport } from './routes/safety'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AppActivityRouteImport } from './routes/_app/activity'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
@@ -55,6 +58,11 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HealthzRoute = HealthzRouteImport.update({
+  id: '/healthz',
+  path: '/healthz',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -75,9 +83,19 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SafetyRoute = SafetyRouteImport.update({
   id: '/safety',
   path: '/safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -172,11 +190,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/emergency': typeof EmergencyRoute
   '/faq': typeof FaqRoute
+  '/healthz': typeof HealthzRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/safety': typeof SafetyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/activity': typeof AppActivityRoute
   '/admin': typeof AppAdminRoute
@@ -199,11 +220,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/emergency': typeof EmergencyRoute
   '/faq': typeof FaqRoute
+  '/healthz': typeof HealthzRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/safety': typeof SafetyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/activity': typeof AppActivityRoute
   '/admin': typeof AppAdminRoute
@@ -228,11 +252,14 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/emergency': typeof EmergencyRoute
   '/faq': typeof FaqRoute
+  '/healthz': typeof HealthzRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/safety': typeof SafetyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/_app/activity': typeof AppActivityRoute
   '/_app/admin': typeof AppAdminRoute
@@ -257,11 +284,14 @@ export interface FileRouteTypes {
     | '/'
     | '/emergency'
     | '/faq'
+    | '/healthz'
     | '/login'
     | '/onboarding'
     | '/privacy'
     | '/register'
+    | '/robots.txt'
     | '/safety'
+    | '/sitemap.xml'
     | '/terms'
     | '/activity'
     | '/admin'
@@ -284,11 +314,14 @@ export interface FileRouteTypes {
     | '/'
     | '/emergency'
     | '/faq'
+    | '/healthz'
     | '/login'
     | '/onboarding'
     | '/privacy'
     | '/register'
+    | '/robots.txt'
     | '/safety'
+    | '/sitemap.xml'
     | '/terms'
     | '/activity'
     | '/admin'
@@ -312,11 +345,14 @@ export interface FileRouteTypes {
     | '/_app'
     | '/emergency'
     | '/faq'
+    | '/healthz'
     | '/login'
     | '/onboarding'
     | '/privacy'
     | '/register'
+    | '/robots.txt'
     | '/safety'
+    | '/sitemap.xml'
     | '/terms'
     | '/_app/activity'
     | '/_app/admin'
@@ -341,11 +377,14 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   EmergencyRoute: typeof EmergencyRoute
   FaqRoute: typeof FaqRoute
+  HealthzRoute: typeof HealthzRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SafetyRoute: typeof SafetyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
   ApiAuthGoogleStartRoute: typeof ApiAuthGoogleStartRoute
@@ -381,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/healthz': {
+      id: '/healthz'
+      path: '/healthz'
+      fullPath: '/healthz'
+      preLoaderRoute: typeof HealthzRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -409,11 +455,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/safety': {
       id: '/safety'
       path: '/safety'
       fullPath: '/safety'
       preLoaderRoute: typeof SafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -579,11 +639,14 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   EmergencyRoute: EmergencyRoute,
   FaqRoute: FaqRoute,
+  HealthzRoute: HealthzRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SafetyRoute: SafetyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
   ApiAuthGoogleStartRoute: ApiAuthGoogleStartRoute,

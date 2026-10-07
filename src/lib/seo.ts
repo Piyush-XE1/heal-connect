@@ -63,3 +63,23 @@ export function pageHead({
   if (noIndex) meta.push({ name: "robots", content: "noindex, nofollow" });
   return { meta, links };
 }
+
+/**
+ * FAQPage structured data (schema.org). Search engines use this to render
+ * expandable Q&A results; the answers are the same copy the page already shows,
+ * so there is nothing extra to keep in sync.
+ */
+export function faqJsonLd(items: { question: string; answer: string }[]) {
+  return {
+    type: "application/ld+json",
+    children: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: items.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: { "@type": "Answer", text: item.answer },
+      })),
+    }),
+  };
+}

@@ -99,7 +99,7 @@ function VerifyPage() {
   const status = current?.status ?? user?.verificationStatus ?? "unverified";
 
   return (
-    <div className="page-shell max-w-3xl space-y-6 py-8">
+    <div className="page-shell max-w-3xl space-y-6 page-y">
       <PageHeader
         title="Verification"
         description="Verification distinguishes reviewed information from self-reported details. It is a platform trust signal — never a medical certification."
@@ -131,7 +131,7 @@ function VerifyPage() {
       ) : (
         <>
           {/* Status */}
-          <section className="surface space-y-4 p-6" aria-labelledby="status-heading">
+          <section className="surface space-y-4 p-4 sm:p-6" aria-labelledby="status-heading">
             <h2 id="status-heading" className="font-display text-lg font-extrabold">
               Current status
             </h2>
@@ -192,7 +192,10 @@ function VerifyPage() {
 
           {/* Submit */}
           {status !== "verified" && status !== "pending" ? (
-            <section className="surface space-y-5 p-6" aria-labelledby="submit-heading">
+            <section
+              className="surface space-y-4 p-5 sm:space-y-5 sm:p-6"
+              aria-labelledby="submit-heading"
+            >
               <h2 id="submit-heading" className="font-display text-lg font-extrabold">
                 Submit verification
               </h2>

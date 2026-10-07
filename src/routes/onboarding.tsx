@@ -135,7 +135,7 @@ function OnboardingPage() {
 
   return (
     <div className="min-h-screen grid-mesh">
-      <div className="page-shell max-w-3xl py-10">
+      <div className="page-shell max-w-3xl page-y">
         <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <LogoMark className="size-10" />

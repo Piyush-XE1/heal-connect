@@ -10,7 +10,13 @@ export const queryKeys = {
   myVerification: ["my-verification"] as const,
   myReports: ["my-reports"] as const,
   blockedUsers: ["blocked-users"] as const,
-  notifications: (filter: "all" | "unread" = "all") => ["notifications", filter] as const,
+  /**
+   * `bell` is the shared badge/popover feed in the app shell. Every notification
+   * query lives under the `["notifications"]` prefix so a single invalidation
+   * refreshes the badge, the popover and the notifications page together.
+   */
+  notifications: (filter: "all" | "unread" | "bell" = "all") => ["notifications", filter] as const,
+  notificationsRoot: ["notifications"] as const,
   requests: (filters: Record<string, unknown>) => ["requests", filters] as const,
   request: (id: string) => ["request", id] as const,
   requestFiltersMeta: ["request-filters-meta"] as const,
@@ -30,7 +36,7 @@ export const invalidationGroups = {
     queryKeys.myRequests,
     queryKeys.matchedRequests,
     queryKeys.emergencyRequests,
-    queryKeys.notifications("all"),
+    queryKeys.notificationsRoot,
     queryKeys.session,
   ] as QueryKey[],
   afterResponseChange: [
@@ -38,7 +44,7 @@ export const invalidationGroups = {
     queryKeys.myActivity,
     queryKeys.myRequests,
     queryKeys.matchedRequests,
-    queryKeys.notifications("all"),
+    queryKeys.notificationsRoot,
   ] as QueryKey[],
   afterProfileChange: [
     queryKeys.session,
@@ -48,7 +54,7 @@ export const invalidationGroups = {
   afterModeration: [
     ["admin"] as QueryKey,
     queryKeys.dashboard,
-    queryKeys.notifications("all"),
+    queryKeys.notificationsRoot,
     queryKeys.session,
   ] as QueryKey[],
 } as const;

@@ -59,7 +59,7 @@ export function RequestCard({
   return (
     <article
       className={cn(
-        "surface surface-hover flex h-full flex-col gap-4 p-5",
+        "surface surface-hover flex h-full flex-col gap-3.5 p-4 sm:gap-4 sm:p-5",
         isEmergency &&
           "border-destructive/40 shadow-[0_0_0_1px_color-mix(in_oklab,var(--destructive)_18%,transparent)]",
         className,
@@ -238,7 +238,7 @@ export function RequestCardMini({ item }: { item: RequestSearchItem }) {
   return (
     <Link
       {...{ to: "/requests/$requestId", params: { requestId: item.id } }}
-      className="surface surface-hover flex items-center gap-3 p-3"
+      className="surface surface-hover flex min-w-0 items-center gap-3 p-3"
     >
       <BloodGroupChip group={item.bloodGroup} size="sm" />
       <span className="min-w-0 flex-1">
