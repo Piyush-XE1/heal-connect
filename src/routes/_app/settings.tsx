@@ -114,14 +114,14 @@ function SettingsPage() {
 
   if (!user) {
     return (
-      <div className="page-shell max-w-3xl py-8">
+      <div className="page-shell max-w-3xl page-y">
         <SkeletonCard />
       </div>
     );
   }
 
   return (
-    <div className="page-shell max-w-3xl space-y-6 py-8">
+    <div className="page-shell max-w-3xl space-y-6 page-y">
       <PageHeader
         title="Settings"
         description="Your role, privacy, notifications and safety controls in one place."
@@ -140,7 +140,7 @@ function SettingsPage() {
       </PageHeader>
 
       {/* Account */}
-      <section className="surface space-y-4 p-6" aria-labelledby="account-heading">
+      <section className="surface space-y-4 p-4 sm:p-6" aria-labelledby="account-heading">
         <h2 id="account-heading" className="font-display text-lg font-extrabold">
           Account
         </h2>
@@ -184,7 +184,7 @@ function SettingsPage() {
       </section>
 
       {/* Role */}
-      <section className="surface space-y-4 p-6" aria-labelledby="role-heading">
+      <section className="surface space-y-4 p-4 sm:p-6" aria-labelledby="role-heading">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="role-heading" className="font-display text-lg font-extrabold">
             How you take part
@@ -247,7 +247,7 @@ function SettingsPage() {
       </section>
 
       {/* Privacy */}
-      <section className="surface space-y-4 p-6" aria-labelledby="privacy-heading">
+      <section className="surface space-y-4 p-4 sm:p-6" aria-labelledby="privacy-heading">
         <h2 id="privacy-heading" className="font-display text-lg font-extrabold">
           Privacy
         </h2>
@@ -300,7 +300,7 @@ function SettingsPage() {
       </section>
 
       {/* Notifications */}
-      <section className="surface space-y-4 p-6" aria-labelledby="notifications-heading">
+      <section className="surface space-y-4 p-4 sm:p-6" aria-labelledby="notifications-heading">
         <h2 id="notifications-heading" className="font-display text-lg font-extrabold">
           Notifications
         </h2>
@@ -348,7 +348,7 @@ function SettingsPage() {
       </section>
 
       {/* Install */}
-      <section className="surface space-y-3 p-6" aria-labelledby="install-heading">
+      <section className="surface space-y-3 p-4 sm:p-6" aria-labelledby="install-heading">
         <h2 id="install-heading" className="font-display text-lg font-extrabold">
           App
         </h2>
@@ -393,7 +393,7 @@ function SettingsPage() {
       </section>
 
       {/* Safety */}
-      <section className="surface space-y-4 p-6" aria-labelledby="safety-heading">
+      <section className="surface space-y-4 p-4 sm:p-6" aria-labelledby="safety-heading">
         <h2 id="safety-heading" className="font-display text-lg font-extrabold">
           Safety and blocking
         </h2>
@@ -489,7 +489,7 @@ function SettingsPage() {
       </section>
 
       {/* Data */}
-      <section className="surface space-y-4 p-6" aria-labelledby="data-heading">
+      <section className="surface space-y-4 p-4 sm:p-6" aria-labelledby="data-heading">
         <h2 id="data-heading" className="font-display text-lg font-extrabold">
           Your data
         </h2>
@@ -540,7 +540,7 @@ function SettingsPage() {
         </div>
         <InfoNote tone="neutral" title="Deleting your account">
           Data deletion is handled by our team in this MVP. Email{" "}
-          <a className="font-semibold underline" href={`mailto:${BRAND.supportEmail}`}>
+          <a className="tap-link font-semibold underline" href={`mailto:${BRAND.supportEmail}`}>
             {BRAND.supportEmail}
           </a>{" "}
           from your registered address and we will remove your account, profile and contact details.

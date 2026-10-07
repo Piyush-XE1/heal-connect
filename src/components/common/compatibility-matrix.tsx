@@ -11,9 +11,14 @@ import { InfoNote } from "@/components/common/primitives";
  */
 export function CompatibilityMatrix({ highlight }: { highlight?: BloodGroup | null }) {
   return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto scroll-thin">
-        <table className="w-full min-w-[34rem] border-separate border-spacing-0 text-sm">
+    /*
+     * `min-w-0` matters here: without it the 34rem table below sets the
+     * min-content width of whatever grid/flex track this component sits in, so
+     * the whole section was pushed wider than a phone screen.
+     */
+    <div className="min-w-0 space-y-4">
+      <div className="scroll-thin -mx-1 overflow-x-auto px-1">
+        <table className="w-full min-w-[30rem] border-separate border-spacing-0 text-sm sm:min-w-[34rem]">
           <caption className="sr-only">
             General red-blood-cell compatibility: rows are donor blood groups, columns are recipient
             blood groups. A tick means the donor group can often donate to that recipient group. The

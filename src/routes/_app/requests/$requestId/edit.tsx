@@ -32,7 +32,7 @@ function EditRequestPage() {
 
   if (isLoading) {
     return (
-      <div className="page-shell max-w-3xl py-8">
+      <div className="page-shell max-w-3xl page-y">
         <SkeletonCard />
       </div>
     );
@@ -40,7 +40,7 @@ function EditRequestPage() {
 
   if (isError || !data) {
     return (
-      <div className="page-shell max-w-3xl py-10">
+      <div className="page-shell max-w-3xl page-y">
         <ErrorState
           title="We could not load this request"
           description="It may have been removed, or you may not have access to it."
@@ -52,7 +52,7 @@ function EditRequestPage() {
 
   if (!data.isOwner && !data.isAdmin) {
     return (
-      <div className="page-shell max-w-3xl py-10">
+      <div className="page-shell max-w-3xl page-y">
         <ErrorState
           title="You cannot edit this request"
           description="Only the person who raised the request (or a moderator) can edit it."
@@ -71,7 +71,7 @@ function EditRequestPage() {
   const { request } = data;
 
   return (
-    <div className="page-shell max-w-3xl space-y-6 py-8">
+    <div className="page-shell max-w-3xl space-y-6 page-y">
       <PageHeader
         title="Edit request"
         description="Changes to the blood group, units, date or urgency notify every donor who offered help."

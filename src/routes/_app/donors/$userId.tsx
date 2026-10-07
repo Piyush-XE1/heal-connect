@@ -86,7 +86,7 @@ function DonorProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="page-shell max-w-3xl space-y-4 py-8">
+      <div className="page-shell max-w-3xl space-y-4 page-y">
         <SkeletonCard />
         <SkeletonLines count={5} />
       </div>
@@ -95,7 +95,7 @@ function DonorProfilePage() {
 
   if (isError || !data) {
     return (
-      <div className="page-shell max-w-3xl py-10">
+      <div className="page-shell max-w-3xl page-y">
         <ErrorState
           title="We could not load this profile"
           description="The member may have removed their profile or been suspended."
@@ -106,7 +106,7 @@ function DonorProfilePage() {
   }
 
   return (
-    <div className="page-shell max-w-3xl space-y-6 py-8">
+    <div className="page-shell max-w-3xl space-y-6 page-y">
       <div className="flex items-center justify-between gap-3">
         <Button asChild variant="ghost" size="sm">
           <Link to="/donors">
@@ -134,7 +134,7 @@ function DonorProfilePage() {
         </div>
       </PageHeader>
 
-      <section className="surface space-y-5 p-6">
+      <section className="surface space-y-4 p-5 sm:space-y-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             {data.avatarUrl ? (
@@ -199,7 +199,7 @@ function DonorProfilePage() {
         <InfoNote tone="primary" icon={Lock} title="What stays private">
           {data.privacyNote} {COMPATIBILITY_DISCLAIMER}
         </InfoNote>
-        <div className="surface space-y-3 p-5">
+        <div className="surface space-y-3 p-4 sm:p-5">
           <h2 className="font-display text-sm font-bold">Need this donor's help?</h2>
           <p className="text-xs leading-relaxed text-muted-foreground">
             Raise a request with the hospital and requirement details. Matching donors are notified

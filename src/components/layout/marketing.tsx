@@ -28,11 +28,11 @@ export function MarketingHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 transition-all duration-300",
-        scrolled ? "border-b border-border bg-background/90 backdrop-blur-md" : "bg-transparent",
+        "safe-top sticky top-0 z-40 transition-colors duration-300",
+        scrolled ? "sticky-bar" : "bg-transparent",
       )}
     >
-      <div className="page-shell flex h-16 items-center justify-between gap-4">
+      <div className="page-shell flex h-14 items-center justify-between gap-3 sm:h-16">
         <Link to="/" aria-label="Heal Connect home" className="flex items-center">
           <Logo />
         </Link>
@@ -49,22 +49,25 @@ export function MarketingHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {user ? (
             <>
-              <Button asChild variant="ghost" className="hidden sm:inline-flex">
+              <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
                 <Link to="/notifications">Notifications</Link>
               </Button>
-              <Button asChild>
-                <Link to="/dashboard">Go to dashboard</Link>
+              <Button asChild size="sm">
+                <Link to="/dashboard">
+                  <span className="sm:hidden">Dashboard</span>
+                  <span className="hidden sm:inline">Go to dashboard</span>
+                </Link>
               </Button>
             </>
           ) : (
             <>
-              <Button asChild variant="ghost">
+              <Button asChild variant="ghost" size="sm">
                 <Link to="/login">Sign in</Link>
               </Button>
-              <Button asChild>
+              <Button asChild size="sm">
                 <Link to="/register">Get started</Link>
               </Button>
             </>

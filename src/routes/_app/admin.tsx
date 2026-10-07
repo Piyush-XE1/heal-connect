@@ -272,7 +272,7 @@ function AdminPage() {
 
   if (!user?.isAdmin) {
     return (
-      <div className="page-shell max-w-3xl py-10">
+      <div className="page-shell max-w-3xl page-y">
         <EmptyState
           icon={ShieldAlert}
           title="Administrator access required"
@@ -288,7 +288,7 @@ function AdminPage() {
   }
 
   return (
-    <div className="page-shell space-y-6 py-8">
+    <div className="page-shell space-y-6 page-y">
       <PageHeader
         title="Admin dashboard"
         description="Moderate members and requests, act on reports, review verification requests and monitor platform health."
@@ -433,7 +433,7 @@ function AdminPage() {
               </div>
 
               <div className="grid gap-4 lg:grid-cols-2">
-                <section className="surface space-y-3 p-5" aria-labelledby="chart-day">
+                <section className="surface space-y-3 p-4 sm:p-5" aria-labelledby="chart-day">
                   <h2 id="chart-day" className="font-display text-sm font-bold">
                     Requests created (last 14 days)
                   </h2>
@@ -456,7 +456,7 @@ function AdminPage() {
                   </ul>
                 </section>
 
-                <section className="surface space-y-3 p-5" aria-labelledby="chart-demand">
+                <section className="surface space-y-3 p-4 sm:p-5" aria-labelledby="chart-demand">
                   <h2 id="chart-demand" className="font-display text-sm font-bold">
                     Open demand by blood group
                   </h2>
@@ -497,7 +497,7 @@ function AdminPage() {
               </div>
 
               <div className="grid gap-4 lg:grid-cols-2">
-                <section className="surface space-y-3 p-5" aria-labelledby="emergency-watch">
+                <section className="surface space-y-3 p-4 sm:p-5" aria-labelledby="emergency-watch">
                   <h2
                     id="emergency-watch"
                     className="flex items-center gap-2 font-display text-sm font-bold"
@@ -530,7 +530,7 @@ function AdminPage() {
                   )}
                 </section>
 
-                <section className="surface space-y-3 p-5" aria-labelledby="audit-trail">
+                <section className="surface space-y-3 p-4 sm:p-5" aria-labelledby="audit-trail">
                   <h2 id="audit-trail" className="font-display text-sm font-bold">
                     Recent moderation actions
                   </h2>
@@ -674,7 +674,7 @@ function AdminPage() {
             <>
               <ul className="space-y-3">
                 {pagedUsers.map((row) => (
-                  <li key={row.id} className="surface space-y-3 p-5">
+                  <li key={row.id} className="surface space-y-3 p-4 sm:p-5">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="flex flex-wrap items-center gap-2 font-display text-base font-bold">
@@ -886,7 +886,7 @@ function AdminPage() {
             <>
               <ul className="space-y-3">
                 {pagedRequests.map((row) => (
-                  <li key={row.id} className="surface space-y-3 p-5">
+                  <li key={row.id} className="surface space-y-3 p-4 sm:p-5">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="flex flex-wrap items-center gap-2 font-display text-base font-bold">
@@ -1043,7 +1043,7 @@ function AdminPage() {
           ) : reportsQuery.data?.items.length ? (
             <ul className="space-y-3">
               {reportsQuery.data.items.map((report) => (
-                <li key={report.id} className="surface space-y-3 p-5">
+                <li key={report.id} className="surface space-y-3 p-4 sm:p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="flex flex-wrap items-center gap-2 font-display text-base font-bold">
@@ -1189,7 +1189,7 @@ function AdminPage() {
           ) : verificationsQuery.data?.items.length ? (
             <ul className="space-y-3">
               {verificationsQuery.data.items.map((record) => (
-                <li key={record.id} className="surface space-y-3 p-5">
+                <li key={record.id} className="surface space-y-3 p-4 sm:p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="flex flex-wrap items-center gap-2 font-display text-base font-bold">

@@ -648,7 +648,7 @@ export function RequestForm({
           {mode === "create" || isDraft ? (
             <button
               type="button"
-              className="text-xs font-semibold text-primary underline-offset-4 hover:underline disabled:opacity-60"
+              className="tap-link text-xs font-semibold text-primary underline-offset-4 hover:underline disabled:opacity-60"
               onClick={() => draftMutation.mutate(form.getValues())}
               disabled={busy}
             >

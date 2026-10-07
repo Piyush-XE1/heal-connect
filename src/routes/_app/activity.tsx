@@ -64,7 +64,7 @@ function ActivityPage() {
   });
 
   const renderOffer = (offer: DonorResponseView, showWithdraw: boolean) => (
-    <li key={offer.id} className="surface space-y-3 p-5">
+    <li key={offer.id} className="surface space-y-3 p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <UrgencyBadge urgency={offer.requestUrgency} />
@@ -135,7 +135,7 @@ function ActivityPage() {
   );
 
   return (
-    <div className="page-shell space-y-6 py-8">
+    <div className="page-shell space-y-6 page-y">
       <PageHeader
         title="My activity"
         description="Every offer you sent, where it stands, and the notifications tied to it."
@@ -242,7 +242,7 @@ function ActivityPage() {
               ) : (
                 <ol className="space-y-3">
                   {data.notifications.map((notification) => (
-                    <li key={notification.id} className="surface flex gap-4 p-4">
+                    <li key={notification.id} className="surface flex gap-3 p-3.5 sm:gap-4 sm:p-4">
                       <span
                         className={`mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl ${
                           notification.read

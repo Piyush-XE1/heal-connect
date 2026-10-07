@@ -67,7 +67,7 @@ function NotificationsPage() {
   });
 
   return (
-    <div className="page-shell max-w-3xl space-y-6 py-8">
+    <div className="page-shell max-w-3xl space-y-6 page-y">
       <PageHeader
         title="Notifications"
         description="Matches, donor responses, request changes and verification decisions — everything that needs your attention."
@@ -147,7 +147,7 @@ function NotificationsPage() {
               {data.items.map((notification) => (
                 <li
                   key={notification.id}
-                  className={`surface flex gap-4 p-4 ${notification.read ? "" : "border-primary/30 bg-primary-soft/40"}`}
+                  className={`surface flex gap-3 p-3.5 sm:gap-4 sm:p-4 ${notification.read ? "" : "border-primary/30 bg-primary-soft/40"}`}
                 >
                   <span
                     className={`mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl ${
@@ -172,7 +172,7 @@ function NotificationsPage() {
                       {notification.link ? (
                         <Link
                           to={notification.link}
-                          className="font-semibold text-primary hover:underline"
+                          className="tap-link font-semibold text-primary hover:underline"
                           onClick={() => {
                             if (!notification.read) markOne.mutate(notification.id);
                           }}
@@ -183,7 +183,7 @@ function NotificationsPage() {
                       {!notification.read ? (
                         <button
                           type="button"
-                          className="font-semibold hover:underline"
+                          className="tap-link font-semibold hover:underline"
                           onClick={() => markOne.mutate(notification.id)}
                         >
                           Mark as read

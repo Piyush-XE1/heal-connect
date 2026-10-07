@@ -133,7 +133,7 @@ function DonorsPage() {
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.perPage)) : 1;
 
   return (
-    <div className="page-shell space-y-6 py-8">
+    <div className="page-shell space-y-6 page-y">
       <PageHeader
         title="Donor directory"
         description="Self-reported donor profiles, shown at city and area level only. Use it to see who can help near you — then raise a request so coordination stays structured and safe."
@@ -170,7 +170,7 @@ function DonorsPage() {
         the coordinator accepts. Never ask donors for payment.
       </InfoNote>
 
-      <div className="surface space-y-4 p-5">
+      <div className="surface space-y-4 p-4 sm:p-5">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="donor-q">Search</Label>
@@ -394,7 +394,7 @@ function DonorsPage() {
       <InfoNote tone="blood" title="Want to appear here?">
         Donors can opt in from their donor profile by keeping “Visible to recipients” enabled, and
         by setting an accurate availability status.{" "}
-        <Link to="/profile" className="font-semibold underline">
+        <Link to="/profile" className="tap-link font-semibold underline">
           Open donor profile
         </Link>
         . Availability labels:{" "}

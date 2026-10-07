@@ -128,7 +128,7 @@ function SafetyPage() {
       </div>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="surface space-y-3 p-6">
+        <div className="surface space-y-3 p-4 sm:p-6">
           <h2 className="font-display text-lg font-extrabold">Do this</h2>
           <ul className="space-y-2">
             {DOS.map((item) => (
@@ -139,7 +139,7 @@ function SafetyPage() {
             ))}
           </ul>
         </div>
-        <div className="surface space-y-3 p-6">
+        <div className="surface space-y-3 p-4 sm:p-6">
           <h2 className="font-display text-lg font-extrabold">Never do this</h2>
           <ul className="space-y-2">
             {DONTS.map((item) => (
@@ -188,7 +188,7 @@ function SafetyPage() {
         <InfoNote tone="neutral" icon={HeartHandshake} title="Organ donation">
           {ORGAN_DONATION_NOTICE}
         </InfoNote>
-        <div className="surface space-y-3 p-6">
+        <div className="surface space-y-3 p-4 sm:p-6">
           <h2 className="flex items-center gap-2 font-display text-base font-bold">
             <FileText className="size-4 text-primary" aria-hidden="true" />
             Read the details

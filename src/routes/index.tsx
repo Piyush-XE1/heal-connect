@@ -52,17 +52,26 @@ import {
 import { FAQ_ITEMS, LANDING_FAQ_IDS } from "@/lib/faq";
 import { MATCHING_WEIGHTS } from "@/lib/blood";
 import { queryKeys } from "@/lib/query-keys";
-import { pageHead } from "@/lib/seo";
+import { faqJsonLd, pageHead } from "@/lib/seo";
 import { fetchPublicStats, type PublicStats } from "@/server/api/requests";
 
+/** The subset of the FAQ shown on the landing page (also used for structured data). */
+function landingFaqItems() {
+  return LANDING_FAQ_IDS.map((id) => FAQ_ITEMS.find((item) => item.id === id)).filter(
+    (item): item is (typeof FAQ_ITEMS)[number] => Boolean(item),
+  );
+}
+
 export const Route = createFileRoute("/")({
-  head: () =>
-    pageHead({
+  head: () => ({
+    ...pageHead({
       title: "Heal Connect — Give. Receive. Save lives.",
       description:
         "Heal Connect connects people willing to help with people who need legitimate medical donation assistance: verified blood, platelet and medical assistance requests, matched safely with nearby donors.",
       path: "/",
     }),
+    scripts: [faqJsonLd(landingFaqItems())],
+  }),
   loader: async (): Promise<{ stats: PublicStats | null }> => {
     try {
       const stats = await fetchPublicStats();
@@ -194,9 +203,7 @@ function LandingPage() {
     staleTime: 60_000,
   });
 
-  const faqItems = LANDING_FAQ_IDS.map((id) => FAQ_ITEMS.find((item) => item.id === id)).filter(
-    (item): item is (typeof FAQ_ITEMS)[number] => Boolean(item),
-  );
+  const faqItems = landingFaqItems();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -205,17 +212,17 @@ function LandingPage() {
       <main className="flex-1">
         {/* Hero ------------------------------------------------------- */}
         <section className="relative overflow-hidden grid-mesh">
-          <div className="page-shell grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_1fr] lg:py-20">
-            <div className="space-y-6">
+          <div className="page-shell grid items-center gap-9 py-8 sm:gap-12 sm:py-12 lg:grid-cols-[1.05fr_1fr] lg:py-20">
+            <div className="space-y-5 sm:space-y-6">
               <Pill tone="primary" className="px-3 py-1.5 text-xs">
                 <Sparkles className="size-3.5" aria-hidden="true" />
                 Give. Receive. Save lives.
               </Pill>
-              <h1 className="font-display text-4xl leading-[1.05] font-extrabold text-balance sm:text-5xl lg:text-[3.4rem]">
+              <h1 className="font-display text-[1.9rem] leading-[1.12] font-extrabold text-balance sm:text-5xl sm:leading-[1.05] lg:text-[3.4rem]">
                 One platform to connect people willing to help with people who need{" "}
                 <span className="text-gradient-brand">legitimate medical donation assistance</span>.
               </h1>
-              <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              <p className="max-w-xl text-[0.975rem] leading-relaxed text-muted-foreground sm:text-lg">
                 Raise a clear request for blood, platelets or medical assistance. Offer help if you
                 are eligible. Coordinate safely — with privacy built in, hospitals in charge, and no
                 money changing hands.
@@ -327,8 +334,8 @@ function LandingPage() {
           </div>
 
           {/* Live counters */}
-          <div className="page-shell pb-12">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="page-shell pb-8 sm:pb-12">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
               <StatTile
                 label="Open requests"
                 value={stats ? stats.openRequests : "—"}
@@ -362,16 +369,16 @@ function LandingPage() {
         </section>
 
         {/* How it works --------------------------------------------- */}
-        <section id="how-it-works" className="page-shell scroll-mt-24 py-16 lg:py-20">
+        <section id="how-it-works" className="page-shell section-y content-auto scroll-mt-24">
           <SectionHeading
             eyebrow="How it works"
             title="From a request in a hospital corridor to a confirmed donor"
             description="Four steps, no guesswork. Every step keeps private information private and leaves medical judgement with the professionals."
           />
-          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-7 grid gap-4 sm:mt-10 md:grid-cols-2 xl:grid-cols-4">
             {STEPS.map((step, index) => (
               <Reveal key={step.title} delay={index * 80}>
-                <article className="surface surface-hover h-full space-y-3 p-6">
+                <article className="surface surface-hover h-full space-y-3 p-5 sm:p-6">
                   <div className="flex items-center justify-between">
                     <span className="grid size-11 place-items-center rounded-2xl bg-primary-soft text-primary">
                       <step.icon className="size-5" aria-hidden="true" />
@@ -393,17 +400,17 @@ function LandingPage() {
         {/* Participate ---------------------------------------------- */}
         <section
           id="participate"
-          className="scroll-mt-24 border-y border-border bg-muted/40 py-16 lg:py-20"
+          className="section-y content-auto scroll-mt-24 border-y border-border bg-muted/40"
         >
-          <div className="page-shell space-y-10">
+          <div className="page-shell space-y-7 sm:space-y-10">
             <SectionHeading
               eyebrow="Two ways to take part"
               title="Donors give and receive. Recipients find help and coordinate."
               description="Most members are both over time — you can donate when you are able and raise a request when you need one. Your role decides which tools you see first."
             />
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
               <Reveal>
-                <article className="surface h-full space-y-5 p-7">
+                <article className="surface h-full space-y-4 p-5 sm:space-y-5 sm:p-7">
                   <div className="flex items-center justify-between">
                     <span className="grid size-12 place-items-center rounded-2xl bg-blood/10 text-blood">
                       <Droplet className="size-6" aria-hidden="true" />
@@ -444,7 +451,7 @@ function LandingPage() {
               </Reveal>
 
               <Reveal delay={100}>
-                <article className="surface h-full space-y-5 p-7">
+                <article className="surface h-full space-y-4 p-5 sm:space-y-5 sm:p-7">
                   <div className="flex items-center justify-between">
                     <span className="grid size-12 place-items-center rounded-2xl bg-primary-soft text-primary">
                       <HeartHandshake className="size-6" aria-hidden="true" />
@@ -488,8 +495,8 @@ function LandingPage() {
         </section>
 
         {/* Matching ------------------------------------------------- */}
-        <section className="page-shell py-16 lg:py-20">
-          <div className="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-start">
+        <section className="page-shell section-y content-auto">
+          <div className="grid gap-7 sm:gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-start">
             <div className="space-y-6">
               <SectionHeading
                 eyebrow="Smart matching"
@@ -515,7 +522,10 @@ function LandingPage() {
                   },
                   { label: "Request urgency", weight: MATCHING_WEIGHTS.urgency, icon: Timer },
                 ].map((factor) => (
-                  <div key={factor.label} className="surface flex items-center gap-4 p-4">
+                  <div
+                    key={factor.label}
+                    className="surface flex items-center gap-3 p-3.5 sm:gap-4 sm:p-4"
+                  >
                     <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
                       <factor.icon className="size-5" aria-hidden="true" />
                     </span>
@@ -561,9 +571,9 @@ function LandingPage() {
         {/* Trust --------------------------------------------------- */}
         <section
           id="trust"
-          className="scroll-mt-24 border-y border-border bg-muted/40 py-16 lg:py-20"
+          className="section-y content-auto scroll-mt-24 border-y border-border bg-muted/40"
         >
-          <div className="page-shell space-y-10">
+          <div className="page-shell space-y-7 sm:space-y-10">
             <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div className="space-y-6">
                 <SectionHeading
@@ -584,6 +594,7 @@ function LandingPage() {
                   alt="A clinician speaking with a patient in a bright consultation room"
                   className="h-56 w-full rounded-3xl object-cover shadow-lg sm:h-64"
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -618,13 +629,13 @@ function LandingPage() {
         </section>
 
         {/* Emergency ---------------------------------------------- */}
-        <section id="emergency-assistance" className="scroll-mt-24 py-16 lg:py-20">
+        <section id="emergency-assistance" className="section-y content-auto scroll-mt-24">
           <div className="page-shell">
-            <div className="surface relative overflow-hidden border-destructive/30 p-6 sm:p-10">
+            <div className="surface relative overflow-hidden border-destructive/30 p-5 sm:p-10">
               <div className="absolute -top-16 -right-10 size-52 rounded-full bg-destructive/10 blur-3xl" />
-              <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+              <div className="relative grid gap-6 sm:gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
                 <div className="space-y-5">
-                  <Pill tone="danger" className="animate-pulse-ring px-3 py-1.5">
+                  <Pill tone="danger" className="pulse-ring px-3 py-1.5">
                     <Siren className="size-3.5" aria-hidden="true" />
                     Emergency assistance
                   </Pill>
@@ -680,9 +691,9 @@ function LandingPage() {
         {/* FAQ ----------------------------------------------------- */}
         <section
           id="faq"
-          className="scroll-mt-24 border-t border-border bg-muted/40 py-16 lg:py-20"
+          className="section-y content-auto scroll-mt-24 border-t border-border bg-muted/40"
         >
-          <div className="page-shell grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="page-shell grid gap-7 sm:gap-10 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="space-y-4">
               <SectionHeading
                 eyebrow="FAQ"
@@ -700,7 +711,7 @@ function LandingPage() {
             </div>
             <div className="space-y-3">
               {faqItems.map((item) => (
-                <details key={item.id} className="surface group p-5 open:shadow-md">
+                <details key={item.id} className="surface group p-4 open:shadow-md sm:p-5">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-base font-bold">
                     {item.question}
                     <span className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition group-open:rotate-45">
@@ -717,17 +728,17 @@ function LandingPage() {
         </section>
 
         {/* Closing CTA -------------------------------------------- */}
-        <section className="page-shell py-16 lg:py-20">
+        <section className="page-shell section-y content-auto">
           <div className="surface overflow-hidden">
-            <div className="gradient-brand relative p-8 text-center text-white sm:p-14">
-              <h2 className="font-display text-3xl font-extrabold text-balance sm:text-4xl">
+            <div className="gradient-brand relative p-6 text-center text-white sm:p-14">
+              <h2 className="font-display text-[1.6rem] leading-tight font-extrabold text-balance sm:text-4xl">
                 Somebody nearby can help. Somebody nearby needs help.
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/90 sm:text-base">
                 {BRAND.positioning} Join in less than a minute — choose your role, add what matters,
                 and start saving lives responsibly.
               </p>
-              <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col justify-center gap-3 sm:mt-8 sm:flex-row">
                 <Button asChild size="lg" className="h-12 bg-white text-primary hover:bg-white/90">
                   <Link to={user ? "/dashboard" : "/register"}>
                     {user ? "Go to dashboard" : "Create your free account"}

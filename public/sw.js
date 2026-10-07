@@ -15,7 +15,7 @@
  *    and the push scaffolding.
  */
 
-const VERSION = "heal-connect-v1";
+const VERSION = "heal-connect-v2";
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 const FONT_CACHE = `${VERSION}-fonts`;
@@ -23,24 +23,21 @@ const PAGE_CACHE = `${VERSION}-pages`;
 
 const OFFLINE_URL = "/offline.html";
 
+/*
+ * Keep the install step lean. Every extra URL here is a request fired at the
+ * same moment the user is waiting for the page, so we precache only the offline
+ * fallback, the manifest and the icons the OS needs. Public routes are cached
+ * on first visit instead (see handleNavigation).
+ */
 const PRECACHE = [
   OFFLINE_URL,
   "/manifest.webmanifest",
   "/favicon.svg",
-  "/favicon.ico",
   "/icons/icon.svg",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/maskable-512.png",
   "/icons/apple-touch-icon.png",
-  "/",
-  "/login",
-  "/register",
-  "/emergency",
-  "/faq",
-  "/safety",
-  "/terms",
-  "/privacy",
 ];
 
 const DEV_HOST = /^(localhost|127\.0\.0\.1|0\.0\.0\.0|::1)$|\.e2b\.app$/i.test(
@@ -114,12 +111,15 @@ async function handleNavigation(request) {
   }
 
   try {
-    const response = await fetchWithTimeout(request, 6000);
+    const response = await fetchWithTimeout(request, 3500);
     if (response && response.ok && !DEV_HOST) {
       // Only cache committed documents from the same origin.
       const contentType = response.headers.get("content-type") ?? "";
       if (contentType.includes("text/html")) {
-        cache.put(request, response.clone()).catch(() => {});
+        cache
+          .put(request, response.clone())
+          .then(trimPageCache)
+          .catch(() => {});
       }
     }
     return response;
@@ -137,6 +137,18 @@ async function handleNavigation(request) {
   }
 }
 
+/** Keeps the page cache from growing without bound on long-lived installs. */
+async function trimPageCache() {
+  try {
+    const cache = await caches.open(PAGE_CACHE);
+    const keys = await cache.keys();
+    if (keys.length <= 24) return;
+    await Promise.all(keys.slice(0, keys.length - 24).map((key) => cache.delete(key)));
+  } catch {
+    /* non-fatal */
+  }
+}
+
 async function fetchWithTimeout(request, ms) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
@@ -147,10 +159,16 @@ async function fetchWithTimeout(request, ms) {
   }
 }
 
-/** Stale-while-revalidate for same-origin build assets. */
-async function handleAsset(request) {
+/**
+ * Build assets are content-hashed and immutable, so a cache hit is always
+ * correct — serving it straight from cache avoids a pointless network request
+ * on every page view. Anything else (icons, manifest, arbitrary static files)
+ * is stale-while-revalidate.
+ */
+async function handleAsset(request, immutable) {
   const cache = await caches.open(ASSET_CACHE);
   const cached = await cache.match(request);
+  if (cached && immutable) return cached;
   const network = fetch(request)
     .then((response) => {
       if (response && response.ok && !DEV_HOST)
@@ -203,7 +221,7 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/_server")) return;
 
   if (url.pathname.startsWith("/icons/") || isStaticAsset(url)) {
-    event.respondWith(handleAsset(request));
+    event.respondWith(handleAsset(request, url.pathname.startsWith("/assets/")));
   }
 });
 

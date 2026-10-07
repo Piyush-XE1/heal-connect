@@ -225,14 +225,14 @@ function ProfilePage() {
 
   if (isLoading && !session) {
     return (
-      <div className="page-shell max-w-4xl py-8">
+      <div className="page-shell max-w-4xl page-y">
         <SkeletonCard />
       </div>
     );
   }
 
   return (
-    <div className="page-shell max-w-4xl space-y-6 py-8">
+    <div className="page-shell max-w-4xl space-y-6 page-y">
       <PageHeader
         title="Donor profile"
         description="Your details decide which requests reach you. Sensitive fields stay private — we never publish your phone number, address or exact location."
@@ -289,7 +289,10 @@ function ProfilePage() {
       <Progress value={session?.profileCompletion ?? 0} aria-label="Profile completion" />
 
       {/* Personal details */}
-      <section className="surface space-y-5 p-6" aria-labelledby="personal-heading">
+      <section
+        className="surface space-y-4 p-5 sm:space-y-5 sm:p-6"
+        aria-labelledby="personal-heading"
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="personal-heading" className="font-display text-lg font-extrabold">
             Personal details
@@ -497,7 +500,10 @@ function ProfilePage() {
       </section>
 
       {/* Donor details */}
-      <section className="surface space-y-5 p-6" aria-labelledby="donor-heading">
+      <section
+        className="surface space-y-4 p-5 sm:space-y-5 sm:p-6"
+        aria-labelledby="donor-heading"
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="donor-heading" className="font-display text-lg font-extrabold">
             Donation details

@@ -124,7 +124,7 @@ export function UrgencyBadge({ urgency, className }: { urgency: Urgency; classNa
     urgency === "emergency" ? "danger" : urgency === "urgent" ? "warning" : "neutral";
   const Icon = urgency === "emergency" ? ShieldAlert : urgency === "urgent" ? Clock : CalendarClock;
   return (
-    <Pill tone={tone} className={cn(urgency === "emergency" && "animate-pulse-ring", className)}>
+    <Pill tone={tone} className={cn(urgency === "emergency" && "pulse-ring", className)}>
       <Icon className="size-3.5" aria-hidden="true" />
       {URGENCY_LABELS[urgency]}
     </Pill>
@@ -265,7 +265,7 @@ export function SectionHeading({
       {eyebrow ? (
         <p className="mb-3 text-xs font-bold tracking-[0.16em] text-primary uppercase">{eyebrow}</p>
       ) : null}
-      <h2 className="font-display text-3xl leading-tight font-extrabold text-balance sm:text-4xl">
+      <h2 className="font-display text-[1.6rem] leading-tight font-extrabold text-balance sm:text-4xl">
         {title}
       </h2>
       {description ? (
@@ -292,10 +292,15 @@ export function PageHeader({
 }) {
   return (
     <header
-      className={cn("flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between", className)}
+      className={cn(
+        "flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4",
+        className,
+      )}
     >
       <div className="space-y-2">
-        <h1 className="font-display text-2xl leading-tight font-extrabold sm:text-3xl">{title}</h1>
+        <h1 className="font-display text-[1.4rem] leading-tight font-extrabold sm:text-3xl">
+          {title}
+        </h1>
         {description ? (
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{description}</p>
         ) : null}
@@ -322,9 +327,9 @@ export function StatTile({
   className?: string;
 }) {
   return (
-    <div className={cn("surface surface-hover p-4 sm:p-5", className)}>
+    <div className={cn("surface surface-hover h-full p-3.5 sm:p-5", className)}>
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase sm:text-xs">
           {label}
         </p>
         {Icon ? (
@@ -335,7 +340,7 @@ export function StatTile({
           </span>
         ) : null}
       </div>
-      <p className="mt-2 font-display text-2xl font-extrabold sm:text-3xl">{value}</p>
+      <p className="mt-1.5 font-display text-xl font-extrabold sm:mt-2 sm:text-3xl">{value}</p>
       {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
     </div>
   );
@@ -391,7 +396,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "surface flex flex-col items-center justify-center gap-3 px-6 py-14 text-center",
+        "surface flex flex-col items-center justify-center gap-3 px-5 py-9 text-center sm:px-6 sm:py-14",
         className,
       )}
     >
@@ -446,7 +451,7 @@ export function ErrorState({
 
 export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn("surface space-y-4 p-5", className)} aria-hidden="true">
+    <div className={cn("surface space-y-4 p-4 sm:p-5", className)} aria-hidden="true">
       <div className="flex items-center justify-between gap-3">
         <div className="skeleton-shimmer h-6 w-32 rounded-full" />
         <div className="skeleton-shimmer h-9 w-11 rounded-xl" />
@@ -550,8 +555,10 @@ export function Reveal({
     <Tag
       ref={ref as never}
       className={cn(
-        "transition-[opacity,transform] duration-700 ease-out will-change-transform",
-        visible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0",
+        "transition-[opacity,transform] duration-700 ease-out",
+        // `will-change` is only useful while the element is still waiting to
+        // animate; keeping it afterwards pins a compositor layer for nothing.
+        visible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0 will-change-transform",
         className,
       )}
       style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}

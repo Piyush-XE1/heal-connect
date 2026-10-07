@@ -141,7 +141,7 @@ function RequestDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="page-shell max-w-4xl space-y-4 py-8">
+      <div className="page-shell max-w-4xl space-y-4 page-y">
         <SkeletonCard />
         <SkeletonLines count={6} />
       </div>
@@ -150,7 +150,7 @@ function RequestDetailPage() {
 
   if (isError || !data) {
     return (
-      <div className="page-shell max-w-3xl py-10">
+      <div className="page-shell max-w-3xl page-y">
         <ErrorState
           title="This request is not available"
           description="It may have been cancelled, resolved, or removed by moderators."
@@ -170,7 +170,7 @@ function RequestDetailPage() {
   const matchItem: RequestSearchItem = { ...request, match, isOwn: isOwner };
 
   return (
-    <div className="page-shell max-w-4xl space-y-6 py-8">
+    <div className="page-shell max-w-4xl space-y-6 page-y">
       <div className="flex items-center justify-between gap-3">
         <Button asChild variant="ghost" size="sm">
           <Link to="/find-help">
@@ -217,7 +217,7 @@ function RequestDetailPage() {
 
       {/* Header card */}
       <section
-        className={`surface space-y-5 p-6 ${isEmergency ? "border-destructive/40" : ""}`}
+        className={`surface space-y-4 p-5 sm:space-y-5 sm:p-6 ${isEmergency ? "border-destructive/40" : ""}`}
         aria-labelledby="request-title"
       >
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -388,7 +388,7 @@ function RequestDetailPage() {
           Coordination
         </h2>
         {request.contact ? (
-          <div className="surface space-y-3 p-5">
+          <div className="surface space-y-3 p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="flex items-center gap-2 font-semibold">
                 <PhoneCall className="size-4 text-primary" aria-hidden="true" />
@@ -439,7 +439,7 @@ function RequestDetailPage() {
           ) : (
             <ul className="space-y-3">
               {responses.map((offer) => (
-                <li key={offer.id} className="surface space-y-3 p-5">
+                <li key={offer.id} className="surface space-y-3 p-4 sm:p-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <BloodGroupChip group={offer.donorBloodGroup ?? null} size="sm" />
@@ -563,7 +563,7 @@ function RequestDetailPage() {
       {request.myResponseStatus === "pending" || request.myResponseStatus === "accepted" ? (
         <section className="space-y-3">
           <h2 className="font-display text-lg font-extrabold">Your offer</h2>
-          <div className="surface space-y-3 p-5">
+          <div className="surface space-y-3 p-4 sm:p-5">
             <p className="text-sm text-muted-foreground">
               Your offer is{" "}
               {request.myResponseStatus === "accepted"

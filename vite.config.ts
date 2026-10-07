@@ -7,6 +7,14 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  /**
+   * Pre-compress and serve `.gz`/`.br` variants of the built assets. The
+   * Lovable config's `nitro` type only declares the keys it needs, so the
+   * option is passed through with a narrow cast.
+   */
+  nitro: {
+    compressPublicAssets: { gzip: true, brotli: true },
+  } as never,
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

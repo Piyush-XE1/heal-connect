@@ -22,6 +22,7 @@ import { RespondDialog } from "@/components/requests/respond-dialog";
 import { Button } from "@/components/ui/button";
 import { SimplePagination } from "@/components/common/pagination";
 import { useAuth } from "@/components/providers/auth-provider";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { MATCHING_EXPLAINER, MEDICAL_DECISION_DISCLAIMER } from "@/lib/blood";
 import { queryKeys } from "@/lib/query-keys";
 import { errorMessage, unwrapAction } from "@/lib/actions";
@@ -45,12 +46,16 @@ export const Route = createFileRoute("/_app/find-help")({
   component: FindHelpPage,
 });
 
+/** Desktop shows a 3-column grid; phones show one column, so ask for fewer rows. */
 const PER_PAGE = 9;
+const PER_PAGE_MOBILE = 6;
 
 function FindHelpPage() {
   const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const perPage = isMobile ? PER_PAGE_MOBILE : PER_PAGE;
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
   const [page, setPage] = useState(1);
   const [respondItem, setRespondItem] = useState<RequestSearchItem | null>(null);
@@ -73,7 +78,7 @@ function FindHelpPage() {
     const input: Record<string, unknown> = {
       sort: filters.sort,
       page,
-      perPage: PER_PAGE,
+      perPage,
     };
     if (filters.q) input["q"] = filters.q;
     if (filters.bloodGroup) input["bloodGroup"] = filters.bloodGroup as BloodGroup;
@@ -89,7 +94,7 @@ function FindHelpPage() {
       input["lng"] = location.lng;
     }
     return input;
-  }, [filters, location, page]);
+  }, [filters, location, page, perPage]);
 
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: queryKeys.requests(queryInput),
@@ -143,7 +148,7 @@ function FindHelpPage() {
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.perPage)) : 1;
 
   return (
-    <div className="page-shell space-y-6 py-8">
+    <div className="page-shell space-y-6 page-y">
       <PageHeader
         title="Find help requests"
         description="Every open request in your area — filtered the way you want. Compatibility shown here is general guidance only; the blood bank confirms the final match."
@@ -189,7 +194,7 @@ function FindHelpPage() {
         </div>
       </PageHeader>
 
-      <div className="grid gap-6 lg:grid-cols-[19rem_1fr] lg:items-start">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-[19rem_1fr] lg:items-start">
         <div className="lg:sticky lg:top-24">
           <RequestFilters
             filters={filters}
